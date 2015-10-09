@@ -1,0 +1,155 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class DirectivaAcceso implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long iddirectivaacceso;
+	private String nombre;
+	private Integer numintentosbloqueo;
+	private Integer tiempomaximobloqueo;
+	private Integer validarcaptchaenlogin;
+	private Integer validarcaptchenintentosfallidos;
+	private Integer verdirectivaaccesologin;
+
+	private Integer verintentosfallidos;
+	private Integer verbloqueotiempotrascurrido;
+
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	private List<AplicacionBean> aplicaciones;
+
+	public Integer getValidarcaptchenintentosfallidos() {
+		return validarcaptchenintentosfallidos;
+	}
+
+	public void setValidarcaptchenintentosfallidos(Integer validarcaptchenintentosfallidos) {
+		this.validarcaptchenintentosfallidos = validarcaptchenintentosfallidos;
+	}
+
+	public Long getIddirectivaacceso() {
+		return iddirectivaacceso;
+	}
+
+	public void setIddirectivaacceso(Long iddirectivaacceso) {
+		this.iddirectivaacceso = iddirectivaacceso;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public Integer getNumintentosbloqueo() {
+		return numintentosbloqueo;
+	}
+
+	public void setNumintentosbloqueo(Integer numintentosbloqueo) {
+		this.numintentosbloqueo = numintentosbloqueo;
+	}
+
+	public Integer getTiempomaximobloqueo() {
+		return tiempomaximobloqueo;
+	}
+
+	public void setTiempomaximobloqueo(Integer tiempomaximobloqueo) {
+		this.tiempomaximobloqueo = tiempomaximobloqueo;
+	}
+
+	public Integer getValidarcaptchaenlogin() {
+		return validarcaptchaenlogin;
+	}
+
+	public void setValidarcaptchaenlogin(Integer validarcaptchaenlogin) {
+		this.validarcaptchaenlogin = validarcaptchaenlogin;
+	}
+
+	public Integer getVerdirectivaaccesologin() {
+		return verdirectivaaccesologin;
+	}
+
+	public void setVerdirectivaaccesologin(Integer verdirectivaaccesologin) {
+		this.verdirectivaaccesologin = verdirectivaaccesologin;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public List<AplicacionBean> getAplicaciones() {
+		return aplicaciones;
+	}
+
+	public void setAplicaciones(List<AplicacionBean> aplicaciones) {
+		this.aplicaciones = aplicaciones;
+	}
+
+	public Integer getVerintentosfallidos() {
+		return verintentosfallidos;
+	}
+
+	public void setVerintentosfallidos(Integer verintentosfallidos) {
+		this.verintentosfallidos = verintentosfallidos;
+	}
+
+	public Integer getVerbloqueotiempotrascurrido() {
+		return verbloqueotiempotrascurrido;
+	}
+
+	public void setVerbloqueotiempotrascurrido(Integer verbloqueotiempotrascurrido) {
+		this.verbloqueotiempotrascurrido = verbloqueotiempotrascurrido;
+	}
+
+}

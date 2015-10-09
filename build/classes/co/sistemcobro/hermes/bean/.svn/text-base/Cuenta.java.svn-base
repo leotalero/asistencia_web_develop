@@ -1,0 +1,47 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class Cuenta implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Integer idcuenta;
+	private String nombre;
+	private Integer estado;
+
+	public Integer getIdcuenta() {
+		return idcuenta;
+	}
+
+	public void setIdcuenta(Integer idcuenta) {
+		this.idcuenta = idcuenta;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	@Override
+	public String toString() {
+		return "Cuenta [idcuenta=" + idcuenta + ", nombre=" + nombre
+				+ ", estado=" + estado + "]";
+	}
+
+}

@@ -1,0 +1,876 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.Area;
+import co.sistemcobro.rrhh.bean.Cargo;
+import co.sistemcobro.rrhh.bean.CargoAreaAsignada;
+import co.sistemcobro.rrhh.bean.Contrato;
+import co.sistemcobro.rrhh.bean.ContratoTipo;
+import co.sistemcobro.rrhh.bean.EmpleadoSalario;
+import co.sistemcobro.rrhh.bean.Empresa;
+import co.sistemcobro.rrhh.bean.EmpresaSucursal;
+import co.sistemcobro.rrhh.bean.ReporteEmpleado;
+import co.sistemcobro.rrhh.bean.ReporteInformacionAdicionalEmpleado;
+import co.sistemcobro.rrhh.bean.ReporteProcesoDisciplinario;
+import co.sistemcobro.rrhh.bean.RetiroMotivo;
+import co.sistemcobro.rrhh.bean.Sucursal;
+import co.sistemcobro.rrhh.bean.TipoMoneda;
+import co.sistemcobro.rrhh.bean.EmpleadoBean;
+import co.sistemcobro.rrhh.dao.ContratoDAO;
+
+/**
+ * 
+ * @author Leonardo talero.
+ * 
+ */
+@Stateless
+public class ContratoEJB extends BaseEJB {
+
+	private Logger logger = Logger.getLogger(ContratoEJB.class);
+
+	public ContratoEJB() {
+	}
+	
+	
+	
+	public List<Contrato> getContratosporIdEmpleado(Long idempleado) throws DatoException, LogicaException {
+		
+		List<Contrato> contrato;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			contrato=contratoDAO.getContratosporIdEmpleado(idempleado);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contrato;	
+	}
+		
+	public Contrato getUltimoContratosporIdEmpleado(Long idempleado) throws DatoException, LogicaException {
+	Contrato contrato;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			contrato=contratoDAO.getUltimoContratosporIdEmpleado(idempleado);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contrato;
+	}
+	public  List<ReporteEmpleado> getcontratoultimoempleadoporoEmpleados(List<EmpleadoBean> empleados) throws DatoException, LogicaException {
+		List<ReporteEmpleado> reporteempleados=new ArrayList<ReporteEmpleado>();
+			try {
+				ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+				reporteempleados=contratoDAO.getcontratoultimoempleadoporoEmpleados(empleados);
+				
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return reporteempleados;
+	}
+	
+	/**
+	 * Este método obtiene el listado de bancos (TODOS LOS BANCOS) que tienen los empleados.
+	 * @param List. La lista de EmpleadoBean.
+	 * @return List.
+	 * */
+	public  List<ReporteInformacionAdicionalEmpleado> obtenerBancosDeEmpleados(List<EmpleadoBean> empleados) throws DatoException, LogicaException {
+		
+		List<ReporteInformacionAdicionalEmpleado> reporteInfoAdicional = new ArrayList<ReporteInformacionAdicionalEmpleado>();
+		
+			try {
+				ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+				reporteInfoAdicional = contratoDAO.obtenerTodosLosBancosDeEmpleados(empleados);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return reporteInfoAdicional;
+	}
+	
+	/**
+	 * Este método obtiene el listado de las afiliaciones (TODAS) que tienen los empleados.
+	 * @param List. La lista de ReporteInformacionAdicionalEmpleado.
+	 * @return List.
+	 * */
+	public  List<ReporteInformacionAdicionalEmpleado> obtenerTodasLasAfiliacionesDeEmpelados(List<EmpleadoBean> empleados) throws DatoException, LogicaException {
+		
+		List<ReporteInformacionAdicionalEmpleado> reporteInfoAdicional = new ArrayList<ReporteInformacionAdicionalEmpleado>();
+		
+			try {
+				ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+				reporteInfoAdicional = contratoDAO.obtenerTodosLasAfiliacionesDeEmpleados(empleados);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return reporteInfoAdicional;
+	}
+	
+	/**
+	 * Este método obtiene el listado de educacion (TODAS) que tienen los empleados.
+	 * @param List. La lista de ReporteInformacionAdicionalEmpleado.
+	 * @return List.
+	 * */
+	public  List<ReporteInformacionAdicionalEmpleado> obtenerEducacionDeEmpleados(List<EmpleadoBean> empleados) throws DatoException, LogicaException {
+		
+		List<ReporteInformacionAdicionalEmpleado> reporteInfoAdicional = new ArrayList<ReporteInformacionAdicionalEmpleado>();
+		
+			try {
+				ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+				reporteInfoAdicional = contratoDAO.obtenerEducacionDeEmpleados(empleados);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return reporteInfoAdicional;
+	}
+	
+	/**
+	 * Este método obtiene el listado de familia (TODA) que tienen los empleados.
+	 * @param List. La lista de ReporteInformacionAdicionalEmpleado.
+	 * @return List.
+	 * */
+	public  List<ReporteInformacionAdicionalEmpleado> obtenerFamiliaDeEmpleados(List<EmpleadoBean> empleados) throws DatoException, LogicaException {
+		
+		List<ReporteInformacionAdicionalEmpleado> reporteInfoAdicional = new ArrayList<ReporteInformacionAdicionalEmpleado>();
+		
+			try {
+				ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+				reporteInfoAdicional = contratoDAO.obtenerFamiliaDeEmpleados(empleados);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return reporteInfoAdicional;
+	}
+	
+	/**
+	 * Este método obtiene el listado de Documento que tienen los empleados.
+	 * @param List. La lista de ReporteInformacionAdicionalEmpleado.
+	 * @return List.
+	 * */
+	public  List<ReporteInformacionAdicionalEmpleado> obtenerDocumentosDeEmpleados(List<EmpleadoBean> empleados) throws DatoException, LogicaException {
+		
+		List<ReporteInformacionAdicionalEmpleado> reporteInfoAdicional = new ArrayList<ReporteInformacionAdicionalEmpleado>();
+		
+			try {
+				ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+				reporteInfoAdicional = contratoDAO.obtenerDocumentosDeEmpleados(empleados);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return reporteInfoAdicional;
+	}
+	
+	/**
+	 * Este método obtiene el listado de propiedaes que tienen los empleados.
+	 * @param List. La lista de ReporteInformacionAdicionalEmpleado.
+	 * @return List.
+	 * */
+	public  List<ReporteInformacionAdicionalEmpleado> obtenerPropiedadesDeEmpleados(List<EmpleadoBean> empleados) throws DatoException, LogicaException {
+		
+		List<ReporteInformacionAdicionalEmpleado> reporteInfoAdicional = new ArrayList<ReporteInformacionAdicionalEmpleado>();
+		
+			try {
+				ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+				reporteInfoAdicional = contratoDAO.obtenerPropiedadesDeEmpleados(empleados);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return reporteInfoAdicional;
+	}
+	
+	
+	
+	/**
+	 *  Este método setea a cada empleado el ultimo banco con el campo vigentedesde mas reciente.
+	 *  @param List. La lista de tipo ReporteEmpleado. para setear los datos.
+	 *  @return List. La lista de tipo ReporteEmpleado con los datos seteados.
+	 *  @author jpuentes
+	 */
+	public List<ReporteEmpleado> getUltimoBancoPorEmpleado(List<ReporteEmpleado> listaReporteEmpleados) throws DatoException, LogicaException{
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaReporteEmpleados = contratoDAO.getUltimoBancoPorEmpleado(listaReporteEmpleados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		
+		return listaReporteEmpleados;
+	}
+	
+	
+	/**
+	 *  Este método setea a cada empleado la ultima afiliacion a salud mas reciente.
+	 *  @param List. La lista de tipo ReporteEmpleado. para setear los datos.
+	 *  @return List. La lista de tipo ReporteEmpleado con los datos seteados.
+	 *  @author jpuentes
+	 */
+	public List<ReporteEmpleado> getUltimaAfiliacionEps(List<ReporteEmpleado> listaReporteEmpleados) throws DatoException, LogicaException{
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaReporteEmpleados = contratoDAO.getUltimaAfiliacionEps(listaReporteEmpleados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		
+		return listaReporteEmpleados;
+	}
+	
+	/**
+	 *  Este método setea a cada empleado la ultima afiliacion a PENSION mas reciente.
+	 *  @param List. La lista de tipo ReporteEmpleado. para setear los datos.
+	 *  @return List. La lista de tipo ReporteEmpleado con los datos seteados.
+	 *  @author jpuentes
+	 */
+	public List<ReporteEmpleado> getUltimaAfiliacionPension(List<ReporteEmpleado> listaReporteEmpleados) throws DatoException, LogicaException{
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaReporteEmpleados = contratoDAO.getUltimaAfiliacionPension(listaReporteEmpleados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		
+		return listaReporteEmpleados;
+	}
+	
+	/**
+	 *  Este método setea a cada empleado la ultima afiliacion a cesantias mas reciente.
+	 *  @param List. La lista de tipo ReporteEmpleado. para setear los datos.
+	 *  @return List. La lista de tipo ReporteEmpleado con los datos seteados.
+	 *  @author jpuentes
+	 */
+	public List<ReporteEmpleado> getUltimaAfiliacionCesantias(List<ReporteEmpleado> listaReporteEmpleados) throws DatoException, LogicaException{
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaReporteEmpleados = contratoDAO.getUltimaAfiliacionCesantias(listaReporteEmpleados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		
+		return listaReporteEmpleados;
+	}
+
+	/**
+	 *  Este método setea a cada empleado la ultima afiliacion a caja de compensación mas reciente.
+	 *  @param List. La lista de tipo ReporteEmpleado. para setear los datos.
+	 *  @return List. La lista de tipo ReporteEmpleado con los datos seteados.
+	 *  @author jpuentes
+	 */
+	public List<ReporteEmpleado> getUltimaAfiliacionCajaDeCompensacion(List<ReporteEmpleado> listaReporteEmpleados) throws DatoException, LogicaException{
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaReporteEmpleados = contratoDAO.getUltimaAfiliacionCajaDeCompensacion(listaReporteEmpleados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		
+		return listaReporteEmpleados;
+	}
+	
+	
+	/**
+	 *  Este método setea a cada empleado el máximo nivel educativo alcanzado por el empleado.
+	 *  @param List. La lista de tipo ReporteEmpleado. para setear los datos.
+	 *  @return List. La lista de tipo ReporteEmpleado con los datos seteados.
+	 *  @author jpuentes
+	 */
+	public List<ReporteEmpleado> getMaximoNivelEducacionAlcanzado(List<ReporteEmpleado> listaReporteEmpleados) throws DatoException, LogicaException{
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaReporteEmpleados = contratoDAO.getMaximoNivelEducacionAlcanzado(listaReporteEmpleados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaReporteEmpleados;
+	}
+	
+    /**
+     * Este método setea a cada empleado la informacion del salario que posee el contrato.
+	 *  @param List. La lista de tipo ReporteEmpleado. para setear los datos.
+	 *  @return List. La lista de tipo ReporteEmpleado con los datos seteados.
+	 *  @author jpuentes
+     */
+	public List<ReporteEmpleado> getSalariosDeContratos(List<ReporteEmpleado> listaReporteEmpleados) throws DatoException, LogicaException{
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaReporteEmpleados = contratoDAO.getSalariosDeContratos(listaReporteEmpleados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaReporteEmpleados;
+	}
+	public  List<ReporteEmpleado> getcontratosempleadoporoEmpleados(List<EmpleadoBean> empleados) throws DatoException, LogicaException {
+		List<ReporteEmpleado> reporteempleados=new ArrayList<ReporteEmpleado>();
+			try {
+				ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+				reporteempleados=contratoDAO.getcontratosempleadoporoEmpleados(empleados);
+				
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return reporteempleados;
+		}
+
+	public List<Empresa> getEmpresas() throws DatoException, LogicaException {
+		List<Empresa> empresas = new ArrayList<Empresa>();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			empresas = contratoDAO.getEmpresas();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return empresas;
+		
+	}
+	public List<Empresa> getEmpresasporId(Long idempresa) throws DatoException, LogicaException {
+		List<Empresa> empresas = new ArrayList<Empresa>();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			empresas = contratoDAO.getEmpresasporId(idempresa);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return empresas;	
+	}
+	
+	public List<Sucursal> getSucursalesporEmpresa(Long idempresa) throws DatoException, LogicaException {
+		List<EmpresaSucursal> empresassucursales = new ArrayList<EmpresaSucursal>();
+		List<Sucursal> sucursales = new ArrayList<Sucursal>();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			empresassucursales = contratoDAO.getSucursalesporEmpresa(idempresa);
+			sucursales=contratoDAO.getSucursalesporEmpresasucursal(empresassucursales);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return sucursales;
+		
+	}
+	public Sucursal getSucursalesporid(Long idsucursal) throws DatoException, LogicaException {
+		//List<EmpresaSucursal> empresassucursales = new ArrayList<EmpresaSucursal>();
+		Sucursal sucursal = new Sucursal();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			//empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+			sucursal=contratoDAO.getSucursalesporId(idsucursal);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return sucursal;
+	}
+
+	public List<Area> getAreas() throws DatoException, LogicaException {
+		List<Area> areas = new ArrayList<Area>();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			areas = contratoDAO.getAreas();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return areas;
+		
+	}
+	
+	public List<Cargo> getCargos() throws DatoException, LogicaException {
+		List<Cargo> cargos = new ArrayList<Cargo>();
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			cargos = contratoDAO.getCargos();
+			
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return cargos;
+	}
+	public List<Cargo> getCargosporArea(Long idarea) throws DatoException, LogicaException {
+		List<Cargo> cargos = new ArrayList<Cargo>();
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			cargos = contratoDAO.getCargosporArea(idarea);
+			
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return cargos;
+		
+	}
+public Contrato getContratosporId(Long idcontrato) throws DatoException, LogicaException {
+		
+		Contrato contrato;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			contrato=contratoDAO.getContratobyId(idcontrato);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contrato;	
+	}
+	
+	public List<RetiroMotivo> getMotivos() throws DatoException, LogicaException {
+		
+		List<RetiroMotivo> contratos=new ArrayList<RetiroMotivo>();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			contratos=contratoDAO.getMotivos();
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contratos;		
+	}
+	
+	public RetiroMotivo  getMotivosporId(Long idmotivo) throws DatoException, LogicaException {
+		
+		RetiroMotivo contratos=new RetiroMotivo();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			contratos=contratoDAO.getMotivosporId(idmotivo);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contratos;		
+	}
+	
+	
+	public Contrato insertarContrato(Contrato contrato) throws DatoException, LogicaException {
+		
+		Contrato resultado=null;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			 resultado = contratoDAO.insertarContrato(contrato);
+				
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+	
+	
+	public Integer actualizaContrato(Contrato contrato) throws DatoException, LogicaException {
+		Integer resultado=null;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			 resultado = contratoDAO.actualizaContrato(contrato);
+				
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+	
+	/*
+	 
+	
+	 
+	 * */
+
+	public Integer deshabilitarEstadoContrato(Contrato contrato) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			contrato.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resu=contratoDAO.actualizarEstadoContrato(contrato);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	public Integer habilitarEstadoContrato(Contrato contrato) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			contrato.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=contratoDAO.actualizarEstadoContrato(contrato);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	
+	public List<CargoAreaAsignada> getCargoAreasAsignadas(Long idcargo,Long idareaasignada) throws DatoException, LogicaException {
+		List<CargoAreaAsignada> resu =new ArrayList<CargoAreaAsignada>();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			
+			resu=contratoDAO.getCargoAreasAsignadas(idcargo,idareaasignada);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	public List<CargoAreaAsignada> getCargoAreasAsignadasporId(Long idcargo,Long idareaasignada,Long idareamostrar) throws DatoException, LogicaException {
+		List<CargoAreaAsignada> resu =new ArrayList<CargoAreaAsignada>();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			
+			resu=contratoDAO.getCargoAreasAsignadasporId(idcargo,idareaasignada,idareamostrar);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	public List<CargoAreaAsignada> getCargoAreasAsignadaslistados(List<String> cargos,List<String> areas) throws DatoException, LogicaException {
+		
+		List<CargoAreaAsignada> resu =new ArrayList<CargoAreaAsignada>();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			
+			resu=contratoDAO.getCargoAreasAsignadaslistados(cargos,areas);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	
+	public List<Area> getAreasporId(Long idarea) throws DatoException, LogicaException {
+		List<Area> resu =new ArrayList<Area>();
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			
+			resu=contratoDAO.getAreasporId(idarea);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	
+	public Integer deshabilitarEstadoArea(CargoAreaAsignada cargoarea) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			cargoarea.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resu=contratoDAO.actualizarEstadoAreaAsociada(cargoarea);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	
+	public Integer habilitarEstadoArea(CargoAreaAsignada cargoarea) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			cargoarea.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=contratoDAO.actualizarEstadoAreaAsociada(cargoarea);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	
+	public Integer insertarCargosAreasaMostrar(List<CargoAreaAsignada> cargosareas) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			
+			resu=contratoDAO.insertarCargosAreasaMostrar(cargosareas);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	
+    /**
+     * Obtener los tipos de contratos existentes.
+     * @return List. La lista de ContratoTipo.  
+     */
+	public List<ContratoTipo> obtenerTiposDeContrato() throws DatoException, LogicaException {
+		List<ContratoTipo> listaTiposContrato = null;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaTiposContrato = contratoDAO.obtenerTiposContrato();
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaTiposContrato;
+	}
+	
+	
+	/**
+	 * Obtener los tipos de moneda.
+	 * @return List. La lista de TipoMoneda.
+	 */
+	public List<TipoMoneda> obtenerTiposDeMoneda() throws DatoException, LogicaException {
+		List<TipoMoneda> listaTiposMoneda = null;
+		try {
+			logger.info("va a obtener los tipos de moneda.");
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaTiposMoneda = contratoDAO.obtenerTiposMoneda();
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaTiposMoneda;
+	}
+	
+	
+	/**
+     * Insertar la relación EmpleadoSalario.
+     * @param EmpleadoSalario. la relación a insertar.
+     * @return EmpleadoSalario. La relación insertada.
+     */
+	public EmpleadoSalario insertarEmpleadoSalario(EmpleadoSalario empladoSalario) throws DatoException, LogicaException {
+		EmpleadoSalario resultado = null;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			resultado = contratoDAO.insertarEmpleadoSalario(empladoSalario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+	
+	
+
+	/**
+     * Obtener la relación EmpleadoSalario por id de contrato
+     * @param Long. idcontrato.
+     * @return EmpleadoSalario. La relación.
+     */
+	public EmpleadoSalario obtenerEmpleadoSalarioPorIdContrato(Long idContrato) throws DatoException, LogicaException {
+		EmpleadoSalario resultado = null;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			resultado = contratoDAO.obtenerEmpleadoSalarioPorId(idContrato);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+	
+	
+    /**
+     * Actualizar la información de salario de un contrato.
+     */
+	public Integer actualizarEmpleadoSalario(EmpleadoSalario empleadoSalario) throws DatoException, LogicaException {
+		Integer resultado = 0;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			resultado = contratoDAO.actualizarEmpleadoSalario(empleadoSalario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+	
+	
+
+	/**
+	 * Obtener la lista de empleado salarios.
+	 */
+	public List<EmpleadoSalario> obtenerEmpleadoSalario() throws DatoException, LogicaException {
+		List<EmpleadoSalario> listaEmpleadoSalario = null;
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			listaEmpleadoSalario = contratoDAO.obtenerEmpleadoSalario();
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaEmpleadoSalario;
+	}
+	
+	
+	/**
+	 * Obtener todas las faltas de los contratos.
+	 */
+	public List<ReporteProcesoDisciplinario> obtenerTodasLasFaltasDelContrato(List<ReporteEmpleado> reporteEmpleados) throws DatoException, LogicaException {
+		List<ReporteProcesoDisciplinario> reporteProcesoDisciplinario = null;
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			reporteProcesoDisciplinario = contratoDAO.obtenerTodasLasFaltasDeContratos(reporteEmpleados);
+			for(ReporteProcesoDisciplinario reporte : reporteProcesoDisciplinario){
+				reporte.setUltimoContrato(contratoDAO.getUltimoContratosporIdEmpleado(reporte.getEmpleado().getIdempleado()));
+			}
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return reporteProcesoDisciplinario;
+	}
+	
+
+	/**
+	 * Obtener ocurrencia de las faltas de los contratos.
+	 */
+	public List<ReporteProcesoDisciplinario> obtenerOcurrenciaDeFaltasPorContrato(List<ReporteEmpleado> reporteEmpleados) throws DatoException, LogicaException {
+		List<ReporteProcesoDisciplinario> reporteProcesoDisciplinario = null;
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			reporteProcesoDisciplinario = contratoDAO.obtenerOcurrenciaDeFaltasDeContratos(reporteEmpleados);
+			for(ReporteProcesoDisciplinario reporte : reporteProcesoDisciplinario){
+				reporte.setUltimoContrato(contratoDAO.getUltimoContratosporIdEmpleado(reporte.getEmpleado().getIdempleado()));
+			}
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return reporteProcesoDisciplinario;
+	}
+	
+
+	/**
+	 * Obtener historial de los procesos disciplinarios.
+	 */
+	public List<ReporteProcesoDisciplinario> obtenerHistorialDeProcesosDisciplinarios(List<ReporteEmpleado> reporteEmpleados) throws DatoException, LogicaException {
+		List<ReporteProcesoDisciplinario> reporteProcesoDisciplinario = null;
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			reporteProcesoDisciplinario = contratoDAO.obtenerHistorialDeProcesosDisciplinarios(reporteEmpleados);
+			for(ReporteProcesoDisciplinario reporte : reporteProcesoDisciplinario){
+				reporte.setUltimoContrato(contratoDAO.getUltimoContratosporIdEmpleado(reporte.getEmpleado().getIdempleado()));
+			}
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return reporteProcesoDisciplinario;
+	}
+	
+
+	/**
+	 * Obtener archivos de revisión de los procesos disciplinarios.
+	 */
+	public List<ReporteProcesoDisciplinario> obtenerArchivosDeRevision(List<ReporteEmpleado> reporteEmpleados) throws DatoException, LogicaException {
+		List<ReporteProcesoDisciplinario> reporteProcesoDisciplinario = null;
+		
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dc_rrhh);
+			reporteProcesoDisciplinario = contratoDAO.obtenerArchivosDeRevision(reporteEmpleados);
+			for(ReporteProcesoDisciplinario reporte : reporteProcesoDisciplinario){
+				reporte.setUltimoContrato(contratoDAO.getUltimoContratosporIdEmpleado(reporte.getEmpleado().getIdempleado()));
+			}
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return reporteProcesoDisciplinario;
+	}
+	
+}

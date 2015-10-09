@@ -1,0 +1,130 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class UsuarioCuenta implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Integer idusuario;
+	private Integer idcuenta;
+	private String dato;
+
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	private Cuenta cuenta;
+	private UsuarioBean usuario;
+	private Estado estadob;
+
+	public UsuarioCuenta() {
+	}
+
+	public Integer getIdusuario() {
+		return idusuario;
+	}
+
+	public void setIdusuario(Integer idusuario) {
+		this.idusuario = idusuario;
+	}
+
+	public Integer getIdcuenta() {
+		return idcuenta;
+	}
+
+	public void setIdcuenta(Integer idcuenta) {
+		this.idcuenta = idcuenta;
+	}
+
+	public String getDato() {
+		return dato;
+	}
+
+	public void setDato(String dato) {
+		this.dato = dato;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public Cuenta getCuenta() {
+		return cuenta;
+	}
+
+	public void setCuenta(Cuenta cuenta) {
+		this.cuenta = cuenta;
+	}
+
+	public UsuarioBean getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(UsuarioBean usuario) {
+		this.usuario = usuario;
+	}
+
+	public Estado getEstadob() {
+		return estadob;
+	}
+
+	public void setEstadob(Estado estadob) {
+		this.estadob = estadob;
+	}
+
+	@Override
+	public String toString() {
+		return "UsuarioCuenta [idusuario=" + idusuario + ", idcuenta="
+				+ idcuenta + ", dato=" + dato + ", idusuariocrea="
+				+ idusuariocrea + ", fechacrea=" + fechacrea
+				+ ", idusuariomod=" + idusuariomod + ", fechamod=" + fechamod
+				+ ", estado=" + estado + ", cuenta=" + cuenta + ", usuario="
+				+ usuario + "]";
+	}
+
+}

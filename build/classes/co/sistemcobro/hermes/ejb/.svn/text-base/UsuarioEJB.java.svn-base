@@ -1,0 +1,1063 @@
+package co.sistemcobro.hermes.ejb;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.DirectivaContrasenaException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.hermes.bean.AccesoHistorial;
+import co.sistemcobro.hermes.bean.AplicacionBean;
+import co.sistemcobro.hermes.bean.ContrasenaHistorial;
+import co.sistemcobro.hermes.bean.Cuenta;
+import co.sistemcobro.hermes.bean.DirectivaAcceso;
+import co.sistemcobro.hermes.bean.DirectivaContrasena;
+import co.sistemcobro.hermes.bean.DirectivaRed;
+import co.sistemcobro.hermes.bean.GrupoBean;
+import co.sistemcobro.hermes.bean.IdentificacionTipo;
+import co.sistemcobro.hermes.bean.PreguntasSeguraBean;
+import co.sistemcobro.hermes.bean.Red;
+import co.sistemcobro.hermes.bean.Sucursal;
+import co.sistemcobro.hermes.bean.UsuarioAplicacionBean;
+import co.sistemcobro.hermes.bean.UsuarioBean;
+import co.sistemcobro.hermes.bean.UsuarioCuenta;
+import co.sistemcobro.hermes.bean.UsuarioIni;
+import co.sistemcobro.hermes.bean.UsuarioPreguntaSeguraBean;
+import co.sistemcobro.hermes.constante.AplicacionEnum;
+import co.sistemcobro.hermes.constante.UsuarioTipoBusquedaEnum;
+import co.sistemcobro.hermes.dao.AccesoHistorialDAO;
+import co.sistemcobro.hermes.dao.AplicacionDAO;
+import co.sistemcobro.hermes.dao.ConstrasenaHistorialDAO;
+import co.sistemcobro.hermes.dao.CuentaDAO;
+import co.sistemcobro.hermes.dao.DirectivaAccesoDAO;
+import co.sistemcobro.hermes.dao.DirectivaContrasenaDAO;
+import co.sistemcobro.hermes.dao.DirectivaRedDAO;
+import co.sistemcobro.hermes.dao.GrupoDAO;
+import co.sistemcobro.hermes.dao.SucursalDAO;
+import co.sistemcobro.hermes.dao.UsuarioAplicacionDAO;
+import co.sistemcobro.hermes.dao.UsuarioCuentaDAO;
+import co.sistemcobro.hermes.dao.UsuarioDAO;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+@Stateless
+public class UsuarioEJB extends BaseEJB {
+
+	private Logger logger = Logger.getLogger(UsuarioEJB.class);
+
+	public UsuarioEJB() {
+	}
+	
+	public List<UsuarioCuenta> getUsuariosPorCuenta(Integer idcuenta, String[] estados) throws LogicaException {
+		try {
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (String e : estados) {
+					estados_final += e + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			return usuarioDAO.getUsuariosPorCuenta(idcuenta, estados_final);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+	
+	public ContrasenaHistorial getContrasenaHistorialUltimoPorIdsusuario(Integer idusuario) throws LogicaException {
+		try {
+			ConstrasenaHistorialDAO constrasenahistorialDAO = new ConstrasenaHistorialDAO(dc_hermes);
+			return constrasenahistorialDAO.getContrasenaHistorialUltimoPorIdsusuario(idusuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+	
+	public List<AccesoHistorial> getAccesoHistorialUltimosPorIdsusuarioYTipo(Integer idusuario, Integer idaccesotipo, Integer ultimosdias) throws LogicaException {
+		try {
+			AccesoHistorialDAO accesoHistorialDAO = new AccesoHistorialDAO(dc_hermes);
+			return accesoHistorialDAO.getAccesoHistorialUltimosPorIdsusuarioYTipo(idusuario, idaccesotipo, ultimosdias);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public List<AccesoHistorial> getAccesoHistorialUltimosPorIdsusuarioTipoYBase(Integer idusuario, Integer idaccesotipo, Integer idaccesotipobase) throws LogicaException {
+		try {
+			AccesoHistorialDAO accesoHistorialDAO = new AccesoHistorialDAO(dc_hermes);
+			return accesoHistorialDAO.getAccesoHistorialUltimosPorIdsusuarioTipoYBase(idusuario, idaccesotipo, idaccesotipobase);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public AccesoHistorial getAccesoHistorialUltimosPorId(Long idaccesohistorial) throws DatoException, LogicaException {
+		try {
+			AccesoHistorialDAO accesoHistorialDAO = new AccesoHistorialDAO(dc_hermes);
+			return accesoHistorialDAO.getAccesoHistorialUltimosPorId(idaccesohistorial);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+		
+		
+	public UsuarioBean getUsuarioPorUsuario(String usuario) throws LogicaException {
+		try {
+			UsuarioDAO usuarioDAOc = new UsuarioDAO(dc_hermes);
+			return usuarioDAOc.getUsuarioPorUsuario(usuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Integer insertaAccesoHistorial(AccesoHistorial accesohistorial) throws LogicaException {
+		Integer resultado = 0;
+		try {
+			AccesoHistorialDAO accesoHistorialDAO = new AccesoHistorialDAO(dg_hermes);
+			resultado = accesoHistorialDAO.insertarAccesoHistorial(accesohistorial);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+
+	public Integer actualizarAccesoHistorial(AccesoHistorial accesohistorial) throws LogicaException {
+		Integer resultado = 0;
+		try {
+			AccesoHistorialDAO accesoHistorialDAO = new AccesoHistorialDAO(dg_hermes);
+			resultado = accesoHistorialDAO.actualizarAccesoHistorial(accesohistorial);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+
+	
+	public Integer actualizarAccesoHistoriallistado(List<AccesoHistorial> accesohistorial) throws LogicaException {
+		Integer resultado = 0;
+		try {
+			AccesoHistorialDAO accesoHistorialDAO = new AccesoHistorialDAO(dg_hermes);
+			resultado = accesoHistorialDAO.actualizarAccesoHistoriallistado(accesohistorial);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+	
+	
+	public List<DirectivaAcceso> getDirectivaAccesos(Integer[] estados) throws LogicaException {
+		try {
+			DirectivaAccesoDAO directivaaccesoDAO = new DirectivaAccesoDAO(dc_hermes);
+			return directivaaccesoDAO.getDirectivaAccesos(estados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public DirectivaAcceso getDirectivaAccesoPorIdaplicacion(Integer idaplicacion) throws LogicaException {
+		try {
+			DirectivaAccesoDAO directivaaccesoDAO = new DirectivaAccesoDAO(dc_hermes);
+			return directivaaccesoDAO.getDirectivaAccesoAccesoPorIdaplicacion(idaplicacion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Cuenta getCuentaPorIdcuenta(Integer idcuenta) throws LogicaException {
+		try {
+			CuentaDAO cuentaDAO = new CuentaDAO(dc_hermes);
+			return cuentaDAO.getCuentaPorIdcuenta(idcuenta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public List<ContrasenaHistorial> getContrasenasHistialPorIdsusuario(Integer idusuario) throws LogicaException {
+		try {
+			ConstrasenaHistorialDAO constrasenahistorialDAO = new ConstrasenaHistorialDAO(dc_hermes);
+			return constrasenahistorialDAO.getContrasenasHistorialPorIdsusuario(idusuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Boolean validarContrasenaBasadaEnLaDirectiva(final Integer idusuario, final String contrasena) throws LogicaException, DirectivaContrasenaException {
+		Boolean valido = false;
+		try {
+			DirectivaContrasenaDAO directivaContrasenaDAO = new DirectivaContrasenaDAO(dc_hermes);
+			DirectivaContrasena directivacontrasena = directivaContrasenaDAO.getDirectivaContrasenaPorIdusuario(idusuario);
+
+			if (null == contrasena) {
+				throw new DirectivaContrasenaException("Contraseña no puede ser NULO.");
+			}
+
+			if (directivacontrasena.getHistorialmaximo() > 0) {
+				ConstrasenaHistorialDAO constrasenaHistorialDAO = new ConstrasenaHistorialDAO(dc_hermes);
+				List<ContrasenaHistorial> contrasenashistorial = constrasenaHistorialDAO.getContrasenasQueConincidePorIdsusuario(idusuario, contrasena, directivacontrasena.getHistorialmaximo());
+				if (contrasenashistorial.size() > 0) {
+					throw new DirectivaContrasenaException("No debe de coincidir con ninguna de sus " + directivacontrasena.getHistorialmaximo() + " últimas contraseñas.");
+				}
+			}
+
+			if (directivacontrasena.getValidolongitudminima() > 0) {
+				if (contrasena.length() < directivacontrasena.getValidolongitudminima()) {
+					throw new DirectivaContrasenaException("Debe tener mínimo " + directivacontrasena.getValidolongitudminima() + " caracteres.");
+				}
+			}
+
+			if (directivacontrasena.getValidolongitudmaxima() > 0) {
+				if (contrasena.length() > directivacontrasena.getValidolongitudmaxima()) {
+					throw new DirectivaContrasenaException("Debe tener máximo " + directivacontrasena.getValidolongitudmaxima() + " caracteres.");
+				}
+			}
+
+			if (directivacontrasena.getValidonumerocantidad() > 0) {
+				if (Util.contarCaracteresNumero(contrasena) < directivacontrasena.getValidonumerocantidad()) {
+					throw new DirectivaContrasenaException("Por lo menos debe contar con " + directivacontrasena.getValidonumerocantidad() + " número(s).");
+				}
+			}
+
+			if (directivacontrasena.getValidomayusculacantidad() > 0) {
+				if (Util.contarCaracteresAlfabeticosMayuscula(contrasena) < directivacontrasena.getValidomayusculacantidad()) {
+					throw new DirectivaContrasenaException("Por lo menos debe contar con " + directivacontrasena.getValidomayusculacantidad() + " mayúscula(s).");
+				}
+			}
+
+			if (directivacontrasena.getValidominusculacantidad() > 0) {
+				if (Util.contarCaracteresAlfabeticosMinuscula(contrasena) < directivacontrasena.getValidominusculacantidad()) {
+					throw new DirectivaContrasenaException("Por lo menos debe contar con " + directivacontrasena.getValidominusculacantidad() + " minúscula(s).");
+				}
+			}
+
+			if (directivacontrasena.getValidoespecialcantidad() > 0) {
+				if (Util.contarCaracteresEspeciales(contrasena) < directivacontrasena.getValidoespecialcantidad()) {
+					throw new DirectivaContrasenaException("Por lo menos debe contar con " + directivacontrasena.getValidoespecialcantidad() + " carácter(es) especial(es).");
+				}
+			}
+			valido = true;
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return valido;
+	}
+
+	public UsuarioBean tieneAccesoAplicacionConInit(Integer idusuario, AplicacionEnum aplicacion) throws LogicaException {
+		UsuarioBean usuario = null;
+		try {
+			usuario = tieneAccesoAplicacion(idusuario, aplicacion);
+			if (null != usuario) {
+				/* Si el usuario existe se carga los datos de inicio de sesión */
+				UsuarioIni usuarioini = new UsuarioIni();
+				usuarioini.setDiasrestacambiarcontrasena(getDiasRestaCambiarContrasena(usuario));
+				usuario.setUsuarioini(usuarioini);
+			}
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return usuario;
+	}
+
+	public Integer getDiasRestaCambiarContrasena(UsuarioBean usuario) throws LogicaException {
+		Integer diasresta = -1;
+
+		try {
+			DirectivaContrasena directivacontrasena = getDirectivaContrasenaPorIdusuario(usuario.getIdusuario());
+			if (directivacontrasena == null) {
+				diasresta = -1;
+			} else if (directivacontrasena.getVigenciamaxima() <= 0) {
+				// Si es negativo o 0 es porque la contraseña nunca expira.
+				diasresta = -1;
+			} else {
+				// Si es mayor que cero, verificamos los días que han transcurrido desde la última vez que cambio su contraseña.
+				Integer dias = getDiasSinCambiarContrasenaPorIdusuario(usuario.getIdusuario());
+				if (dias >= 0) {
+					if (dias > directivacontrasena.getVigenciamaxima()) {
+						// Si días es mayor que la vigencia maxima de la contraseña procedemos a solicitar el cambio.
+						diasresta = 0;
+					} else {
+						// Días que restan para que expire la contraseña.
+						diasresta = directivacontrasena.getVigenciamaxima() - dias;
+					}
+				} else {
+					// Si es negativo es porque no se ha encontrado registros.
+					diasresta = -1;
+				}
+			}
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return diasresta;
+	}
+
+	public List<DirectivaContrasena> getDirectivaContrasenas(Integer[] estados) throws LogicaException {
+		try {
+			DirectivaContrasenaDAO directivacontrasenaDAO = new DirectivaContrasenaDAO(dc_hermes);
+			return directivacontrasenaDAO.getDirectivaContrasenas(estados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public DirectivaContrasena getDirectivaContrasenaPorIdusuario(Integer idusuario) throws LogicaException {
+		try {
+			DirectivaContrasenaDAO directivaContrasenaDAO = new DirectivaContrasenaDAO(dc_hermes);
+			return directivaContrasenaDAO.getDirectivaContrasenaPorIdusuario(idusuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Integer getDiasSinCambiarContrasenaPorIdusuario(Integer idusuario) throws LogicaException {
+		Integer dias = -1;
+		try {
+			ConstrasenaHistorialDAO constrasenaHistorialDAO = new ConstrasenaHistorialDAO(dc_hermes);
+			dias = constrasenaHistorialDAO.getDiasSinCambiarContrasenaPorIdusuario(idusuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return dias;
+	}
+
+	public Integer insertarUsuarioCuenta(UsuarioCuenta usuariocuenta) throws LogicaException {
+		Integer resultado = 0;
+		try {
+			UsuarioCuentaDAO usuarioCuentaDAO = new UsuarioCuentaDAO(dg_hermes);
+			resultado = usuarioCuentaDAO.insertarUsuarioCuenta(usuariocuenta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+
+	public Integer insertarUsuarioAplicacion(UsuarioAplicacionBean usuarioaplicacion) throws LogicaException {
+		Integer resultado = 0;
+		try {
+			UsuarioAplicacionDAO usuarioAplicacionDAO = new UsuarioAplicacionDAO(dg_hermes);
+			resultado = usuarioAplicacionDAO.insertarUsuarioAplicacion(usuarioaplicacion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+
+	public Integer insertarUsuario(UsuarioBean usuario) throws LogicaException {
+		Integer resultado = 0;
+		try {
+			if (validarUsuarioUnico(usuario)) {
+				UsuarioDAO usuarioDAOg = new UsuarioDAO(dg_hermes);
+				resultado = usuarioDAOg.insertarUsuario(usuario);
+				if (resultado > 0) {
+					updateContrasena(usuario.getClave(), usuario.getIdusuario(), usuario.getIdusuariocrea(), usuario.getClaveCambio());
+				}
+			}
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+
+		return resultado;
+	}
+
+	private boolean validarUsuarioUnico(UsuarioBean usuario) throws LogicaException {
+		boolean resultado = false;
+		boolean unicousuario = false;
+		boolean unicoaidentificacion = false;
+		try {
+			UsuarioDAO usuarioDAOc = new UsuarioDAO(dc_hermes);
+			UsuarioBean usuarioencontrado = usuarioDAOc.getUsuarioPorUsuario(usuario.getUsuario());
+			if (null != usuarioencontrado) {
+				if (usuario.getIdusuario() != null && usuario.getIdusuario() > 0) {
+					if (usuario.getIdusuario().equals(usuarioencontrado.getIdusuario())) {
+						unicousuario = true;
+					}
+				}
+				if (!unicousuario) {
+					throw new LogicaException("El usuario [" + usuarioencontrado.getUsuario() + "] ya se encuentra en uso, ingrese otro nombre de usuario.");
+				}
+			} else {
+				unicousuario = true;
+			}
+
+			UsuarioBean usuarioidentificacion = usuarioDAOc.getUsuarioPorIdentificacion(usuario.getNumidentificacion());
+			if (null != usuarioidentificacion) {
+				if (usuario.getIdusuario() != null && usuario.getIdusuario() > 0) {
+					if (usuario.getIdusuario().equals(usuarioidentificacion.getIdusuario())) {
+						unicoaidentificacion = true;
+					}
+				}
+				if (!unicoaidentificacion) {
+					throw new LogicaException("El usuario [" + usuarioidentificacion.getUsuario() + "] tiene el mismo num. de identificacion [" + usuarioidentificacion.getNumidentificacion() + "] que el usuario [" + usuario.getUsuario()
+							+ "]. Si se trata de la misma persona debe actualizar el usuario [" + usuarioidentificacion.getUsuario() + "]");
+				}
+			} else {
+				unicoaidentificacion = true;
+			}
+
+			if (unicousuario && unicoaidentificacion) {
+				resultado = true;
+			}
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+
+	public Integer updateContrasena(final String clave, final Integer idusuario, final Integer idusuariocrea, final Integer clavecambio) throws LogicaException {
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dg_hermes);
+			Integer estado = usuarioDAO.updateContrasena(clave, idusuario);
+			if (estado > 0) {
+				logger.info("Se actualizó constraseña [idusuario:" + idusuario + "] nuevo valor [clave:*********]");
+				/* Se inserta el historico de la contraseña */
+				ContrasenaHistorial contrasenahistorial = new ContrasenaHistorial();
+				contrasenahistorial.setIdusuario(idusuario);
+				contrasenahistorial.setClave(clave);
+				contrasenahistorial.setIdusuariocrea(idusuariocrea);
+				contrasenahistorial.setEstado(EstadoEnum.ACTIVO.getIndex());
+				ConstrasenaHistorialDAO constrasenaHistorialDAO = new ConstrasenaHistorialDAO(dg_hermes);
+				constrasenaHistorialDAO.insertarContrasenaHistorial(contrasenahistorial);
+
+				Integer resultado2 = usuarioDAO.actualizarClavecambioPorUsuario(idusuario, clavecambio);
+				if (resultado2 > 0) {
+					// Se actualizó correctamente.
+				} else {
+					throw new LogicaException("Error al actualizar el campo clavecambio.");
+				}
+			}
+			return estado;
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Integer actualizarUsuario(UsuarioBean usuario) throws LogicaException {
+		Integer resultado = 0;
+		try {
+			if (validarUsuarioUnico(usuario)) {
+				UsuarioDAO usuarioDAO = new UsuarioDAO(dg_hermes);
+				resultado = usuarioDAO.actualizarUsuario(usuario);
+			}
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+
+		return resultado;
+
+	}
+
+	public Integer eliminarUsuarioCuenta(UsuarioCuenta usuariocuenta) throws LogicaException {
+		try {
+			UsuarioCuentaDAO usuarioCuentaDAO = new UsuarioCuentaDAO(dg_hermes);
+			usuariocuenta.setEstado(EstadoEnum.ELIMINADO.getIndex());
+			return usuarioCuentaDAO.actualizarEstadoUsuarioCuenta(usuariocuenta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Integer deshabilitarUsuarioCuenta(UsuarioCuenta usuariocuenta) throws LogicaException {
+		try {
+			UsuarioCuentaDAO usuarioCuentaDAO = new UsuarioCuentaDAO(dg_hermes);
+			usuariocuenta.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			return usuarioCuentaDAO.actualizarEstadoUsuarioCuenta(usuariocuenta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Integer activarUsuarioCuenta(UsuarioCuenta usuariocuenta) throws LogicaException {
+		try {
+			UsuarioCuentaDAO usuarioCuentaDAO = new UsuarioCuentaDAO(dg_hermes);
+			usuariocuenta.setEstado(EstadoEnum.ACTIVO.getIndex());
+			return usuarioCuentaDAO.actualizarEstadoUsuarioCuenta(usuariocuenta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Integer eliminarUsuarioAplicacion(UsuarioAplicacionBean usuarioaplicacion) {
+		UsuarioAplicacionDAO usuarioAplicacionDAO = new UsuarioAplicacionDAO(dg_hermes);
+		usuarioaplicacion.setEstado(EstadoEnum.ELIMINADO.getIndex());
+		return usuarioAplicacionDAO.actualizarEstadoUsuarioAplicacion(usuarioaplicacion);
+	}
+
+	public Integer deshabilitarUsuarioAplicacion(UsuarioAplicacionBean usuarioaplicacion) {
+		UsuarioAplicacionDAO usuarioAplicacionDAO = new UsuarioAplicacionDAO(dg_hermes);
+		usuarioaplicacion.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+		return usuarioAplicacionDAO.actualizarEstadoUsuarioAplicacion(usuarioaplicacion);
+	}
+
+	public Integer activarUsuarioAplicacion(UsuarioAplicacionBean usuarioaplicacion) {
+		UsuarioAplicacionDAO usuarioAplicacionDAO = new UsuarioAplicacionDAO(dg_hermes);
+		usuarioaplicacion.setEstado(EstadoEnum.ACTIVO.getIndex());
+		return usuarioAplicacionDAO.actualizarEstadoUsuarioAplicacion(usuarioaplicacion);
+	}
+
+	public Integer deshabilitarUsuario(UsuarioBean usuario) throws LogicaException {
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dg_hermes);
+			usuario.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			return usuarioDAO.actualizarEstadoUsuario(usuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Integer eliminarUsuario(UsuarioBean usuario) throws LogicaException {
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dg_hermes);
+			usuario.setEstado(EstadoEnum.ELIMINADO.getIndex());
+			return usuarioDAO.actualizarEstadoUsuario(usuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public Integer activarUsuario(UsuarioBean usuario) throws LogicaException {
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dg_hermes);
+			usuario.setEstado(EstadoEnum.ACTIVO.getIndex());
+			return usuarioDAO.actualizarEstadoUsuario(usuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public UsuarioBean isUsuario(String usuario, String clave) throws LogicaException {
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			return usuarioDAO.isUsuario(usuario, clave);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public UsuarioBean tieneAccesoAplicacion(Integer idusuario, AplicacionEnum aplicacion) throws LogicaException {
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			return usuarioDAO.tieneAccesoAplicacion(idusuario, aplicacion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public List<GrupoBean> getGrupos(String[] estados) throws LogicaException {
+		try {
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (String e : estados) {
+					estados_final += e + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+			GrupoDAO grupoDAO = new GrupoDAO(dc_hermes);
+			return grupoDAO.getGrupos(estados_final);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public List<GrupoBean> getGruposPorAplicacion(Integer idaplicacion) {
+		GrupoDAO grupoDAO = new GrupoDAO(dc_hermes);
+		return grupoDAO.getGruposPorAplicacion(idaplicacion);
+	}
+
+	public List<Sucursal> getSucursales(String[] estados) throws LogicaException {
+		List<Sucursal> sucursales = new ArrayList<Sucursal>();
+
+		try {
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (String e : estados) {
+					estados_final += e + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+			SucursalDAO sucursalDAO = new SucursalDAO(dc_hermes);
+			sucursales = sucursalDAO.getSucursales(estados_final);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return sucursales;
+	}
+	
+	public UsuarioBean getUsuarioPorNumIdentificacion(String numidentificacion) throws LogicaException {
+		UsuarioBean usuariobean = null;
+
+		try {
+
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			usuariobean = usuarioDAO.getUsuarioPorIdentificacion(numidentificacion);
+
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString());
+		}
+		return usuariobean;
+	}
+	public UsuarioBean getUsuarioPorIdentificacionyTipo(String numidentificacion,Long ididentificaciontipo) throws DatoException, LogicaException {
+		UsuarioBean usuariobean = null;
+
+		try {
+
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			usuariobean = usuarioDAO.getUsuarioPorIdentificacionyTipo(numidentificacion, ididentificaciontipo);
+
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString());
+		}
+		return usuariobean;
+	}
+		
+	
+	public List<AplicacionBean> getAplicaciones(String[] estados) throws LogicaException {
+		try {
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (String e : estados) {
+					estados_final += e + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+			AplicacionDAO aplicacionDAO = new AplicacionDAO(dc_hermes);
+			return aplicacionDAO.getAplicaciones(estados_final);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public AplicacionBean getAplicacionPorIdaplicacion(Integer idaplicacion) throws LogicaException {
+		try {
+			AplicacionDAO aplicacionDAO = new AplicacionDAO(dc_hermes);
+			return aplicacionDAO.getAplicacionPorIdaplicacion(idaplicacion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public List<Cuenta> getCuentas(String[] estados) throws LogicaException {
+		try {
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (String e : estados) {
+					estados_final += e + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+			CuentaDAO cuentaDAO = new CuentaDAO(dc_hermes);
+			return cuentaDAO.getCuentas(estados_final);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public UsuarioAplicacionBean getUsuarioPorAplicacionyGrupo(Integer idusuario, Integer idaplicacion, Integer idgrupo) throws LogicaException {
+		UsuarioAplicacionBean usuarioaplicacion = null;
+
+		try {
+
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			usuarioaplicacion = usuarioDAO.getUsuarioPorAplicacionyGrupo(idusuario, idaplicacion, idgrupo);
+
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString());
+		}
+		return usuarioaplicacion;
+	}
+	
+	
+
+	public UsuarioCuenta getUsuarioCuenta(Integer idusuario, Integer idcuenta) throws LogicaException {
+		UsuarioCuenta usuariocuenta = null;
+		try {
+			UsuarioCuentaDAO usuarioCuentaDAO = new UsuarioCuentaDAO(dc_hermes);
+			usuariocuenta = usuarioCuentaDAO.getUsuarioCuenta(idusuario, idcuenta);
+
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.fillInStackTrace());
+		}
+		return usuariocuenta;
+	}
+
+	public Integer actualizarUsuarioAplicacion(UsuarioAplicacionBean usuarioaplicacion) throws LogicaException {
+		Integer resultado = 0;
+
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dg_hermes);
+			resultado = usuarioDAO.actualizarUsuarioAplicacion(usuarioaplicacion);
+
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString());
+		}
+		return resultado;
+	}
+
+	public Integer actualizarUsuarioCuenta(UsuarioCuenta usuariocuenta) throws LogicaException {
+		Integer resultado = 0;
+
+		try {
+			UsuarioCuentaDAO usuarioCuentaDAO = new UsuarioCuentaDAO(dg_hermes);
+			resultado = usuarioCuentaDAO.actualizarUsuarioCuenta(usuariocuenta);
+
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString());
+		}
+		return resultado;
+	}
+
+	public List<UsuarioAplicacionBean> getUsuariosPorAplicacionyGrupo(Integer idaplicacion, String[] grupos, String[] estados) throws LogicaException {
+		List<UsuarioAplicacionBean> usuarioaplicaciones = new ArrayList<UsuarioAplicacionBean>();
+		try {
+			String grupos_final = "";
+			if (null != grupos && grupos.length > 0) {
+				for (String g : grupos) {
+					grupos_final += g + ",";
+				}
+				grupos_final = grupos_final.substring(0, grupos_final.length() - 1);
+			}
+
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (String e : estados) {
+					estados_final += e + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+
+			usuarioaplicaciones = usuarioDAO.getUsuariosPorAplicacionyGrupo(idaplicacion, grupos_final, estados_final);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString());
+		}
+		return usuarioaplicaciones;
+	}
+
+	public List<UsuarioAplicacionBean> getUsuariosPorAplicacionGrupoCuenta(Integer idaplicacion, String[] grupos, String[] estados, Integer idcuenta) throws LogicaException {
+		List<UsuarioAplicacionBean> usuarioaplicaciones = new ArrayList<UsuarioAplicacionBean>();
+		try {
+			String grupos_final = "";
+			if (null != grupos && grupos.length > 0) {
+				for (String g : grupos) {
+					grupos_final += g + ",";
+				}
+				grupos_final = grupos_final.substring(0, grupos_final.length() - 1);
+			}
+
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (String e : estados) {
+					estados_final += e + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+
+			usuarioaplicaciones = usuarioDAO.getUsuariosPorAplicacionGrupoCuenta(idaplicacion, grupos_final, estados_final, idcuenta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString());
+		}
+		return usuarioaplicaciones;
+	}
+
+	public List<UsuarioAplicacionBean> getUsuariosPorAplicacion(Integer idaplicacion, String[] estados) throws LogicaException {
+		try {
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (String e : estados) {
+					estados_final += e + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			return usuarioDAO.getUsuariosPorAplicacion(idaplicacion, estados_final);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public List<UsuarioBean> buscarUsuarios(String desde, String hasta, String valor, UsuarioTipoBusquedaEnum tipobusqueda) throws LogicaException {
+		try {
+			if (UsuarioTipoBusquedaEnum.NOMBRE.getIndex() == tipobusqueda.getIndex() || UsuarioTipoBusquedaEnum.NUMIDENTIFICACION.getIndex() == tipobusqueda.getIndex() || UsuarioTipoBusquedaEnum.USUARIO.getIndex() == tipobusqueda.getIndex()) {
+				if (null != valor && valor.length() > 0) {
+					valor = "%" + valor.trim().replace(" ", "%") + "%";
+				} else {
+					valor = "%";
+				}
+			}
+
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			return usuarioDAO.buscarUsuarios(desde, hasta, valor, tipobusqueda);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public UsuarioBean getUsuarioPorCodusuario(Integer codusuario) throws LogicaException {
+
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			UsuarioBean usuario = usuarioDAO.getUsuarioPorCodusuario(codusuario);
+			return usuario;
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public UsuarioBean getUsuario(Integer idusuario) throws LogicaException {
+
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			UsuarioBean usuario = usuarioDAO.getUsuario(idusuario);
+			return usuario;
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	}
+
+	public List<UsuarioAplicacionBean> getUsuarioAplicacionPorIdusuario(Integer idusuario) throws LogicaException {
+		List<UsuarioAplicacionBean> uas = new ArrayList<UsuarioAplicacionBean>();
+		try {
+			UsuarioAplicacionDAO usuarioAplicacionDAO = new UsuarioAplicacionDAO(dc_hermes);
+			uas = usuarioAplicacionDAO.getUsuarioAplicacionPorIdusuario(idusuario, new Integer[] { EstadoEnum.ACTIVO.getIndex(), EstadoEnum.DESHABILITADO.getIndex(), EstadoEnum.ELIMINADO.getIndex() });
+
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return uas;
+	}
+	
+	
+	public List<UsuarioAplicacionBean> getUsuarioAplicacionPorIdusuarioconLink(Integer idusuario) throws LogicaException {
+		List<UsuarioAplicacionBean> uas = new ArrayList<UsuarioAplicacionBean>();
+		try {
+			UsuarioAplicacionDAO usuarioAplicacionDAO = new UsuarioAplicacionDAO(dc_hermes);
+			uas = usuarioAplicacionDAO.getUsuarioAplicacionPorIdusuarioconLink(idusuario, new Integer[] { EstadoEnum.ACTIVO.getIndex(), EstadoEnum.DESHABILITADO.getIndex(), EstadoEnum.ELIMINADO.getIndex() });
+
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return uas;
+	}
+	
+
+	public List<UsuarioCuenta> getUsuarioCuentasPorIdusuario(Integer idusuario) throws LogicaException {
+		List<UsuarioCuenta> usuariocuentas = new ArrayList<UsuarioCuenta>();
+		try {
+			UsuarioCuentaDAO usuarioCuentaDAO = new UsuarioCuentaDAO(dc_hermes);
+			usuariocuentas = usuarioCuentaDAO.getUsuarioCuentas(idusuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return usuariocuentas;
+	}
+	
+	
+	public List<UsuarioPreguntaSeguraBean> getPreguntasPoridUsuario(Long idusuario) throws LogicaException {
+		List<UsuarioPreguntaSeguraBean> usuariopreguntas = new ArrayList<UsuarioPreguntaSeguraBean>();
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			usuariopreguntas = usuarioDAO.getPreguntasPoridUsuario(idusuario);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return usuariopreguntas;
+	}
+	public List<PreguntasSeguraBean> getPreguntasdeSeguridad() throws LogicaException {
+		List<PreguntasSeguraBean> preguntas = new ArrayList<PreguntasSeguraBean>();
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			preguntas = usuarioDAO.getPreguntasdeSeguridad();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return preguntas;
+	}
+	public Integer insertarUsuarioPreguntaseguridad(List<UsuarioPreguntaSeguraBean> usuariopreguntas ) throws DatoException, LogicaException {
+		Integer flag=null;
+		//List<PreguntasSeguraBean> preguntas = new ArrayList<PreguntasSeguraBean>();
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dg_hermes);
+			flag = usuarioDAO.insertarUsuarioPreguntaseguridad(usuariopreguntas);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return flag;
+	}
+	public Integer actualizarPreguntasSeguridad(UsuarioPreguntaSeguraBean pregunta) throws DatoException, LogicaException {
+		Integer flag=null;
+		//List<PreguntasSeguraBean> preguntas = new ArrayList<PreguntasSeguraBean>();
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dg_hermes);
+			flag = usuarioDAO.actualizarPreguntasSeguridad(pregunta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return flag;
+	}
+		
+
+	public PreguntasSeguraBean getPreguntasdeSeguridadporId(Long idpreguntasegura) throws DatoException,LogicaException {
+		PreguntasSeguraBean pregunta = new PreguntasSeguraBean();
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			pregunta = usuarioDAO.getPreguntasdeSeguridadporId(idpreguntasegura);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return pregunta;
+	}
+		
+	public IdentificacionTipo getIdentifiacionTipoporId(Long idIdentificacionTipo) throws DatoException, LogicaException {
+		IdentificacionTipo identificaciontipo = new IdentificacionTipo();
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			identificaciontipo = usuarioDAO.getIdentifiacionTipoporId(idIdentificacionTipo);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return identificaciontipo;
+	}
+	public List<IdentificacionTipo> getIdentifiacionTipo() throws DatoException, LogicaException {
+		List<IdentificacionTipo> identificaciontipo = new ArrayList<IdentificacionTipo>();
+		try {
+			UsuarioDAO usuarioDAO = new UsuarioDAO(dc_hermes);
+			identificaciontipo = usuarioDAO.getIdentifiacionTipo();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return identificaciontipo;
+		
+	}
+	
+	public DirectivaRed getDirectivaRedporId(Integer iddirectivadered) throws DatoException, LogicaException {
+		DirectivaRed directivared= new DirectivaRed();
+		try {
+			DirectivaRedDAO directivaredDAO = new DirectivaRedDAO(dc_hermes);
+			directivared = directivaredDAO.getDirectivaRedporId(iddirectivadered);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return directivared;
+	}
+	
+	public List<Red> getRedpporIdDirectiva(Integer iddirectivadered) throws DatoException, LogicaException {
+		List<Red> redes= new ArrayList<Red>();
+		try {
+			DirectivaRedDAO directivaredDAO = new DirectivaRedDAO(dc_hermes);
+			redes = directivaredDAO.getRedpporIdDirectiva(iddirectivadered);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return redes;
+	}
+		
+}

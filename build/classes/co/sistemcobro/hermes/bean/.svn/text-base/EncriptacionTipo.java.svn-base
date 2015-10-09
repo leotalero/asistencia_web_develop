@@ -1,0 +1,65 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class EncriptacionTipo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Integer idencriptaciontipo;
+	private String nombre;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer estado;
+
+	public Integer getIdencriptaciontipo() {
+		return idencriptaciontipo;
+	}
+
+	public void setIdencriptaciontipo(Integer idencriptaciontipo) {
+		this.idencriptaciontipo = idencriptaciontipo;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	@Override
+	public String toString() {
+		return "EncriptacionTipo [idencriptaciontipo=" + idencriptaciontipo + ", nombre=" + nombre + ", idusuariocrea=" + idusuariocrea + ", fechacrea=" + fechacrea + ", estado=" + estado + "]";
+	}
+
+}

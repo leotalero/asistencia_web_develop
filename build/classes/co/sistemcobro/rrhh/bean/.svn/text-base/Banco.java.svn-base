@@ -1,0 +1,79 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jhon Puentes
+ * 
+ */
+public class Banco implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idbanco;
+
+	private String nombrebanco;
+	
+	private String observacion;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	public Long getIdbanco() {
+		return idbanco;
+	}
+	public void setIdbanco(Long idbanco) {
+		this.idbanco = idbanco;
+	}
+	public String getNombrebanco() {
+		return nombrebanco;
+	}
+	public void setNombrebanco(String nombrebanco) {
+		this.nombrebanco = nombrebanco;
+	}
+	public String getObservacion() {
+		return observacion;
+	}
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+}

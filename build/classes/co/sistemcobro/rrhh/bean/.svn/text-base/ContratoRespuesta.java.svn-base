@@ -1,0 +1,92 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class ContratoRespuesta implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idcontrato;
+	
+	private Long idrespuesta;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	private Respuesta respuesta;
+	
+	
+	
+	
+	public Long getIdcontrato() {
+		return idcontrato;
+	}
+	public void setIdcontrato(Long idcontrato) {
+		this.idcontrato = idcontrato;
+	}
+	public Long getIdrespuesta() {
+		return idrespuesta;
+	}
+	public void setIdrespuesta(Long idrespuesta) {
+		this.idrespuesta = idrespuesta;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	
+	
+
+	public Respuesta getRespuesta() {
+		return respuesta;
+	}
+	public void setRespuesta(Respuesta respuesta) {
+		this.respuesta = respuesta;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+	
+	
+	
+
+	
+
+
+}

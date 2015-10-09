@@ -1,0 +1,82 @@
+package co.sistemcobro.asistencia.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class AsistenciaTipo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idasistenciatipo;
+	private String nombreasistenciatipo;
+	private String abreviatura;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	public Long getIdasistenciatipo() {
+		return idasistenciatipo;
+	}
+	public void setIdasistenciatipo(Long idasistenciatipo) {
+		this.idasistenciatipo = idasistenciatipo;
+	}
+	public String getNombreasistenciatipo() {
+		return nombreasistenciatipo;
+	}
+	public void setNombreasistenciatipo(String nombreasistenciatipo) {
+		this.nombreasistenciatipo = nombreasistenciatipo;
+	}
+	public String getAbreviatura() {
+		return abreviatura;
+	}
+	public void setAbreviatura(String abreviatura) {
+		this.abreviatura = abreviatura;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	
+	
+
+
+	
+
+	
+
+
+}

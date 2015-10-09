@@ -1,0 +1,41 @@
+package co.sistemcobro.all.util;
+
+import com.mindprod.base64.Base64u;
+
+public class Base64TC {
+
+	public Base64TC() {
+
+	}
+
+	public String codificar(String datoCodificar) {
+		String encoded = new String();
+
+		try {
+			byte[] sendBytes = datoCodificar.getBytes("ISO-8859-1");
+			Base64u base64 = new Base64u();
+			base64.setLineLength(72);
+			encoded = base64.encode(sendBytes);
+		} catch (java.io.UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+		return encoded;
+	}
+
+	public String decodificar(String datoDecodificar) {
+		String decoded = new String();
+
+		try {
+			Base64u base64 = new Base64u();
+			base64.setLineLength(72);
+			byte[] reconstitutedBytes = base64.decode(datoDecodificar);
+			decoded = new String(reconstitutedBytes, "ISO-8859-1");
+		} catch (java.io.UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+		return decoded;
+	}
+
+}

@@ -1,0 +1,228 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+import co.sistemcobro.hermes.bean.UsuarioBean;
+
+/**
+ * 
+ * @author Leonardo Talero
+ * 
+ */
+public class EmpleadoBean implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private Long idempleado;
+	private String codempleado;
+	private Long idgenero;
+	private Genero genero;
+	private String nombres;
+	private String apellidos;
+	private Timestamp fechanacimiento;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	private Contrato ultimocontrato;
+	
+	private UsuarioBean usuariohermes;
+	private List<EmpleadoIdentificacion> identificaciones;
+	private EmpleadoIdentificacion empleadoidentificacion ;
+	private IdentificacionTipo identificaciontipo;
+	private String fotonombre;
+	private String estadofoto;
+	//Novedades reporte.
+	private EmpleadoBanco empleadobanco;
+	private Banco banco;
+	
+	public Contrato getUltimocontrato() {
+		return ultimocontrato;
+	}
+
+	public void setUltimocontrato(Contrato ultimocontrato) {
+		this.ultimocontrato = ultimocontrato;
+	}
+
+
+	
+	// private GrupoBean grupo;
+	
+
+	public EmpleadoBean() {
+	}
+
+	public Long getIdempleado() {
+		return idempleado;
+	}
+
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+
+	public String getCodempleado() {
+		return codempleado;
+	}
+
+	public void setCodempleado(String codempleado) {
+		this.codempleado = codempleado;
+	}
+
+	public Long getIdgenero() {
+		return idgenero;
+	}
+
+	public void setIdgenero(Long idgenero) {
+		this.idgenero = idgenero;
+	}
+
+	public String getNombres() {
+		return nombres;
+	}
+
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
+	}
+
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+
+	public Timestamp getFechanacimiento() {
+		return fechanacimiento;
+	}
+
+	public void setFechanacimiento(Timestamp fechanacimiento) {
+		this.fechanacimiento = fechanacimiento;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public Genero getGenero() {
+		return genero;
+	}
+
+	public void setGenero(Genero genero) {
+		this.genero = genero;
+	}
+
+	public UsuarioBean getUsuariohermes() {
+		return usuariohermes;
+	}
+
+	public void setUsuariohermes(UsuarioBean usuariohermes) {
+		this.usuariohermes = usuariohermes;
+	}
+
+	public List<EmpleadoIdentificacion> getIdentificaciones() {
+		return identificaciones;
+	}
+
+	public void setIdentificaciones(List<EmpleadoIdentificacion> identificaciones) {
+		this.identificaciones = identificaciones;
+	}
+
+	public EmpleadoIdentificacion getEmpleadoidentificacion() {
+		return empleadoidentificacion;
+	}
+
+	public void setEmpleadoidentificacion(
+			EmpleadoIdentificacion empleadoidentificacion) {
+		this.empleadoidentificacion = empleadoidentificacion;
+	}
+
+	public IdentificacionTipo getIdentificaciontipo() {
+		return identificaciontipo;
+	}
+
+	public void setIdentificaciontipo(IdentificacionTipo identificaciontipo) {
+		this.identificaciontipo = identificaciontipo;
+	}
+
+	public EmpleadoBanco getEmpleadobanco() {
+		return empleadobanco;
+	}
+
+	public void setEmpleadobanco(EmpleadoBanco empleadobanco) {
+		this.empleadobanco = empleadobanco;
+	}
+
+	public Banco getBanco() {
+		return banco;
+	}
+
+	public void setBanco(Banco banco) {
+		this.banco = banco;
+	}
+
+	public String getFotonombre() {
+		return fotonombre;
+	}
+
+	public void setFotonombre(String fotonombre) {
+		this.fotonombre = fotonombre;
+	}
+
+	public String getEstadofoto() {
+		return estadofoto;
+	}
+
+	public void setEstadofoto(String estadofoto) {
+		this.estadofoto = estadofoto;
+	}
+
+	
+	
+	//@Override
+	//public String toString() {
+	//	return "UsuarioBean [idusuario=" + idusuario + ", nombre=" + nombre + ", usuariolatitude=" + usuarioaltitude + ", clave=" + clave + ", usuario=" + usuario + ", estado=" + estado + "]";
+	//}
+
+}

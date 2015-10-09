@@ -1,0 +1,42 @@
+package co.sistemcobro.asistencia.bean;
+
+import java.io.Serializable;
+import java.sql.Time;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class Botones implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private BotonEntrada botonentrada ;
+	private BotonSalida botonsalida ;
+	private String mensaje ;
+	public String getMensaje() {
+		return mensaje;
+	}
+	public void setMensaje(String mensaje) {
+		this.mensaje = mensaje;
+	}
+	public BotonEntrada getBotonentrada() {
+		return botonentrada;
+	}
+	public void setBotonentrada(BotonEntrada botonentrada) {
+		this.botonentrada = botonentrada;
+	}
+	public BotonSalida getBotonsalida() {
+		return botonsalida;
+	}
+	public void setBotonsalida(BotonSalida botonsalida) {
+		this.botonsalida = botonsalida;
+	}
+	
+	
+	
+
+
+}

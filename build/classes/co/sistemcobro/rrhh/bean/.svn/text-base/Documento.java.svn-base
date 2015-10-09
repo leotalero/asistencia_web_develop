@@ -1,0 +1,91 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class Documento implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long iddocumento;
+
+	private Long idempleado;
+	
+	private String nombredocumento;
+	private String nombredocumentomostrar;
+	private String rutadocumento;
+	
+	
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	public Long getIddocumento() {
+		return iddocumento;
+	}
+	public void setIddocumento(Long iddocumento) {
+		this.iddocumento = iddocumento;
+	}
+	public Long getIdempleado() {
+		return idempleado;
+	}
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+	public String getNombredocumento() {
+		return nombredocumento;
+	}
+	public void setNombredocumento(String nombredocumento) {
+		this.nombredocumento = nombredocumento;
+	}
+	public String getRutadocumento() {
+		return rutadocumento;
+	}
+	public void setRutadocumento(String rutadocumento) {
+		this.rutadocumento = rutadocumento;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public String getNombredocumentomostrar() {
+		return nombredocumentomostrar;
+	}
+	public void setNombredocumentomostrar(String nombredocumentomostrar) {
+		this.nombredocumentomostrar = nombredocumentomostrar;
+	}
+
+}

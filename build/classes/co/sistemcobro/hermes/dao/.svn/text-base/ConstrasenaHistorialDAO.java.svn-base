@@ -1,0 +1,245 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.hermes.bean.ContrasenaHistorial;
+import co.sistemcobro.hermes.bean.UsuarioBean;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class ConstrasenaHistorialDAO extends BaseDAO {
+
+	@SuppressWarnings("unused")
+	private Logger logger = Logger.getLogger(ConstrasenaHistorialDAO.class);
+
+	public ConstrasenaHistorialDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public ContrasenaHistorial getContrasenaHistorialUltimoPorIdsusuario(Integer idusuario) throws DatoException {
+		ContrasenaHistorial contrasenahistorial = null;
+		UsuarioBean usuariocrea = null;
+		try {
+			StringBuilder q = new StringBuilder();
+			q.append("select top 1 ch.idcontrasenahistorial, ch.idusuario, ch.idusuariocrea, ch.fechacrea, ch.estado, ");
+			q.append("u.idusuario, u.codusuario, u.usuario, u.nombre  ");
+			q.append("from hermes.contrasena_historial ch  ");
+			q.append("inner join hermes.sco_usuario u on u.codusuario = ch.idusuariocrea  ");
+			q.append("where ch.idusuario = ? and ch.estado=2 ");
+			q.append("order by ch.fechacrea desc ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+
+			rs = ps.executeQuery();
+
+			int i = 1;
+			if (rs.next()) {
+				i = 1;
+				contrasenahistorial = new ContrasenaHistorial();
+				contrasenahistorial.setIdcontrasenahistorial(rs.getInt(i++));
+				contrasenahistorial.setIdusuario(rs.getInt(i++));
+				contrasenahistorial.setIdusuariocrea(rs.getInt(i++));
+				contrasenahistorial.setFechacrea(rs.getTimestamp(i++));
+				contrasenahistorial.setEstado(rs.getInt(i++));
+
+				usuariocrea = new UsuarioBean();
+				usuariocrea.setIdusuario(rs.getInt(i++));
+				usuariocrea.setCodusuario(rs.getInt(i++));
+				usuariocrea.setUsuario(rs.getString(i++));
+				usuariocrea.setNombre(rs.getString(i++));
+
+				contrasenahistorial.setUsuariocrea(usuariocrea);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contrasenahistorial;
+
+	}
+
+	public List<ContrasenaHistorial> getContrasenasHistorialPorIdsusuario(Integer idusuario) throws DatoException {
+		List<ContrasenaHistorial> contrasenashistorial = new ArrayList<ContrasenaHistorial>();
+		ContrasenaHistorial contrasenahistorial = null;
+		UsuarioBean usuariocrea = null;
+		try {
+			StringBuilder q = new StringBuilder();
+			q.append("select ch.idcontrasenahistorial, ch.idusuario, ch.idusuariocrea, ch.fechacrea, ch.estado, ");
+			q.append("u.idusuario, u.codusuario, u.usuario, u.nombre  ");
+			q.append("from hermes.contrasena_historial ch  ");
+			q.append("inner join hermes.sco_usuario u on u.codusuario = ch.idusuariocrea  ");
+			q.append("where ch.idusuario = ? ");
+			q.append("order by ch.fechacrea desc ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+
+			rs = ps.executeQuery();
+
+			int i = 1;
+			while (rs.next()) {
+				i = 1;
+				contrasenahistorial = new ContrasenaHistorial();
+				contrasenahistorial.setIdcontrasenahistorial(rs.getInt(i++));
+				contrasenahistorial.setIdusuario(rs.getInt(i++));
+				contrasenahistorial.setIdusuariocrea(rs.getInt(i++));
+				contrasenahistorial.setFechacrea(rs.getTimestamp(i++));
+				contrasenahistorial.setEstado(rs.getInt(i++));
+
+				usuariocrea = new UsuarioBean();
+				usuariocrea.setIdusuario(rs.getInt(i++));
+				usuariocrea.setCodusuario(rs.getInt(i++));
+				usuariocrea.setUsuario(rs.getString(i++));
+				usuariocrea.setNombre(rs.getString(i++));
+
+				contrasenahistorial.setUsuariocrea(usuariocrea);
+
+				contrasenashistorial.add(contrasenahistorial);
+			}
+
+		} catch (SQLException e) {
+			 	throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+				throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contrasenashistorial;
+
+	}
+
+	public List<ContrasenaHistorial> getContrasenasQueConincidePorIdsusuario(Integer idusuario, String clave, Integer numeroregistros) throws DatoException {
+		List<ContrasenaHistorial> contrasenashistorial = new ArrayList<ContrasenaHistorial>();
+		ContrasenaHistorial contrasenahistorial = null;
+
+		try {
+			StringBuilder q = new StringBuilder();
+			q.append("select tmp.idcontrasenahistorial, tmp.idusuario, tmp.idusuariocrea, tmp.fechacrea, tmp.estado ");
+			q.append("from (select top " + numeroregistros + " ch.idcontrasenahistorial, ch.idusuario, ch.clave, ch.idusuariocrea, ch.fechacrea, ch.estado ");
+			q.append("from hermes.contrasena_historial ch  ");
+			q.append("where ch.idusuario = ? ");
+			q.append("order by ch.fechacrea desc ) tmp ");
+			q.append("where tmp.clave = ? ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+			ps.setString(2, clave);
+
+			rs = ps.executeQuery();
+
+			int i = 1;
+			while (rs.next()) {
+				i = 1;
+				contrasenahistorial = new ContrasenaHistorial();
+				contrasenahistorial.setIdcontrasenahistorial(rs.getInt(i++));
+				contrasenahistorial.setIdusuario(rs.getInt(i++));
+				contrasenahistorial.setIdusuariocrea(rs.getInt(i++));
+				contrasenahistorial.setFechacrea(rs.getTimestamp(i++));
+				contrasenahistorial.setEstado(rs.getInt(i++));
+				contrasenashistorial.add(contrasenahistorial);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contrasenashistorial;
+
+	}
+
+	public Integer getDiasSinCambiarContrasenaPorIdusuario(Integer idusuario) throws DatoException {
+		Integer dias = -1;
+
+		try {
+			StringBuilder q = new StringBuilder();
+			q.append("select case ");
+			q.append("when (select max(ch.fechacrea) ");
+			q.append("from hermes.contrasena_historial ch ");
+			q.append("where ch.estado=2 and ch.idusuario=?) is null ");
+			q.append("then -1 ");
+			q.append("else (datediff(dd,(select isnull(max(ch1.fechacrea), getdate()) ");
+			q.append("from hermes.contrasena_historial ch1 ");
+			q.append("where ch1.estado=2 and ch1.idusuario=?), getdate())) ");
+			q.append("end as dias;  ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+			ps.setInt(2, idusuario);
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				dias = rs.getInt(1);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return dias;
+
+	}
+
+	public Integer insertarContrasenaHistorial(ContrasenaHistorial contrasenahistorial) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("insert hermes.contrasena_historial (idusuario, clave, idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,getdate(),?) ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+
+			ps.setInt(c++, contrasenahistorial.getIdusuario());
+			ps.setString(c++, contrasenahistorial.getClave());
+			ps.setInt(c++, contrasenahistorial.getIdusuariocrea());
+			ps.setInt(c++, contrasenahistorial.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+	}
+
+}

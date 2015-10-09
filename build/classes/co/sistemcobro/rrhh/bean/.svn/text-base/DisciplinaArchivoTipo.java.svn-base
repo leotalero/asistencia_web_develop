@@ -1,0 +1,64 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+public class DisciplinaArchivoTipo implements Serializable {
+
+	
+	private static final long serialVersionUID = 1L;
+	
+	private Long iddisciplinaarchivotipo;
+	private String nombretipoarchivo;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	public Long getIddisciplinaarchivotipo() {
+		return iddisciplinaarchivotipo;
+	}
+	public void setIddisciplinaarchivotipo(Long iddisciplinaarchivotipo) {
+		this.iddisciplinaarchivotipo = iddisciplinaarchivotipo;
+	}
+	public String getNombretipoarchivo() {
+		return nombretipoarchivo;
+	}
+	public void setNombretipoarchivo(String nombretipoarchivo) {
+		this.nombretipoarchivo = nombretipoarchivo;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	
+	
+}

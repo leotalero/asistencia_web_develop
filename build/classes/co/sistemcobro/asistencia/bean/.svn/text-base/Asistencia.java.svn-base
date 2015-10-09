@@ -1,0 +1,331 @@
+package co.sistemcobro.asistencia.bean;
+
+import java.io.Serializable;
+import java.sql.Time;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class Asistencia implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idasistencia;
+	private Long idasistenciafuente;
+	private Long idasistenciatipo;
+	private Long idcontrato;
+	private Integer idclasificacion;
+	private Timestamp fechainicioprogramado;
+	private Timestamp fechafinprogramado;
+	private String fechastring;
+	private Timestamp fechainiciomarcado;
+	private Timestamp fechafinmarcado;
+	private Time horaentradaprogramada;
+	private Time horasalidaprogramada;
+
+	private Integer minutosflexibilidad;
+	
+	private Integer calculoentrada;
+	private Integer calculosalida;
+	private Integer calculomintrabajados;
+	private String estadoasistencia;
+	private String ip;
+	private String publicip;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	
+	private AsistenciaTipo asistenciatipo;
+	
+	private AsistenciaFuente asistenciafuente;
+	
+	private AsistenciaClasificacion clasificacion;
+
+
+	public Long getIdasistencia() {
+		return idasistencia;
+	}
+
+
+	public void setIdasistencia(Long idasistencia) {
+		this.idasistencia = idasistencia;
+	}
+
+
+	public Long getIdasistenciafuente() {
+		return idasistenciafuente;
+	}
+
+
+	public void setIdasistenciafuente(Long idasistenciafuente) {
+		this.idasistenciafuente = idasistenciafuente;
+	}
+
+
+	public Long getIdasistenciatipo() {
+		return idasistenciatipo;
+	}
+
+
+	public void setIdasistenciatipo(Long idasistenciatipo) {
+		this.idasistenciatipo = idasistenciatipo;
+	}
+
+
+	public Long getIdcontrato() {
+		return idcontrato;
+	}
+
+
+	public void setIdcontrato(Long idcontrato) {
+		this.idcontrato = idcontrato;
+	}
+
+
+	public Timestamp getFechainicioprogramado() {
+		return fechainicioprogramado;
+	}
+
+
+	public void setFechainicioprogramado(Timestamp fechainicioprogramado) {
+		this.fechainicioprogramado = fechainicioprogramado;
+	}
+
+
+	public Timestamp getFechafinprogramado() {
+		return fechafinprogramado;
+	}
+
+
+	public void setFechafinprogramado(Timestamp fechafinprogramado) {
+		this.fechafinprogramado = fechafinprogramado;
+	}
+
+
+	public Timestamp getFechainiciomarcado() {
+		return fechainiciomarcado;
+	}
+
+
+	public void setFechainiciomarcado(Timestamp fechainiciomarcado) {
+		this.fechainiciomarcado = fechainiciomarcado;
+	}
+
+
+	public Timestamp getFechafinmarcado() {
+		return fechafinmarcado;
+	}
+
+
+	public void setFechafinmarcado(Timestamp fechafinmarcado) {
+		this.fechafinmarcado = fechafinmarcado;
+	}
+
+
+
+
+	public Time getHoraentradaprogramada() {
+		return horaentradaprogramada;
+	}
+
+
+	public void setHoraentradaprogramada(Time horaentradaprogramada) {
+		this.horaentradaprogramada = horaentradaprogramada;
+	}
+
+
+	public Time getHorasalidaprogramada() {
+		return horasalidaprogramada;
+	}
+
+
+	public void setHorasalidaprogramada(Time horasalidaprogramada) {
+		this.horasalidaprogramada = horasalidaprogramada;
+	}
+
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+
+	public AsistenciaTipo getAsistenciatipo() {
+		return asistenciatipo;
+	}
+
+
+	public void setAsistenciatipo(AsistenciaTipo asistenciatipo) {
+		this.asistenciatipo = asistenciatipo;
+	}
+
+
+	public AsistenciaFuente getAsistenciafuente() {
+		return asistenciafuente;
+	}
+
+
+	public void setAsistenciafuente(AsistenciaFuente asistenciafuente) {
+		this.asistenciafuente = asistenciafuente;
+	}
+
+
+	public Integer getCalculoentrada() {
+		return calculoentrada;
+	}
+
+
+	public void setCalculoentrada(Integer calculoentrada) {
+		this.calculoentrada = calculoentrada;
+	}
+
+
+	public Integer getCalculosalida() {
+		return calculosalida;
+	}
+
+
+	public void setCalculosalida(Integer calculosalida) {
+		this.calculosalida = calculosalida;
+	}
+
+
+	public String getEstadoasistencia() {
+		return estadoasistencia;
+	}
+
+
+	public void setEstadoasistencia(String estadoasistencia) {
+		this.estadoasistencia = estadoasistencia;
+	}
+
+
+	public Integer getMinutosflexibilidad() {
+		return minutosflexibilidad;
+	}
+
+
+	public void setMinutosflexibilidad(Integer minutosflexibilidad) {
+		this.minutosflexibilidad = minutosflexibilidad;
+	}
+
+
+	public String getIp() {
+		return ip;
+	}
+
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+
+	public String getPublicip() {
+		return publicip;
+	}
+
+
+	public void setPublicip(String publicip) {
+		this.publicip = publicip;
+	}
+
+
+	public Integer getIdclasificacion() {
+		return idclasificacion;
+	}
+
+
+	public void setIdclasificacion(Integer idclasificacion) {
+		this.idclasificacion = idclasificacion;
+	}
+
+
+	public AsistenciaClasificacion getClasificacion() {
+		return clasificacion;
+	}
+
+
+	public void setClasificacion(AsistenciaClasificacion clasificacion) {
+		this.clasificacion = clasificacion;
+	}
+
+
+	public String getFechastring() {
+		return fechastring;
+	}
+
+
+	public void setFechastring(String fechastring) {
+		this.fechastring = fechastring;
+	}
+
+
+	public Integer getCalculomintrabajados() {
+		return calculomintrabajados;
+	}
+
+
+	public void setCalculomintrabajados(Integer calculomintrabajados) {
+		this.calculomintrabajados = calculomintrabajados;
+	}
+
+
+
+	
+	
+	
+
+	
+
+
+}

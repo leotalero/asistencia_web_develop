@@ -1,0 +1,281 @@
+package co.sistemcobro.asistencia.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.asistencia.bean.Asistencia;
+import co.sistemcobro.asistencia.bean.AsistenciaClasificacion;
+import co.sistemcobro.asistencia.bean.AsistenciaFuente;
+import co.sistemcobro.asistencia.bean.AsistenciaTipo;
+import co.sistemcobro.hermes.bean.Estado;
+import co.sistemcobro.hermes.bean.UsuarioBean;
+import co.sistemcobro.hermes.constante.UsuarioTipoBusquedaEnum;
+import co.sistemcobro.rrhh.bean.EmpleadoBean;
+import co.sistemcobro.rrhh.bean.Propiedad;
+
+//import co.sistemcobro.hermes.bean.IdentificacionTipo;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class AsistenciaDAO extends BaseDAO {
+
+	public AsistenciaDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	
+	public List<Asistencia> getAsistenciaHistorico(Long idcontrato) throws DatoException {
+		Asistencia asistencia = null;
+		List<Asistencia> asistencias=new ArrayList<Asistencia>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select TOP 20 a.idasistencia,a.idasistenciafuente,a.idasistenciatipo,a.idcontrato,a.horaentradaprogramada,");
+			q.append("a.horasalidaprogramada,a.fechainicioprogramado,a.fechafinprogramado,a.fechainiciomarcado,a.fechafinmarcado,a.minutosflexibilidad,a.ip,a.publicip,");
+			q.append(" a.calculoentrada,a.calculosalida,a.idusuariocrea,a.fechacrea, a.idusuariomod, a.fechamod, a.estado, ");
+			q.append(" at.idasistenciatipo,at.nombreasistenciatipo,at.abreviatura, ");
+			q.append(" af.idasistenciafuente,af.nombreasistenciafuente,af.abreviatura,"
+					+ " case "+
+			" when (a.calculoentrada)>0 then 'Tarde' "+
+			" else 'A tiempo' "+ 
+			" end as 'Estado_asistencia'");
+			q.append(" from asistencia.asistencia a  ");
+			q.append(" left join  asistencia.asistencia_tipo at on at.idasistenciatipo=a.idasistenciatipo  ");
+			q.append(" left join  asistencia.asistencia_fuente af on af.idasistenciafuente=a.idasistenciafuente  ");
+			q.append(" where a.estado =? and a.idcontrato=? order by idasistencia desc");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idcontrato);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				asistencia = new Asistencia();
+				asistencia.setIdasistencia(rs.getLong(c++));
+				asistencia.setIdasistenciafuente(rs.getLong(c++));
+				asistencia.setIdasistenciatipo(rs.getLong(c++));
+				asistencia.setIdcontrato(rs.getLong(c++));
+				asistencia.setHoraentradaprogramada(rs.getTime(c++));
+				asistencia.setHorasalidaprogramada(rs.getTime(c++));
+				asistencia.setFechainicioprogramado(rs.getTimestamp(c++));
+				asistencia.setFechastring(Util.timestampToString(asistencia.getFechainicioprogramado(), "dd/MM/yyyy"));
+				asistencia.setFechafinprogramado(rs.getTimestamp(c++));
+				asistencia.setFechainiciomarcado(rs.getTimestamp(c++));
+				asistencia.setFechafinmarcado(rs.getTimestamp(c++));
+				asistencia.setMinutosflexibilidad(rs.getInt(c++));
+				asistencia.setIp(rs.getString(c++));
+				asistencia.setPublicip(rs.getString(c++));
+				asistencia.setCalculoentrada(rs.getInt(c++));
+				asistencia.setCalculosalida(rs.getInt(c++));
+				asistencia.setIdusuariocrea(rs.getInt(c++));
+				asistencia.setFechacrea(rs.getTimestamp(c++));
+				asistencia.setIdusuariomod(rs.getInt(c++));
+				asistencia.setFechamod(rs.getTimestamp(c++));
+				asistencia.setEstado(rs.getInt(c++));
+				
+				AsistenciaTipo asistenciatipo=new AsistenciaTipo();
+				asistenciatipo.setIdasistenciatipo(rs.getLong(c++));
+				asistenciatipo.setNombreasistenciatipo(rs.getString(c++));
+				asistenciatipo.setAbreviatura(rs.getString(c++));
+				
+				asistencia.setAsistenciatipo(asistenciatipo);
+				
+				AsistenciaFuente asistenciafuente=new AsistenciaFuente();
+				asistenciafuente.setIdasistenciafuente(rs.getLong(c++));
+				asistenciafuente.setNombreasistenciafuente(rs.getString(c++));
+				asistenciafuente.setAbreviatura(rs.getString(c++));
+				
+				asistencia.setEstadoasistencia(rs.getString(c++));
+				asistencia.setAsistenciafuente(asistenciafuente);
+				asistencias.add(asistencia);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return asistencias;
+
+	}
+	
+	public Timestamp getHoraServidor() throws DatoException {
+		Propiedad propiedad = null;
+		Timestamp dateservidor =null;
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select getdate()");
+	
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				dateservidor = rs.getTimestamp(c++);
+				
+				//Date fechaactual=new Date();
+				//dateservidor = Util.dateToTimeStamp(fechaactual);
+			
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return dateservidor;
+
+	}
+	
+	public Integer insertaMaracionentrada(Asistencia asistencia) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert asistencia.asistencia (idasistenciafuente, idasistenciatipo,idcontrato,idclasificacion, ");
+			q.append("horaentradaprogramada, horasalidaprogramada, fechainicioprogramado, fechafinprogramado,  ");
+			q.append("fechainiciomarcado, minutosflexibilidad,ip,publicip,");
+			q.append("idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,?,?,?,?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(), Statement.RETURN_GENERATED_KEYS);
+			c = 1;
+
+			
+			
+			ps.setLong(c++, asistencia.getIdasistenciafuente());
+			ps.setLong(c++, asistencia.getIdasistenciatipo());
+			ps.setLong(c++, asistencia.getIdcontrato());
+			ps.setLong(c++, asistencia.getIdclasificacion());
+			ps.setTime(c++, asistencia.getHoraentradaprogramada());
+			ps.setTime(c++, asistencia.getHorasalidaprogramada());
+			ps.setTimestamp(c++, asistencia.getFechainicioprogramado());
+			ps.setTimestamp(c++, asistencia.getFechafinprogramado());
+			ps.setTimestamp(c++, asistencia.getFechainiciomarcado());
+			
+			
+			ps.setInt(c++, asistencia.getMinutosflexibilidad());
+			ps.setString(c++, asistencia.getIp());
+			ps.setString(c++, asistencia.getPublicip());
+			ps.setInt(c++, asistencia.getIdusuariocrea());
+			ps.setInt(c++, asistencia.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				asistencia.setIdasistencia(rs.getLong(1));
+			} else {
+				throw new SQLException("Asistencia no se pudo registrar.");
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	
+	public Integer editarMaracionentradaconmarcacionSalida(Asistencia asistencia) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update asistencia.asistencia set fechafinmarcado=?,  ");
+			
+			q.append(" idusuariomod=?, fechamod=getdate() where idasistencia=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+			
+			ps.setTimestamp(c++, asistencia.getFechafinmarcado());
+		
+			ps.setInt(c++, asistencia.getIdusuariomod());
+			ps.setLong(c++, asistencia.getIdasistencia());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	
+	public List<AsistenciaClasificacion> getAllClasificacion() throws DatoException {
+		AsistenciaClasificacion clasificacion = null;
+		List<AsistenciaClasificacion> clasificaciones=new ArrayList<AsistenciaClasificacion>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select * from asistencia.clasificacion c ");
+			q.append(" where c.estado =?  order by idclasificacion asc");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				clasificacion = new AsistenciaClasificacion();
+				clasificacion.setIdclasificacion(rs.getLong(c++));
+				clasificacion.setAbreviatura(rs.getString(c++));
+				clasificacion.setNombre(rs.getString(c++));
+				clasificacion.setColor(rs.getString(c++));
+				clasificacion.setIdusuariocrea(rs.getInt(c++));
+				clasificacion.setFechacrea(rs.getTimestamp(c++));
+				clasificacion.setIdusuariomod(rs.getInt(c++));
+				clasificacion.setFechamod(rs.getTimestamp(c++));
+				clasificacion.setEstado(rs.getInt(c++));
+				
+			
+				clasificaciones.add(clasificacion);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return clasificaciones;
+
+	}
+}

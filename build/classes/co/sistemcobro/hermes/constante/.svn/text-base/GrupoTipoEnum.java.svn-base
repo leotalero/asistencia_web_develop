@@ -1,0 +1,42 @@
+package co.sistemcobro.hermes.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum GrupoTipoEnum {
+	INTERNO(1), EXTERNO(2);
+
+	public static final Map<Integer, GrupoTipoEnum> mapByID = new HashMap<Integer, GrupoTipoEnum>();
+	public static final Map<String, GrupoTipoEnum> mapByNAME = new HashMap<String, GrupoTipoEnum>();
+
+	static {
+		for (GrupoTipoEnum s : EnumSet.allOf(GrupoTipoEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	GrupoTipoEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static GrupoTipoEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static GrupoTipoEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

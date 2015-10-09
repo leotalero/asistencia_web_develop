@@ -1,0 +1,44 @@
+package co.sistemcobro.rrhh.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum EmpleadoTipoBusquedaEnum {
+	FECHA_CREACION(1), NOMBRE(2), NUMIDENTIFICACION(3), USUARIO(4), CODUSUARIO(
+			5),NUMEROCERTIFICADO(9),CODIGOVERIFICACION(10);
+
+	public static final Map<Integer, EmpleadoTipoBusquedaEnum> mapByID = new HashMap<Integer, EmpleadoTipoBusquedaEnum>();
+	public static final Map<String, EmpleadoTipoBusquedaEnum> mapByNAME = new HashMap<String, EmpleadoTipoBusquedaEnum>();
+
+	static {
+		for (EmpleadoTipoBusquedaEnum s : EnumSet
+				.allOf(EmpleadoTipoBusquedaEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	EmpleadoTipoBusquedaEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static EmpleadoTipoBusquedaEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static EmpleadoTipoBusquedaEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

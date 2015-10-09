@@ -1,0 +1,226 @@
+package co.sistemcobro.rrhh.util;
+
+//import java.awt.print.PageFormat;
+import java.awt.print.PageFormat;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
+
+
+public class MergePDF {
+	
+	 private static Logger logger = Logger.getLogger(MergePDF.class);
+	public static byte[]  concatPDFs(List<InputStream> streamOfPDFFiles,
+            OutputStream outputStream, boolean paginate,boolean paginaintermedia) {
+		ByteArrayOutputStream file = new ByteArrayOutputStream();
+		 byte[] bytes=null;
+        Document document = new Document();
+        try {
+        	logger.warn("ingresa a concatenar");	
+            List<InputStream> pdfs = streamOfPDFFiles;
+            List<PdfReader> readers = new ArrayList<PdfReader>();
+            int totalPages = 0;
+            Iterator<InputStream> iteratorPDFs = pdfs.iterator();
+            logger.warn("itera");
+            // Create Readers for the pdfs.
+            while (iteratorPDFs.hasNext()) {
+                InputStream pdf = iteratorPDFs.next();
+                PdfReader pdfReader = new PdfReader(pdf);
+                logger.warn("adiciona a readers"+pdfReader);
+            
+                readers.add(pdfReader);
+                totalPages += pdfReader.getNumberOfPages();
+            }
+            // Create a writer for the outputstream
+            PdfWriter writer = PdfWriter.getInstance(document, file);
+ 
+            document.open();
+            logger.warn("antes de ltra");
+            BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA,
+                    BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            PdfContentByte cb = writer.getDirectContent(); // Holds the PDF
+            // data
+            logger.warn("despues de ltra");
+            PdfImportedPage page;
+            int currentPageNumber = 0;
+            int pageOfCurrentReaderPDF = 0;
+            Iterator<PdfReader> iteratorPDFReader = readers.iterator();
+            int i=0;
+            // Loop through the PDF files and add to the output.
+            while (iteratorPDFReader.hasNext()) {
+            	i++;
+            	logger.warn("docconcatenado:"+i);
+                PdfReader pdfReader = iteratorPDFReader.next();
+               
+               
+                
+                
+                boolean resuparimpar = siesimpar(pdfReader.getNumberOfPages());
+               
+                Rectangle a = new Rectangle(PageSize.A4);
+                
+                // Create a new page in the target for each source page.
+                while (pageOfCurrentReaderPDF < pdfReader.getNumberOfPages()) {
+                	// document.newPage();
+                
+                    pageOfCurrentReaderPDF++;
+                    currentPageNumber++;
+                   
+                	Rectangle rectangle = pdfReader.getPageSizeWithRotation(pageOfCurrentReaderPDF);
+                	int rsu;
+					if(a.getHeight() >= a.getWidth()){
+						if(rectangle.getRotation()  == 90){
+
+							 rsu= PageFormat.PORTRAIT;
+							 document.setPageSize(rectangle);
+							 document.newPage();
+							
+						}else{
+						 rsu= PageFormat.PORTRAIT;
+						 document.setPageSize(rectangle);
+						 document.newPage();
+						 }
+					}
+                       
+                     else{
+                         rsu= PageFormat.LANDSCAPE;
+                         document.setPageSize(rectangle);
+                         document.newPage();
+                     }
+                    page = writer.getImportedPage(pdfReader,
+                            pageOfCurrentReaderPDF);
+                    cb.addTemplate(page, 0, 0);
+ 
+                    // Code for pagination.
+                    if (paginate) {
+                        cb.beginText();
+                        cb.setFontAndSize(bf, 9);
+                        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, ""
+                                + currentPageNumber + " of " + totalPages, 520,
+                                5, 0);
+                        cb.endText();
+                    }
+                }
+                if(resuparimpar){
+                	if(paginaintermedia){
+                		document.setPageSize(a);
+                    	document.newPage();
+               		 writer.setPageEmpty(false);
+               		document.setPageSize(a);
+                        document.newPage();
+                    }
+                }
+                pageOfCurrentReaderPDF = 0;
+            }
+            
+            
+            
+            file.flush();
+            document.close();
+            file.close();
+            
+            
+              
+           bytes = file.toByteArray();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (document.isOpen())
+                document.close();
+            try {
+                if (outputStream != null)
+                    file.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+		return bytes;
+    }
+	
+		public static boolean siesimpar(int number){
+		
+		 boolean resu=false;
+		if ( (number/2)*2 == number ){
+			
+		      resu=false;
+		}else{
+		    	resu=true;
+		  }
+		return resu;
+		
+	}
+	
+
+	
+
+	public static byte[] encryptPdf(InputStream src,String clave) throws IOException, DocumentException {
+		byte[] bytes=null;
+		try {
+			ByteArrayOutputStream file = new ByteArrayOutputStream();	
+			/** User password. */
+				byte[] USER = clave.getBytes();
+				/** Owner password. */
+				byte[] OWNER = clave.getBytes();
+	
+			    Document document = new Document();
+			    PdfWriter writer = PdfWriter.getInstance(document, file);
+			   int a = PdfWriter.ALLOW_PRINTING;
+			   int b = PdfWriter.STANDARD_ENCRYPTION_128;
+			   logger.warn("antes de encrypt funtion encrypyPdf: "+USER+" , "+OWNER+" a: "+a+" b:"+b);
+		       writer.setEncryption(USER, OWNER,a, b);
+		       // int permissions = PdfWriter.ALLOW_PRINTING | PdfWriter.ALLOW_COPY;
+		       logger.warn("despues de encrypt funtion encrypyPdf");
+		      PdfReader reader = new PdfReader(src);
+		      //  PdfEncryptor.encrypt(reader, file, USER,
+		      //          OWNER, PdfWriter.AllowPrinting | PdfWriter.AllowCopy, false);
+		      
+		      document.open();
+		    
+		         int pageOfCurrentReaderPDF=0;
+		         PdfImportedPage page;
+		         PdfContentByte cb = writer.getDirectContent(); // Holds the PDF
+				while (pageOfCurrentReaderPDF < reader.getNumberOfPages()) {
+					  pageOfCurrentReaderPDF++;
+		        	 
+		        	 page = writer.getImportedPage(reader,
+	                         pageOfCurrentReaderPDF);
+	                 cb.addTemplate(page, 0, 0);
+	                 
+		         }
+		         
+   
+		         document.close();
+		         writer.close();
+		         file.flush();
+	            file.close();
+			   
+	            
+	            
+			      bytes = file.toByteArray();
+				
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			 logger.warn("error:"+e);
+			e.printStackTrace();
+		}
+	    return bytes;
+		    
+		}
+}

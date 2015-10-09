@@ -1,0 +1,229 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.asistencia.bean.AsistenciaClasificacion;
+import co.sistemcobro.rrhh.bean.FrecuenciaAsignacion;
+import co.sistemcobro.rrhh.bean.Horario;
+import co.sistemcobro.rrhh.bean.HorarioAsignado;
+import co.sistemcobro.rrhh.bean.ReporteAsistencia;
+import co.sistemcobro.rrhh.bean.ReporteAsignacion;
+import co.sistemcobro.rrhh.bean.ReporteGraficaAsistencia;
+import co.sistemcobro.rrhh.dao.HorarioDAO;
+
+/**
+ * 
+ * @author Leoardo Talero
+ * 
+ */
+@Stateless
+public class HorarioEJB extends BaseEJB {
+
+	private Logger logger = Logger.getLogger(HorarioEJB.class);
+
+	public HorarioEJB() {
+	}
+	
+	
+	
+	public Horario getHorariosporId(Long idhorario) throws DatoException, LogicaException {
+		
+		Horario horario;
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+			horario=horarioDAO.getHorariosporId(idhorario);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return horario;	
+	}
+		
+	
+
+	public List<Horario> getHorarios() throws DatoException, LogicaException {
+		List<Horario> horarios;
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+			horarios=horarioDAO.getHorarios();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return horarios;
+		
+	
+	}
+	
+	public HorarioAsignado insertarHorarioAsignado(HorarioAsignado horarioasig) throws DatoException, LogicaException {
+		HorarioAsignado horarioasignado=new HorarioAsignado();
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dg_rrhh);
+			horarioasignado=horarioDAO.insertarHorarioAsignado(horarioasig);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return horarioasignado;
+	}
+	public List<HorarioAsignado> insertarHorariosAsignados(List<HorarioAsignado> horariosasig) throws DatoException, LogicaException {
+		List<HorarioAsignado> horariosasignado=new ArrayList<HorarioAsignado>();
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dg_rrhh);
+			horariosasignado=horarioDAO.insertarHorariosAsignados(horariosasig);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return horariosasignado;
+	}
+	public  List<HorarioAsignado> getHorariosAsignadosporContrato(Long idcontrato) throws DatoException, LogicaException {
+		List<HorarioAsignado> horariosasignado=new ArrayList<HorarioAsignado>();
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+			horariosasignado=horarioDAO.getHorariosAsignadosporContrato(idcontrato);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return horariosasignado;
+	}
+	
+	public  List<HorarioAsignado> getHorariosAsignadosporContratoActivos(Long idcontrato) throws DatoException, LogicaException {
+		List<HorarioAsignado> horariosasignado=new ArrayList<HorarioAsignado>();
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+			horariosasignado=horarioDAO.getHorariosAsignadosporContratoActivos(idcontrato);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return horariosasignado;
+	}
+	
+	public HorarioAsignado getHorariosAsignadosporId(Long idhorarioasignado) throws DatoException, LogicaException {
+		HorarioAsignado horariosasignado=new HorarioAsignado();
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+			horariosasignado=horarioDAO.getHorariosAsignadosporId(idhorarioasignado);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return horariosasignado;
+	}
+	
+	public Integer actualizarEstadoHorarioAsignado(HorarioAsignado horarioasig) throws DatoException, LogicaException {
+	//	HorarioAsignado horariosasignado=new HorarioAsignado();
+		Integer resu;
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dg_rrhh);
+			 resu = horarioDAO.actualizarEstadoHorarioAsignado(horarioasig);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	
+	public List<FrecuenciaAsignacion> getFrecuenciasignacion() throws DatoException, LogicaException {
+		
+		List<FrecuenciaAsignacion> rsu;
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+			  rsu= horarioDAO.getFrecuenciasignacion();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return rsu;
+	}
+	public Integer EditarHorarioAsignado(HorarioAsignado horarioasig) throws DatoException, LogicaException {
+		Integer rsu=null;
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dg_rrhh);
+			rsu= horarioDAO.EditarHorarioAsignado(horarioasig);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return rsu;
+		
+	}
+	public Integer deshabilitarHorarioAsignadoMasivo(List<HorarioAsignado> horarioasig) throws DatoException, LogicaException {
+		Integer rsu=null;
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dg_rrhh);
+			
+			rsu= horarioDAO.deshabilitarHorarioAsignadoMasivo(horarioasig);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return rsu;
+		
+	}
+	public List<ReporteAsistencia> Reporteasistencia(String fechadesde,String fechahasta,String basedatosasistencia,List<String> idarea) throws DatoException, LogicaException {
+		 List<ReporteAsistencia> rsu = null;
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+			
+			rsu= horarioDAO.Reporteasistencia(fechadesde, fechahasta,basedatosasistencia,idarea);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return rsu;
+		
+	}
+	public List<ReporteAsignacion> Reporteasignacion(String fechadesde,String fechahasta,List<String> idarea) throws DatoException, LogicaException {
+		 List<ReporteAsignacion> rsu = null;
+		try {
+			HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+			
+			rsu= horarioDAO.Reporteasignacion(fechadesde, fechahasta,idarea);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return rsu;
+		
+	}
+	
+	public List<ReporteGraficaAsistencia> ReporteGraficaAsistencia(String basedatosasistencia,String fechadesde,String fechahasta,List<AsistenciaClasificacion> clasificacion,List<String> idareas) throws DatoException, ParseException, LogicaException {
+		 List<ReporteGraficaAsistencia> rsu =null;
+			try {
+				HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+				
+				rsu= horarioDAO.ReporteGraficaAsistencia(basedatosasistencia,fechadesde, fechahasta,clasificacion,idareas);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return rsu;
+	}
+		
+}

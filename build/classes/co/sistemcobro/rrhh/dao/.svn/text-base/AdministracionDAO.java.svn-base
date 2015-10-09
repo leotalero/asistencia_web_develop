@@ -1,0 +1,54 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.sql.DataSource;
+
+import co.sistemcobro.all.exception.DatoException;
+
+public class AdministracionDAO extends BaseDAO {
+		
+	/**
+	 * Constructor.
+	 */
+	public AdministracionDAO(DataSource ds) {
+		this.ds = ds;
+	}
+	
+	/**
+	 * Este método obtiene el maximo id de una tabla especifica.
+	 * @param String. El nombre de la tabla. (Ejemplo rrhh.empleado)
+	 * @param String. El nombre del id o atributo.
+	 * @throws DatoException 
+	 * */
+	public Long obtenerIdMaximoDeTabla(String nombreTabla, String nombreId) throws DatoException{
+		Long idMaximo = new Long(0);
+
+		try {
+
+			String consulta = "SELECT MAX("+nombreId+") AS idmaximo FROM "+nombreTabla;
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if(rs.next()) {
+				idMaximo = rs.getLong("idmaximo");
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return idMaximo;
+	}
+	
+	
+	
+	
+}

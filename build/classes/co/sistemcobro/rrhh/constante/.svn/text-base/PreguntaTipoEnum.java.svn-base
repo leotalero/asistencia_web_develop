@@ -1,0 +1,43 @@
+package co.sistemcobro.rrhh.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum PreguntaTipoEnum {
+	OPCIONES_MULTIPLES(1),OBSERVACIONES(2);
+
+	public static final Map<Integer, PreguntaTipoEnum> mapByID = new HashMap<Integer, PreguntaTipoEnum>();
+	public static final Map<String, PreguntaTipoEnum> mapByNAME = new HashMap<String, PreguntaTipoEnum>();
+
+	static {
+		for (PreguntaTipoEnum s : EnumSet
+				.allOf(PreguntaTipoEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	PreguntaTipoEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static PreguntaTipoEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static PreguntaTipoEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

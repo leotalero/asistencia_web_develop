@@ -1,0 +1,121 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+public class DisciplinaHistorial implements Serializable {
+
+	
+	private static final long serialVersionUID = 1L;
+	
+	private Long iddisciplinahistorial;
+	private Long iddisciplina;
+	private Long iddisciplinaestado;
+	private String observacion;
+	private String creadorProceso;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	private DisciplinaEstado disciplinaEstado;
+	private List<DisciplinaArchivo> listaArchivos;
+
+	public Long getIddisciplinahistorial() {
+		return iddisciplinahistorial;
+	}
+
+	public void setIddisciplinahistorial(Long iddisciplinahistorial) {
+		this.iddisciplinahistorial = iddisciplinahistorial;
+	}
+
+	public Long getIddisciplina() {
+		return iddisciplina;
+	}
+
+	public void setIddisciplina(Long iddisciplina) {
+		this.iddisciplina = iddisciplina;
+	}
+
+	public Long getIddisciplinaestado() {
+		return iddisciplinaestado;
+	}
+
+	public void setIddisciplinaestado(Long iddisciplinaestado) {
+		this.iddisciplinaestado = iddisciplinaestado;
+	}
+
+	public String getObservacion() {
+		return observacion;
+	}
+
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public DisciplinaEstado getDisciplinaEstado() {
+		return disciplinaEstado;
+	}
+
+	public void setDisciplinaEstado(DisciplinaEstado disciplinaEstado) {
+		this.disciplinaEstado = disciplinaEstado;
+	}
+
+	public String getCreadorProceso() {
+		return creadorProceso;
+	}
+
+	public void setCreadorProceso(String creadorProceso) {
+		this.creadorProceso = creadorProceso;
+	}
+
+	public List<DisciplinaArchivo> getListaArchivos() {
+		return listaArchivos;
+	}
+
+	public void setListaArchivos(List<DisciplinaArchivo> listaArchivos) {
+		this.listaArchivos = listaArchivos;
+	}
+}

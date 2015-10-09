@@ -1,0 +1,102 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.hermes.bean.AplicacionBean;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class AplicacionDAO extends BaseDAO {
+
+	public AplicacionDAO(DataSource ds) {
+		this.ds = ds;
+	}
+	
+	public AplicacionBean getAplicacionPorIdaplicacion(Integer idaplicacion) throws DatoException {
+		AplicacionBean aplicacion = null;
+
+		try {
+			StringBuffer q = new StringBuffer();
+			q.append("select a.idaplicacion, a.nombre, a.nombreexterno, a.estado,a.linkproduccion,a.icono,a.favicon,a.linkpublico  ");
+			q.append("from hermes.sco_aplicacion a where  a.idaplicacion = ? ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idaplicacion);
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				int t = 1;
+				aplicacion = new AplicacionBean();
+				aplicacion.setIdaplicacion(rs.getInt(t++));
+				aplicacion.setNombre(rs.getString(t++));
+				aplicacion.setNombreexterno(rs.getString(t++));
+				aplicacion.setEstado(rs.getInt(t++));
+				aplicacion.setLinkproduccion(rs.getString(t++));
+				aplicacion.setIcono(rs.getString(t++));
+				aplicacion.setFavicon(rs.getString(t++));
+				aplicacion.setLinkpublico(rs.getString(t++));
+				
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return aplicacion;
+
+	}
+
+	public List<AplicacionBean> getAplicaciones(String estados) throws DatoException {
+		List<AplicacionBean> aplicaciones = new ArrayList<AplicacionBean>();
+		AplicacionBean aplicacion = null;
+
+		try {
+			StringBuffer q = new StringBuffer();
+			q.append("select a.idaplicacion, a.nombre, a.nombreexterno, a.estado,a.linkproduccion,a.icono,a.favicon ");
+			q.append("from hermes.sco_aplicacion a where  a.estado in (" + estados + ") ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				int t = 1;
+				aplicacion = new AplicacionBean();
+				aplicacion.setIdaplicacion(rs.getInt(t++));
+				aplicacion.setNombre(rs.getString(t++));
+				aplicacion.setNombreexterno(rs.getString(t++));
+				aplicacion.setEstado(rs.getInt(t++));
+				aplicacion.setLinkproduccion(rs.getString(t++));
+				aplicacion.setIcono(rs.getString(t++));
+				aplicacion.setFavicon(rs.getString(t++));
+				aplicaciones.add(aplicacion);
+
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return aplicaciones;
+
+	}
+
+}

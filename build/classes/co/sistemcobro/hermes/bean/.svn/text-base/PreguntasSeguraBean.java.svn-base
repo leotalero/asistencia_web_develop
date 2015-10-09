@@ -1,0 +1,121 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo Talero
+ * 
+ */
+public class PreguntasSeguraBean implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private Long idpreguntasegura;
+	private String pregunta;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	
+
+	public PreguntasSeguraBean() {
+	}
+
+
+
+	public Long getIdpreguntasegura() {
+		return idpreguntasegura;
+	}
+
+
+
+	public void setIdpreguntasegura(Long idpreguntasegura) {
+		this.idpreguntasegura = idpreguntasegura;
+	}
+
+
+
+	public String getPregunta() {
+		return pregunta;
+	}
+
+
+
+	public void setPregunta(String pregunta) {
+		this.pregunta = pregunta;
+	}
+
+
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+
+	
+
+	
+
+
+	/*@Override
+	public String toString() {
+		return "UsuarioBean [idusuario=" + idusuario + ", nombre=" + nombre + ", usuariolatitude=" + usuarioaltitude + ", clave=" + clave + ", usuario=" + usuario + ", estado=" + estado + "]";
+	}*/
+
+}

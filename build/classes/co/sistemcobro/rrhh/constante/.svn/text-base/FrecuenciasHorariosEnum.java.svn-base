@@ -1,0 +1,45 @@
+package co.sistemcobro.rrhh.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum FrecuenciasHorariosEnum {
+	LUNES(1),MARTES(2),MIERCOLES(3),JUEVES(4),VIERNES(5),SABADO(6),DOMINGO(7),LUNES_VIERNES(8),lUNES_SABADO(9),
+	FIN_DE_SEMANA(10),LUNES_NOCTURNO(11),MARTES_NOCTURNO(12),MIERCOLES_NOCTURNO(13),JUEVES_NOCTURNO(14),VIERNES_NOCTURNO(15)
+	,SABADO_NOCTURNO(16),DOMINGO_NOCTURNO(17),LUNES_VIERNES_NOCTURNO(18),LUNES_SABADO_NOCTURNO(19),FIN_DE_SEMANA_NOCTURNO(20);
+
+	public static final Map<Integer, FrecuenciasHorariosEnum> mapByID = new HashMap<Integer, FrecuenciasHorariosEnum>();
+	public static final Map<String, FrecuenciasHorariosEnum> mapByNAME = new HashMap<String, FrecuenciasHorariosEnum>();
+
+	static {
+		for (FrecuenciasHorariosEnum s : EnumSet
+				.allOf(FrecuenciasHorariosEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	FrecuenciasHorariosEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static FrecuenciasHorariosEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static FrecuenciasHorariosEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

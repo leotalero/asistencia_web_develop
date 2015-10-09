@@ -1,0 +1,94 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class ContrasenaHistorial implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private Integer idcontrasenahistorial;
+	private Integer idusuario;
+	private String clave;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer estado;
+
+	private UsuarioBean usuario;
+	private UsuarioBean usuariocrea;
+
+	public Integer getIdcontrasenahistorial() {
+		return idcontrasenahistorial;
+	}
+
+	public void setIdcontrasenahistorial(Integer idcontrasenahistorial) {
+		this.idcontrasenahistorial = idcontrasenahistorial;
+	}
+
+	public Integer getIdusuario() {
+		return idusuario;
+	}
+
+	public void setIdusuario(Integer idusuario) {
+		this.idusuario = idusuario;
+	}
+
+	public String getClave() {
+		return clave;
+	}
+
+	public void setClave(String clave) {
+		this.clave = clave;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public UsuarioBean getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(UsuarioBean usuario) {
+		this.usuario = usuario;
+	}
+
+	public UsuarioBean getUsuariocrea() {
+		return usuariocrea;
+	}
+
+	public void setUsuariocrea(UsuarioBean usuariocrea) {
+		this.usuariocrea = usuariocrea;
+	}
+
+	@Override
+	public String toString() {
+		return "ContrasenaHistorial [idcontrasenahistorial=" + idcontrasenahistorial + ", idusuario=" + idusuario + ", clave=" + clave + ", idusuariocrea=" + idusuariocrea + ", fechacrea=" + fechacrea + ", estado=" + estado + ", usuario=" + usuario + "]";
+	}
+
+}

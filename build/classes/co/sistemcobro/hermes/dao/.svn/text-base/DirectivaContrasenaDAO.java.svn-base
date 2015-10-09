@@ -1,0 +1,166 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.hermes.bean.DirectivaContrasena;
+import co.sistemcobro.hermes.bean.EncriptacionTipo;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class DirectivaContrasenaDAO extends BaseDAO {
+
+	private Logger logger = Logger.getLogger(DirectivaContrasenaDAO.class);
+
+	public DirectivaContrasenaDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public DirectivaContrasena getDirectivaContrasenaPorIdusuario(Integer idusuario) throws DatoException {
+
+		DirectivaContrasena directivacontrasena = null;		
+		EncriptacionTipo encriptaciontipo = null;
+		
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("select dc.iddirectivacontrasena, dc.idencriptaciontipo, dc.nombre, dc.historialmaximo, dc.vigenciamaxima, dc.vigenciaminima,  ");
+			q.append("dc.validolongitudmaxima, dc.validolongitudminima, dc.validonumerocantidad, dc.validominusculacantidad, dc.validomayusculacantidad, dc.validoespecialcantidad,  ");
+			q.append("dc.idusuariocrea, dc.fechacrea, dc.idusuariomod, dc.fechamod, dc.estado, ");
+			q.append("et.idencriptaciontipo, et.nombre, et.idusuariocrea, et.fechacrea, et.estado ");
+			q.append("from hermes.sco_usuario u   ");
+			q.append("inner join hermes.directiva_contrasena dc on dc.iddirectivacontrasena = u.iddirectivacontrasena  ");
+			q.append("inner join hermes.encriptacion_tipo et on et.idencriptaciontipo = dc.idencriptaciontipo  ");
+			q.append("where u.idusuario = ? ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+			rs = ps.executeQuery();
+
+			int c = 1;
+			if (rs.next()) {
+				c = 1;
+
+				directivacontrasena = new DirectivaContrasena();
+				directivacontrasena.setIddirectivacontrasena(rs.getInt(c++));
+				directivacontrasena.setIdencriptaciontipo(rs.getInt(c++));
+				directivacontrasena.setNombre(rs.getString(c++));
+				directivacontrasena.setHistorialmaximo(rs.getInt(c++));
+				directivacontrasena.setVigenciamaxima(rs.getInt(c++));
+				directivacontrasena.setVigenciaminima(rs.getInt(c++));
+
+				directivacontrasena.setValidolongitudmaxima(rs.getInt(c++));
+				directivacontrasena.setValidolongitudminima(rs.getInt(c++));
+				directivacontrasena.setValidonumerocantidad(rs.getInt(c++));
+				directivacontrasena.setValidominusculacantidad(rs.getInt(c++));
+				directivacontrasena.setValidomayusculacantidad(rs.getInt(c++));
+				directivacontrasena.setValidoespecialcantidad(rs.getInt(c++));
+
+				directivacontrasena.setIdusuariocrea(rs.getInt(c++));
+				directivacontrasena.setFechacrea(rs.getTimestamp(c++));
+				directivacontrasena.setIdusuariomod(rs.getInt(c++));
+				directivacontrasena.setFechamod(rs.getTimestamp(c++));
+				directivacontrasena.setEstado(rs.getInt(c++));
+				
+				
+				encriptaciontipo = new EncriptacionTipo();
+				encriptaciontipo.setIdencriptaciontipo(rs.getInt(c++));
+				encriptaciontipo.setNombre(rs.getString(c++));
+				encriptaciontipo.setIdusuariocrea(rs.getInt(c++));
+				encriptaciontipo.setFechacrea(rs.getTimestamp(c++));
+				encriptaciontipo.setEstado(rs.getInt(c++));
+				
+				directivacontrasena.setEncriptaciontipo(encriptaciontipo);
+
+			}
+
+		} catch (SQLException e) {
+			  logger.error("Atrapó la excepcion SQL:", e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			  logger.error("Atrapó la excepcion SQL:", e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return directivacontrasena;
+
+	}
+
+	public List<DirectivaContrasena> getDirectivaContrasenas(Integer[] estados) throws DatoException {
+		List<DirectivaContrasena> directivacontrasenas = new ArrayList<DirectivaContrasena>();
+		DirectivaContrasena directivacontrasena = null;
+
+		try {
+
+			/* Verificamos y formateamos los estados */
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (Integer e : estados) {
+					estados_final += String.valueOf(e) + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			} else {
+				throw new DatoException("Formato inválido de estados.");
+			}
+
+			/* Preparamos la query */
+			StringBuilder q = new StringBuilder();
+			q.append("select dc.iddirectivacontrasena, dc.nombre, dc.historialmaximo, dc.vigenciamaxima, dc.vigenciaminima,  ");
+			q.append("dc.validolongitudmaxima, dc.validolongitudminima, dc.validonumerocantidad, dc.validominusculacantidad, dc.validomayusculacantidad, dc.validoespecialcantidad,  ");
+			q.append("dc.idusuariocrea, dc.fechacrea, dc.idusuariomod, dc.fechamod, dc.estado ");
+			q.append("from hermes.directiva_contrasena dc  ");
+			q.append("where dc.estado in  (" + estados_final + ") order by dc.nombre ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			rs = ps.executeQuery();
+
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				directivacontrasena = new DirectivaContrasena();
+				directivacontrasena.setIddirectivacontrasena(rs.getInt(c++));
+				directivacontrasena.setNombre(rs.getString(c++));
+				directivacontrasena.setHistorialmaximo(rs.getInt(c++));
+				directivacontrasena.setVigenciamaxima(rs.getInt(c++));
+				directivacontrasena.setVigenciaminima(rs.getInt(c++));
+				
+				directivacontrasena.setValidolongitudmaxima(rs.getInt(c++));
+				directivacontrasena.setValidolongitudminima(rs.getInt(c++));
+				directivacontrasena.setValidonumerocantidad(rs.getInt(c++));
+				directivacontrasena.setValidominusculacantidad(rs.getInt(c++));
+				directivacontrasena.setValidomayusculacantidad(rs.getInt(c++));
+				directivacontrasena.setValidoespecialcantidad(rs.getInt(c++));
+				
+				directivacontrasena.setIdusuariocrea(rs.getInt(c++));
+				directivacontrasena.setFechacrea(rs.getTimestamp(c++));
+				directivacontrasena.setIdusuariomod(rs.getInt(c++));
+				directivacontrasena.setFechamod(rs.getTimestamp(c++));
+				directivacontrasena.setEstado(rs.getInt(c++));
+
+				directivacontrasenas.add(directivacontrasena);
+
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return directivacontrasenas;
+	}
+
+}

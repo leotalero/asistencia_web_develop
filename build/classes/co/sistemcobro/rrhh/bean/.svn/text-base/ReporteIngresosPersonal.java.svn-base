@@ -1,0 +1,122 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+
+public class ReporteIngresosPersonal implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private IdentificacionTipo identificacionTipo;
+	private EmpleadoIdentificacion empleadoIdentificacion;
+	private EmpleadoBean empleado;
+	private Sucursal sucursal;
+	private Contrato contrato;
+	private Cargo cargo;
+	private Area area;
+	private Area areaAsignada;
+	private EmpleadoPropiedad empleadoPropiedad;
+	private AfiliacionEntidad afiliacionEntidadSalud;
+	private AfiliacionEntidad afiliacionEntidadPension;
+	private AfiliacionEntidad afiliacionEntidadCesantias;
+	private AfiliacionEntidad afiliacionEntidadCajaCompensacion;
+	private EmpleadoBanco empleadoBanco;
+	private Banco banco;
+	
+	public IdentificacionTipo getIdentificacionTipo() {
+		return identificacionTipo;
+	}
+	public void setIdentificacionTipo(IdentificacionTipo identificacionTipo) {
+		this.identificacionTipo = identificacionTipo;
+	}
+	public EmpleadoIdentificacion getEmpleadoIdentificacion() {
+		return empleadoIdentificacion;
+	}
+	public void setEmpleadoIdentificacion(
+			EmpleadoIdentificacion empleadoIdentificacion) {
+		this.empleadoIdentificacion = empleadoIdentificacion;
+	}
+	public EmpleadoBean getEmpleado() {
+		return empleado;
+	}
+	public void setEmpleado(EmpleadoBean empleado) {
+		this.empleado = empleado;
+	}
+	public Sucursal getSucursal() {
+		return sucursal;
+	}
+	public void setSucursal(Sucursal sucursal) {
+		this.sucursal = sucursal;
+	}
+	public Contrato getContrato() {
+		return contrato;
+	}
+	public void setContrato(Contrato contrato) {
+		this.contrato = contrato;
+	}
+	public Cargo getCargo() {
+		return cargo;
+	}
+	public void setCargo(Cargo cargo) {
+		this.cargo = cargo;
+	}
+	public EmpleadoPropiedad getEmpleadoPropiedad() {
+		return empleadoPropiedad;
+	}
+	public void setEmpleadoPropiedad(EmpleadoPropiedad empleadoPropiedad) {
+		this.empleadoPropiedad = empleadoPropiedad;
+	}
+	
+	public EmpleadoBanco getEmpleadoBanco() {
+		return empleadoBanco;
+	}
+	public void setEmpleadoBanco(EmpleadoBanco empleadoBanco) {
+		this.empleadoBanco = empleadoBanco;
+	}
+	public Banco getBanco() {
+		return banco;
+	}
+	public void setBanco(Banco banco) {
+		this.banco = banco;
+	}
+	public AfiliacionEntidad getAfiliacionEntidadSalud() {
+		return afiliacionEntidadSalud;
+	}
+	public void setAfiliacionEntidadSalud(AfiliacionEntidad afiliacionEntidadSalud) {
+		this.afiliacionEntidadSalud = afiliacionEntidadSalud;
+	}
+	public AfiliacionEntidad getAfiliacionEntidadPension() {
+		return afiliacionEntidadPension;
+	}
+	public void setAfiliacionEntidadPension(
+			AfiliacionEntidad afiliacionEntidadPension) {
+		this.afiliacionEntidadPension = afiliacionEntidadPension;
+	}
+	public AfiliacionEntidad getAfiliacionEntidadCesantias() {
+		return afiliacionEntidadCesantias;
+	}
+	public void setAfiliacionEntidadCesantias(
+			AfiliacionEntidad afiliacionEntidadCesantias) {
+		this.afiliacionEntidadCesantias = afiliacionEntidadCesantias;
+	}
+	public AfiliacionEntidad getAfiliacionEntidadCajaCompensacion() {
+		return afiliacionEntidadCajaCompensacion;
+	}
+	public void setAfiliacionEntidadCajaCompensacion(
+			AfiliacionEntidad afiliacionEntidadCajaCompensacion) {
+		this.afiliacionEntidadCajaCompensacion = afiliacionEntidadCajaCompensacion;
+	}
+	public Area getArea() {
+		return area;
+	}
+	public void setArea(Area area) {
+		this.area = area;
+	}
+	public Area getAreaAsignada() {
+		return areaAsignada;
+	}
+	public void setAreaAsignada(Area areaAsignada) {
+		this.areaAsignada = areaAsignada;
+	}
+	
+	
+}

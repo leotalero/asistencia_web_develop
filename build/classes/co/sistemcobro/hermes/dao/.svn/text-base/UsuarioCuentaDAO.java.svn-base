@@ -1,0 +1,381 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.hermes.bean.Cuenta;
+import co.sistemcobro.hermes.bean.Estado;
+import co.sistemcobro.hermes.bean.UsuarioBean;
+import co.sistemcobro.hermes.bean.UsuarioCuenta;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class UsuarioCuentaDAO extends BaseDAO {
+
+	private Logger logger = Logger.getLogger(UsuarioCuentaDAO.class);
+
+	public UsuarioCuentaDAO(DataSource ds) {
+		this.ds = ds;
+	}
+	
+	public UsuarioCuenta getUsuarioCuentaPorCodusuario(Integer codusuario, Integer idcuenta) throws DatoException {
+
+		UsuarioCuenta uc = null;
+		Cuenta cuenta = null;
+		Estado usuariocuentaestado = null;
+
+		UsuarioBean usuario = null;
+
+		try {
+			con = ds.getConnection();
+
+			StringBuilder q = new StringBuilder();
+			q.append("select distinct uc.idusuario, uc.idcuenta, uc.dato, uc.idusuariocrea, uc.fechacrea, uc.idusuariomod, uc.fechamod, uc.estado,  ");
+			q.append("u.idusuario, u.idsucursal, u.codusuario, u.numidentificacion, u.usuario, u.nombre, u.extensionaltitude, u.extensionxlite, u.idusuariocrea, u.fechacrea, u.idusuariomod, u.fechamod, u.estado, ");
+			q.append("c.idcuenta, c.nombre, c.estado,  ");
+			q.append("uce.idestado, uce.nombre, uce.nombrecorto, uce.simbolo, uce.orden ");
+			q.append("from hermes.usuario_cuenta uc ");
+			q.append("left join hermes.sco_usuario u on uc.idusuario = u.idusuario ");
+			q.append("left join hermes.cuenta c on uc.idcuenta = c.idcuenta ");
+			q.append("left join hermes.estado uce on uce.idestado = uc.estado   ");
+			q.append("where u.codusuario = ? and uc.idcuenta=?  ");
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, codusuario);
+			ps.setInt(2, idcuenta);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			if (rs.next()) {
+				c = 1;
+				uc = new UsuarioCuenta();
+				uc.setIdusuario(rs.getInt(c++));
+				uc.setIdcuenta(rs.getInt(c++));
+				uc.setDato(rs.getString(c++));
+				uc.setIdusuariocrea(rs.getInt(c++));
+				uc.setFechacrea(rs.getTimestamp(c++));
+				uc.setIdusuariomod(rs.getInt(c++));
+				uc.setFechamod(rs.getTimestamp(c++));
+				uc.setEstado(rs.getInt(c++));
+
+				usuario = new UsuarioBean();
+				usuario.setIdusuario(rs.getInt(c++));
+				usuario.setIdsucursal(rs.getInt(c++));
+				usuario.setCodusuario(rs.getInt(c++));
+				usuario.setNumidentificacion(rs.getString(c++));
+				usuario.setUsuario(rs.getString(c++));
+				usuario.setNombre(rs.getString(c++));
+
+				usuario.setExtensionaltitude(rs.getInt(c++));
+				usuario.setExtensionxlite(rs.getInt(c++));
+				usuario.setIdusuariocrea(rs.getInt(c++));
+				usuario.setFechacrea(rs.getTimestamp(c++));
+				usuario.setIdusuariomod(rs.getInt(c++));
+				usuario.setFechamod(rs.getTimestamp(c++));
+				usuario.setEstado(rs.getInt(c++));
+
+				cuenta = new Cuenta();
+				cuenta.setIdcuenta(rs.getInt(c++));
+				cuenta.setNombre(rs.getString(c++));
+				cuenta.setEstado(rs.getInt(c++));
+				
+				usuariocuentaestado = new Estado();
+				usuariocuentaestado.setIdestado(rs.getInt(c++));
+				usuariocuentaestado.setNombre(rs.getString(c++));
+				usuariocuentaestado.setNombrecorto(rs.getString(c++));
+				usuariocuentaestado.setSimbolo(rs.getString(c++));
+				usuariocuentaestado.setOrden(rs.getInt(c++));	
+
+				uc.setCuenta(cuenta);
+				uc.setUsuario(usuario);
+				uc.setEstadob(usuariocuentaestado);
+
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return uc;
+
+	}
+	
+
+	public Integer actualizarUsuarioCuenta(UsuarioCuenta usuariocuenta)
+			throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+			con = ds.getConnection();
+			StringBuilder q = new StringBuilder();
+			q.append("update hermes.usuario_cuenta set dato=?, idusuariomod=?, ");
+			q.append("fechamod=getdate() where idusuario=? and idcuenta=? ");
+
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+
+			ps.setString(c++, usuariocuenta.getDato());
+			ps.setInt(c++, usuariocuenta.getIdusuariomod());
+			ps.setInt(c++, usuariocuenta.getIdusuario());
+			ps.setInt(c++, usuariocuenta.getIdcuenta());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			logger.error(e.toString(), e.fillInStackTrace());
+			throw new DatoException(e.toString());
+		} catch (Exception e) {
+			logger.error(e.toString(), e.fillInStackTrace());
+			throw new DatoException(e.toString());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	@SuppressWarnings("deprecation")
+	public UsuarioCuenta getUsuarioCuenta(Integer idusuario, Integer idcuenta) throws DatoException {
+
+		UsuarioCuenta uc = null;
+		Cuenta cuenta = null;
+		Estado usuariocuentaestado = null;
+
+		UsuarioBean usuario = null;
+
+		try {
+			con = ds.getConnection();
+
+			StringBuilder q = new StringBuilder();
+			q.append("select distinct uc.idusuario, uc.idcuenta, uc.dato, uc.idusuariocrea, uc.fechacrea, uc.idusuariomod, uc.fechamod, uc.estado,  ");
+			q.append("u.idusuario, u.idsucursal, u.codusuario, u.numidentificacion, u.usuario, u.nombre, u.usuarioaltitude, u.extensionaltitude, u.extensionxlite, u.idusuariocrea, u.fechacrea, u.idusuariomod, u.fechamod, u.estado, ");
+			q.append("c.idcuenta, c.nombre, c.estado,  ");
+			q.append("uce.idestado, uce.nombre, uce.nombrecorto, uce.simbolo, uce.orden ");
+			q.append("from hermes.usuario_cuenta uc ");
+			q.append("left join hermes.sco_usuario u on uc.idusuario = u.idusuario ");
+			q.append("left join hermes.cuenta c on uc.idcuenta = c.idcuenta ");
+			q.append("left join hermes.estado uce on uce.idestado = uc.estado   ");
+			q.append("where uc.idusuario = ? and uc.idcuenta=?  ");
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+			ps.setInt(2, idcuenta);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			if (rs.next()) {
+				c = 1;
+				uc = new UsuarioCuenta();
+				uc.setIdusuario(rs.getInt(c++));
+				uc.setIdcuenta(rs.getInt(c++));
+				uc.setDato(rs.getString(c++));
+				uc.setIdusuariocrea(rs.getInt(c++));
+				uc.setFechacrea(rs.getTimestamp(c++));
+				uc.setIdusuariomod(rs.getInt(c++));
+				uc.setFechamod(rs.getTimestamp(c++));
+				uc.setEstado(rs.getInt(c++));
+
+				usuario = new UsuarioBean();
+				usuario.setIdusuario(rs.getInt(c++));
+				usuario.setIdsucursal(rs.getInt(c++));
+				usuario.setCodusuario(rs.getInt(c++));
+				usuario.setNumidentificacion(rs.getString(c++));
+				usuario.setUsuario(rs.getString(c++));
+				usuario.setNombre(rs.getString(c++));
+				usuario.setUsuarioaltitude(rs.getInt(c++));
+				usuario.setExtensionaltitude(rs.getInt(c++));
+				usuario.setExtensionxlite(rs.getInt(c++));
+				usuario.setIdusuariocrea(rs.getInt(c++));
+				usuario.setFechacrea(rs.getTimestamp(c++));
+				usuario.setIdusuariomod(rs.getInt(c++));
+				usuario.setFechamod(rs.getTimestamp(c++));
+				usuario.setEstado(rs.getInt(c++));
+
+				cuenta = new Cuenta();
+				cuenta.setIdcuenta(rs.getInt(c++));
+				cuenta.setNombre(rs.getString(c++));
+				cuenta.setEstado(rs.getInt(c++));
+				
+				usuariocuentaestado = new Estado();
+				usuariocuentaestado.setIdestado(rs.getInt(c++));
+				usuariocuentaestado.setNombre(rs.getString(c++));
+				usuariocuentaestado.setNombrecorto(rs.getString(c++));
+				usuariocuentaestado.setSimbolo(rs.getString(c++));
+				usuariocuentaestado.setOrden(rs.getInt(c++));	
+
+				uc.setCuenta(cuenta);
+				uc.setUsuario(usuario);
+				uc.setEstadob(usuariocuentaestado);
+
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return uc;
+
+	}
+
+	@SuppressWarnings("deprecation")
+	public List<UsuarioCuenta> getUsuarioCuentas(Integer idusuario) throws DatoException {
+
+		List<UsuarioCuenta> usuariocuentas = new ArrayList<UsuarioCuenta>();
+		UsuarioCuenta uc = null;
+		Cuenta cuenta = null;
+		
+		Estado usuariocuentaestado = null;
+
+		UsuarioBean usuario = null;
+
+		try {
+			con = ds.getConnection();
+
+			StringBuilder q = new StringBuilder();
+			q.append("select distinct uc.idusuario, uc.idcuenta, uc.dato, uc.idusuariocrea, uc.fechacrea, uc.idusuariomod, uc.fechamod, uc.estado,  ");
+			q.append("u.idusuario, u.idsucursal, u.codusuario, u.numidentificacion, u.usuario, u.nombre, u.usuarioaltitude, u.extensionaltitude, u.extensionxlite, u.idusuariocrea, u.fechacrea, u.idusuariomod, u.fechamod, u.estado, ");
+			q.append("c.idcuenta, c.nombre, c.estado,  ");
+			q.append("uce.idestado, uce.nombre, uce.nombrecorto, uce.simbolo, uce.orden ");
+			q.append("from hermes.usuario_cuenta uc ");
+			q.append("left join hermes.sco_usuario u on uc.idusuario = u.idusuario ");
+			q.append("left join hermes.cuenta c on uc.idcuenta = c.idcuenta ");
+			q.append("left join hermes.estado uce on uce.idestado = uc.estado   ");
+			q.append("where uc.idusuario = ?  order by uc.idcuenta  ");
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				uc = new UsuarioCuenta();
+				uc.setIdusuario(rs.getInt(c++));
+				uc.setIdcuenta(rs.getInt(c++));
+				uc.setDato(rs.getString(c++));
+				uc.setIdusuariocrea(rs.getInt(c++));
+				uc.setFechacrea(rs.getTimestamp(c++));
+				uc.setIdusuariomod(rs.getInt(c++));
+				uc.setFechamod(rs.getTimestamp(c++));
+				uc.setEstado(rs.getInt(c++));
+
+				usuario = new UsuarioBean();
+				usuario.setIdusuario(rs.getInt(c++));
+				usuario.setIdsucursal(rs.getInt(c++));
+				usuario.setCodusuario(rs.getInt(c++));
+				usuario.setNumidentificacion(rs.getString(c++));
+				usuario.setUsuario(rs.getString(c++));
+				usuario.setNombre(rs.getString(c++));
+				usuario.setUsuarioaltitude(rs.getInt(c++));
+				usuario.setExtensionaltitude(rs.getInt(c++));
+				usuario.setExtensionxlite(rs.getInt(c++));
+				usuario.setIdusuariocrea(rs.getInt(c++));
+				usuario.setFechacrea(rs.getTimestamp(c++));
+				usuario.setIdusuariomod(rs.getInt(c++));
+				usuario.setFechamod(rs.getTimestamp(c++));
+				usuario.setEstado(rs.getInt(c++));
+
+				cuenta = new Cuenta();
+				cuenta.setIdcuenta(rs.getInt(c++));
+				cuenta.setNombre(rs.getString(c++));
+				cuenta.setEstado(rs.getInt(c++));
+				
+				usuariocuentaestado = new Estado();
+				usuariocuentaestado.setIdestado(rs.getInt(c++));
+				usuariocuentaestado.setNombre(rs.getString(c++));
+				usuariocuentaestado.setNombrecorto(rs.getString(c++));
+				usuariocuentaestado.setSimbolo(rs.getString(c++));
+				usuariocuentaestado.setOrden(rs.getInt(c++));	
+
+				uc.setCuenta(cuenta);
+				uc.setUsuario(usuario);
+				uc.setEstadob(usuariocuentaestado);
+
+				usuariocuentas.add(uc);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return usuariocuentas;
+
+	}
+
+	private static StringBuilder SQL_USUARIO_CUENTA_ESTADO_UPDATE = new StringBuilder()
+			.append("update hermes.usuario_cuenta set estado=?, idusuariomod=?, fechamod=getdate() where idusuario=? and idcuenta=? ");
+
+	public Integer actualizarEstadoUsuarioCuenta(UsuarioCuenta usuarioaplicacion) throws DatoException  {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+			con = ds.getConnection();
+			ps = con.prepareStatement(SQL_USUARIO_CUENTA_ESTADO_UPDATE
+					.toString());
+			c = 1;
+
+			ps.setInt(c++, usuarioaplicacion.getEstado());
+			ps.setInt(c++, usuarioaplicacion.getIdusuariomod());
+			ps.setInt(c++, usuarioaplicacion.getIdusuario());
+			ps.setInt(c++, usuarioaplicacion.getIdcuenta());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	private static String SQL_USUARIOCUENTA_INSERT = "insert hermes.usuario_cuenta (idusuario, "
+			+ "idcuenta, dato, idusuariocrea, fechacrea, estado)  "
+			+ "values (?,?,?,?,getdate(),?)";
+
+	public Integer insertarUsuarioCuenta(UsuarioCuenta usuarioaplicacion)
+			throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+			con = ds.getConnection();
+			ps = con.prepareStatement(SQL_USUARIOCUENTA_INSERT.toString());
+			c = 1;
+
+			ps.setInt(c++, usuarioaplicacion.getIdusuario());
+			ps.setInt(c++, usuarioaplicacion.getIdcuenta());
+			ps.setString(c++, usuarioaplicacion.getDato());
+			ps.setInt(c++, usuarioaplicacion.getIdusuariocrea());
+			ps.setInt(c++, usuarioaplicacion.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+}

@@ -1,0 +1,207 @@
+package co.sistemcobro.all.util;
+
+import java.io.File;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.activation.URLDataSource;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+import co.sistemcobro.all.exception.DatoException;
+
+public final class Mail {
+
+	public static void main(String args[]) {
+		Mail mail = new Mail();
+
+		List<String> destinatarios = new ArrayList<String>();
+		destinatarios.add("jhurtado@sistemcobro.com.co");
+		destinatarios.add("jonycaleb@gmail.com");
+
+		mail.enviaMail(destinatarios, "Test");
+	};
+
+	public void enviaMail(List<String> usuarios, String categoria) {
+
+		try {
+
+			String username = "comite@sistemcobro.com.co";
+			String password = "comite1234";
+
+			Properties props = new Properties();
+			// Nombre del host de correo, es smtp.gmail.com
+			// props.setProperty("mail.smtp.host", "smtp.gmail.com");
+			props.setProperty("mail.smtp.host", "172.16.1.87");
+
+			// TLS si está disponible
+			// props.setProperty("mail.smtp.starttls.enable", "true");
+
+			// Puerto de gmail para envio de correos
+			// props.setProperty("mail.smtp.port", "587");
+			props.setProperty("mail.smtp.port", "25");
+
+			// Nombre del usuario
+			props.setProperty("mail.smtp.user", "comite@sistemcobro.com.co");
+
+			// Si requiere o no usuario y password para conectarse.
+			props.setProperty("mail.smtp.auth", "true");
+
+			Session session = Session.getDefaultInstance(props);
+			session.setDebug(true);
+
+			InternetAddress[] direcciones = new InternetAddress[usuarios.size()];
+
+			for (int i = 0; i < usuarios.size(); i++) {
+				InternetAddress direccion = new InternetAddress(
+						(String) usuarios.get(i));
+				direcciones[i] = direccion;
+			}
+
+			NumberFormat nfCurrency = NumberFormat.getCurrencyInstance();
+			System.out.print(nfCurrency);
+			NumberFormat nfPercent = NumberFormat.getPercentInstance();
+			System.out.print(nfPercent);
+			MimeMessage message = new MimeMessage(session);
+			message.setFrom(new InternetAddress("comite@sistemcobro.com.co"));
+			message.setRecipients(Message.RecipientType.TO, direcciones);
+			// message.setRecipients(Message.RecipientType.TO,"direccion.desarrollo@sistemcobro.com");
+			message.setSubject("Consolidado de comites para " + categoria);
+
+			String formato =
+
+			"<html>"
+					+ "<head>"
+					+ "<P>"
+					+ "<BR/>"
+					+ "<b><font face=\"Arial\" size=3>Estimado(a) "
+					+ categoria
+					+ ",</font></b>"
+					+ "</P>"
+					+ "<b><font face=\"Arial\" size=3>Ha recibido este correo notificandole que tiene comites por revisar, los datos son los siguientes:</font></b>"
+					+ "</head>"
+					+ "<body bgcolor=\"#aaaad1\">"
+					+ "<BR>"
+					+ "</BR>"
+					+ "<table  cellspacing=\"0\" cellpadding=\"5\" border=\"1\" BORDERCOLOR=\"Black\">"
+					+ "<th colspan=\"4\" bgcolor=\"#024180\"><b><font face=\"Arial\" size=5 color=\"#FFFFFF\">Comites pendientes del d&iacute;a de hoy </font></b>"
+					+ "</th>"
+					+ "<tr>"
+					+ "<td bgcolor=\"#024180\" width=\"180\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">Capital</font></b></td>"
+					+ "<td bgcolor=\"#024180\" width=\"180\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">Valor Propuesta</font></b></td>"
+					+ "<td bgcolor=\"#024180\" width=\"180\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">Plazo (Cuotas)</font></b></td>"
+					+ "<td bgcolor=\"#024180\" width=\"250\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">% Valor Propuesta/Capital</font></b></td>"
+					+ "</tr>";
+
+			for (int i = 0; i < 5; i++) {
+				// Comite comite = comitesNuevos.get(i);
+
+				formato += "<tr>"
+						+ "<td bgcolor=\"#024180\" width=\"140\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">"
+						+ "dsfs"
+						+ "</font></b></td>"
+						+ "<td bgcolor=\"#024180\" width=\"140\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">"
+						+ "sdfs fd"
+						+ "</font></b></td>"
+						+ "<td bgcolor=\"#024180\" width=\"140\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">"
+						+ "sdfsdf"
+						+ "</b></td>"
+						+ "<td bgcolor=\"#024180\" width=\"140\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">"
+						+ "fsdfsd" + "</b></td>" + "</tr>";
+
+			}
+
+			formato += "</table>"
+					+ "<BR/>"
+					+ "<table  cellspacing=\"0\" cellpadding=\"5\" border=\"1\" BORDERCOLOR=\"Black\">"
+					+ "<th colspan=\"4\" bgcolor=\"#024180\"><b><font face=\"Arial\" size=5 color=\"#FFFFFF\">Comites pendientes desde el d&iacute;a de ayer </font></b>"
+					+ "</th>"
+					+ "<tr>"
+					+ "<td bgcolor=\"#024180\" width=\"180\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">Capital</font></b></td>"
+					+ "<td bgcolor=\"#024180\" width=\"180\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">Valor Propuesta</font></b></td>"
+					+ "<td bgcolor=\"#024180\" width=\"180\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">Plazo (Cuotas)</font></b></td>"
+					+ "<td bgcolor=\"#024180\" width=\"250\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">% Valor Propuesta/Capital</font></b></td>"
+					+ "</tr>";
+			//
+			for (int i = 0; i < 5; i++) {
+				// Comite comite = comitesPendientes.get(i);
+
+				formato += "<tr>"
+						+ "<td bgcolor=\"#024180\" width=\"140\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">"
+						+ "dsfsd"
+						+ "</font></b></td>"
+						+ "<td bgcolor=\"#024180\" width=\"140\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">"
+						+ "sfsdfsa"
+						+ "</font></b></td>"
+						+ "<td bgcolor=\"#024180\" width=\"140\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">"
+						+ "sdfasdff"
+						+ "</b></td>"
+						+ "<td bgcolor=\"#024180\" width=\"140\" align=center><b><font face=\"Arial\" size=3 color=\"#FFFFFF\">"
+						+ "dfsdfsd" + "</b></td>" + "</tr>";
+
+			}
+
+			formato += "</table>"
+					+ "<BR/>"
+					+ "<font face=\"Arial\" size=3><BR/><B><I>Resumen:</I></B><BR/><UL><li>Usted tiene <U> "
+					+ "5"
+					+ " </U> Comite(s) Nuevo(s) y <U> "
+					+ "5"
+					+ " </U> Comite(s) Antiguo(s)</li></UL></font>"
+					+ "<BR/>"
+					+ "<P><b>Acceda a nuestra sitio web en:  http://www.sistemcobro.com:8081/konfigura</b></P>"
+					+ "<P>"
+					+ "<b><font face=\"Arial\" size=3><BR/>Saludos cordiales,<BR/><BR/>"
+					+ "<IMG SRC=\"cid:figura1\" WIDTH=250 HEIGHT=60 BORDER=2 VSPACE=3 HSPACE=3 ALT=\"Sistemcobro Ltda\">"
+					+ "<BR/><I>Sistemcobro Ltda.<BR/>Av. las Am&eacute;ricas No. 58 51<BR/>Tel:. 749 5000</I></font>"
+					+ "</b>" + "</P>" + "</body>" + "</html>";
+
+			Multipart multipart = new MimeMultipart("related");
+
+			BodyPart texto = new MimeBodyPart();
+			texto.setContent(formato, "text/html");
+
+			multipart.addBodyPart(texto);
+
+			MimeBodyPart imagen = new MimeBodyPart();
+			
+			System.out.print("Path: "+File.separator);
+
+			// String path = System.getProperty("user.dir");
+			// System.out.print(path.replace("\\", "/"));
+			URL imgURL = getClass().getResource("/sistemcobro.jpg");
+			DataSource ds = new URLDataSource(imgURL);
+
+			// imagen.attachFile(path + "/src/main/java/sistemcobro.jpg");
+			imagen.attachFile(imgURL.getPath());
+			imagen.setDataHandler(new DataHandler(ds));
+			imagen.setHeader("Content-ID", "<figura1>");
+			multipart.addBodyPart(imagen);
+
+			message.setContent(multipart);
+
+			Transport transport = session.getTransport("smtp");
+			transport.connect(username, password);
+			transport.sendMessage(message, message.getAllRecipients());
+
+			transport.close();
+
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
+	}
+}

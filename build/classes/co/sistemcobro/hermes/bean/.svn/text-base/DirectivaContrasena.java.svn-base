@@ -1,0 +1,197 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class DirectivaContrasena implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private Integer iddirectivacontrasena;
+	private Integer idencriptaciontipo;
+	private String nombre;
+	private Integer historialmaximo;
+	private Integer vigenciamaxima;
+	private Integer vigenciaminima;
+	private Integer validolongitudmaxima;
+	private Integer validolongitudminima;
+	private Integer validonumerocantidad;
+	private Integer validominusculacantidad;
+	private Integer validomayusculacantidad;
+	private Integer validoespecialcantidad;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	private EncriptacionTipo encriptaciontipo;
+
+	private List<UsuarioBean> usuarios;
+
+	public Integer getIddirectivacontrasena() {
+		return iddirectivacontrasena;
+	}
+
+	public void setIddirectivacontrasena(Integer iddirectivacontrasena) {
+		this.iddirectivacontrasena = iddirectivacontrasena;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public Integer getHistorialmaximo() {
+		return historialmaximo;
+	}
+
+	public void setHistorialmaximo(Integer historialmaximo) {
+		this.historialmaximo = historialmaximo;
+	}
+
+	public Integer getVigenciamaxima() {
+		return vigenciamaxima;
+	}
+
+	public void setVigenciamaxima(Integer vigenciamaxima) {
+		this.vigenciamaxima = vigenciamaxima;
+	}
+
+	public Integer getVigenciaminima() {
+		return vigenciaminima;
+	}
+
+	public void setVigenciaminima(Integer vigenciaminima) {
+		this.vigenciaminima = vigenciaminima;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public List<UsuarioBean> getUsuarios() {
+		return usuarios;
+	}
+
+	public void setUsuarios(List<UsuarioBean> usuarios) {
+		this.usuarios = usuarios;
+	}
+
+	public Integer getIdencriptaciontipo() {
+		return idencriptaciontipo;
+	}
+
+	public void setIdencriptaciontipo(Integer idencriptaciontipo) {
+		this.idencriptaciontipo = idencriptaciontipo;
+	}
+
+	public Integer getValidolongitudmaxima() {
+		return validolongitudmaxima;
+	}
+
+	public void setValidolongitudmaxima(Integer validolongitudmaxima) {
+		this.validolongitudmaxima = validolongitudmaxima;
+	}
+
+	public Integer getValidolongitudminima() {
+		return validolongitudminima;
+	}
+
+	public void setValidolongitudminima(Integer validolongitudminima) {
+		this.validolongitudminima = validolongitudminima;
+	}
+
+	public Integer getValidonumerocantidad() {
+		return validonumerocantidad;
+	}
+
+	public void setValidonumerocantidad(Integer validonumerocantidad) {
+		this.validonumerocantidad = validonumerocantidad;
+	}
+
+	public Integer getValidominusculacantidad() {
+		return validominusculacantidad;
+	}
+
+	public void setValidominusculacantidad(Integer validominusculacantidad) {
+		this.validominusculacantidad = validominusculacantidad;
+	}
+
+	public Integer getValidomayusculacantidad() {
+		return validomayusculacantidad;
+	}
+
+	public void setValidomayusculacantidad(Integer validomayusculacantidad) {
+		this.validomayusculacantidad = validomayusculacantidad;
+	}
+
+	public Integer getValidoespecialcantidad() {
+		return validoespecialcantidad;
+	}
+
+	public void setValidoespecialcantidad(Integer validoespecialcantidad) {
+		this.validoespecialcantidad = validoespecialcantidad;
+	}
+
+	public EncriptacionTipo getEncriptaciontipo() {
+		return encriptaciontipo;
+	}
+
+	public void setEncriptaciontipo(EncriptacionTipo encriptaciontipo) {
+		this.encriptaciontipo = encriptaciontipo;
+	}
+
+	@Override
+	public String toString() {
+		return "DirectivaContrasena [iddirectivacontrasena=" + iddirectivacontrasena + ", idencriptaciontipo=" + idencriptaciontipo + ", nombre=" + nombre + ", historialmaximo=" + historialmaximo + ", vigenciamaxima=" + vigenciamaxima + ", vigenciaminima=" + vigenciaminima
+				+ ", validolongitudmaxima=" + validolongitudmaxima + ", validolongitudminima=" + validolongitudminima + ", validonumerocantidad=" + validonumerocantidad + ", validominusculacantidad=" + validominusculacantidad + ", validomayusculacantidad=" + validomayusculacantidad
+				+ ", validoespecialcantidad=" + validoespecialcantidad + ", idusuariocrea=" + idusuariocrea + ", fechacrea=" + fechacrea + ", idusuariomod=" + idusuariomod + ", fechamod=" + fechamod + ", estado=" + estado + ", encriptaciontipo=" + encriptaciontipo + ", usuarios=" + usuarios + "]";
+	}
+
+}

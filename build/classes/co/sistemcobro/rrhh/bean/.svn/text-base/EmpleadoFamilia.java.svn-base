@@ -1,0 +1,145 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+public class EmpleadoFamilia implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idEmpleadoFamilia;
+	private Long idParentesco;
+	private Long idGenero;
+	private Long ididentificaciontipo;
+	private Long idempleado;
+	private String nombrefamilia;
+	private String apellidoFamilia;
+	private Timestamp fechaNacimiento;
+	private String numeroIdentificacion;
+	private String observacion;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	private Parentesco parentesco;
+	private Genero genero;
+	private IdentificacionTipo tipoIdentificacion;
+	
+	public Long getIdEmpleadoFamilia() {
+		return idEmpleadoFamilia;
+	}
+	public void setIdEmpleadoFamilia(Long idEmpleadoFamilia) {
+		this.idEmpleadoFamilia = idEmpleadoFamilia;
+	}
+	public Long getIdParentesco() {
+		return idParentesco;
+	}
+	public void setIdParentesco(Long idParentesco) {
+		this.idParentesco = idParentesco;
+	}
+	public Long getIdGenero() {
+		return idGenero;
+	}
+	public void setIdGenero(Long idGenero) {
+		this.idGenero = idGenero;
+	}
+	public Long getIdidentificaciontipo() {
+		return ididentificaciontipo;
+	}
+	public void setIdidentificaciontipo(Long ididentificaciontipo) {
+		this.ididentificaciontipo = ididentificaciontipo;
+	}
+	public Long getIdempleado() {
+		return idempleado;
+	}
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+	public String getNombrefamilia() {
+		return nombrefamilia;
+	}
+	public void setNombrefamilia(String nombrefamilia) {
+		this.nombrefamilia = nombrefamilia;
+	}
+	public String getApellidoFamilia() {
+		return apellidoFamilia;
+	}
+	public void setApellidoFamilia(String apellidoFamilia) {
+		this.apellidoFamilia = apellidoFamilia;
+	}
+	public Timestamp getFechaNacimiento() {
+		return fechaNacimiento;
+	}
+	public void setFechaNacimiento(Timestamp fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
+	public String getNumeroIdentificacion() {
+		return numeroIdentificacion;
+	}
+	public void setNumeroIdentificacion(String numeroIdentificacion) {
+		this.numeroIdentificacion = numeroIdentificacion;
+	}
+	public String getObservacion() {
+		return observacion;
+	}
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	
+	public Parentesco getParentesco() {
+		return parentesco;
+	}
+	public void setParentesco(Parentesco parentesco) {
+		this.parentesco = parentesco;
+	}
+	public Genero getGenero() {
+		return genero;
+	}
+	public void setGenero(Genero genero) {
+		this.genero = genero;
+	}
+	public IdentificacionTipo getTipoIdentificacion() {
+		return tipoIdentificacion;
+	}
+	public void setTipoIdentificacion(IdentificacionTipo tipoIdentificacion) {
+		this.tipoIdentificacion = tipoIdentificacion;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	
+}

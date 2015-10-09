@@ -1,0 +1,23 @@
+package co.sistemcobro.hermes.ejb;
+
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+
+public class BaseEJB {
+
+//desarrollo
+	@Resource(mappedName = "dc_hermes")
+	protected DataSource dc_hermes;
+		
+	@Resource(mappedName = "dg_hermes")
+	protected DataSource dg_hermes;
+
+	
+
+}

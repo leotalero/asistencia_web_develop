@@ -1,0 +1,114 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo Taler
+ * 
+ */
+public class EmpleadoPropiedad implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idempleadopropiedad;
+
+	private Long idempleado;
+	private Long idpropiedad;
+	private String dato;
+	private String observacion;
+	private Long idprioridad;
+	
+	private Integer idusuariocrea;
+
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	private Propiedad propiedad;
+	private Prioridad prioridad;
+	
+	public Long getIdempleadopropiedad() {
+		return idempleadopropiedad;
+	}
+	public void setIdempleadopropiedad(Long idempleadopropiedad) {
+		this.idempleadopropiedad = idempleadopropiedad;
+	}
+	public Long getIdempleado() {
+		return idempleado;
+	}
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+	public Long getIdpropiedad() {
+		return idpropiedad;
+	}
+	public void setIdpropiedad(Long idpropiedad) {
+		this.idpropiedad = idpropiedad;
+	}
+	public String getDato() {
+		return dato;
+	}
+	public void setDato(String dato) {
+		this.dato = dato;
+	}
+	public Long getIdprioridad() {
+		return idprioridad;
+	}
+	public void setIdprioridad(Long idprioridad) {
+		this.idprioridad = idprioridad;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	
+	
+	public Propiedad getPropiedad() {
+		return propiedad;
+	}
+	public void setPropiedad(Propiedad propiedad) {
+		this.propiedad = propiedad;
+	}
+	public Prioridad getPrioridad() {
+		return prioridad;
+	}
+	public void setPrioridad(Prioridad prioridad) {
+		this.prioridad = prioridad;
+	}
+	public String getObservacion() {
+		return observacion;
+	}
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+	
+}

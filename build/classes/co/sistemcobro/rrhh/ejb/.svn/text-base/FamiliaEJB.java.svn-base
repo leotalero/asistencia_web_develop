@@ -1,0 +1,219 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.EmpleadoFamilia;
+import co.sistemcobro.rrhh.bean.Parentesco;
+import co.sistemcobro.rrhh.bean.Genero;
+import co.sistemcobro.rrhh.bean.IdentificacionTipo;
+import co.sistemcobro.rrhh.dao.FamiliaDAO;
+
+
+/**
+ * Para gestion de informacion de los familiares del empleado.
+ * @author jpuentes
+ */
+
+@Stateless
+public class FamiliaEJB extends BaseEJB{
+
+	Logger log =Logger.getLogger(FamiliaEJB.class);
+	
+    /**
+     * Constructor. 
+     */
+    public FamiliaEJB() {
+    }
+
+    /**
+     * Consulta el listado de datos de familia de un empleado.
+     * @param Long. idempleado.
+     * @return List. EmpleadoFamilia.
+     */
+    public List<EmpleadoFamilia> obtenerFamiliaDeEmpleadoPorIdEmpleado(Long idEmpleado) throws LogicaException{
+    	
+    	List<EmpleadoFamilia> listaDeEmpleadoFamilia = new ArrayList<EmpleadoFamilia>();
+    	FamiliaDAO familiaDao = null;
+    	try {
+    		
+    		familiaDao = new FamiliaDAO(dc_rrhh);
+    		
+    		if(familiaDao!=null){
+    			listaDeEmpleadoFamilia = familiaDao.obtenerFamiliaDeEmpleadoPorIdEmpleado(idEmpleado);
+    		}
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeEmpleadoFamilia;  
+    }
+    
+    
+    /**
+     * Consulta el listado de parentescos existentes.
+     * @return List. Parentesco.
+     */
+    public List<Parentesco> obtenerListaParentescos() throws LogicaException{
+    	
+    	List<Parentesco> listaDeParentescos = new ArrayList<Parentesco>();
+    	
+    	try {
+    		FamiliaDAO familiaDAO = new FamiliaDAO(dc_rrhh);
+    		listaDeParentescos = familiaDAO.obtenerListaDeParentescos();
+    		
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeParentescos;  
+    }
+    
+    
+    /**
+     * Consulta el listado de generos existentes.
+     * @return List. Genero.
+     */
+    public List<Genero> obtenerListaGeneros() throws LogicaException{
+    	
+    	List<Genero> listaDeGeneros = new ArrayList<Genero>();
+    	
+    	try {
+    		FamiliaDAO familiaDAO = new FamiliaDAO(dc_rrhh);
+    		listaDeGeneros = familiaDAO.obtenerListaDeGeneros();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeGeneros;  
+    }
+    
+    /**
+     * Consulta el listado de los tipos de identificación existentes.
+     * @return List. IdentificacionTipo.
+     */
+    public List<IdentificacionTipo> obtenerListaTiposIdentificacion() throws LogicaException{
+    	
+    	List<IdentificacionTipo> listaDeTiposIdentificacion = new ArrayList<IdentificacionTipo>();
+    	
+    	try {
+    		FamiliaDAO familiaDAO = new FamiliaDAO(dc_rrhh);
+    		listaDeTiposIdentificacion = familiaDAO.obtenerListaTipoDeIdentificacion();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeTiposIdentificacion;  
+    }
+    
+    
+    /**
+     * Método para insertar una relacion empleado_familia.
+     * @param EmpleadoFamilia. La relación a insertar.
+     * @return EmpleadoFamilia. La relación insertada.
+     * @throws LogicaException.
+     */
+    public EmpleadoFamilia insertarNuevoEmpleadoFamilia(EmpleadoFamilia empleadoFamilia) throws LogicaException{
+    	EmpleadoFamilia resultado = null;
+    	try{
+    		FamiliaDAO familiaDAO = new FamiliaDAO(dg_rrhh); 
+    		resultado = familiaDAO.insertarEmpleadoFamilia(empleadoFamilia);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    /**
+     * Método para consultar un familiar por id.
+     * @param Long. El id de la relacion.
+     * @return EmpleadoFamilia. La relación consultada.
+     * @throws LogicaException.
+     */
+    public EmpleadoFamilia consultarEmpleadoFamiliaPorId(Long idEmpleadoFamilia) throws LogicaException{
+    	EmpleadoFamilia resultado = null;
+    	try{
+    		FamiliaDAO familiaDAO = new FamiliaDAO(dg_rrhh); 
+    		resultado = familiaDAO.obtenerFamiliarPorId(idEmpleadoFamilia);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+
+    /**
+     * Editar un EmpleadoFamilia.
+     * @param EmpleadoFamilia. El EmpleadoFamilia a editar.
+     * @return Integer. El numero de filas afectadas.
+     */
+	public Integer editarEmpleadoFamilia(EmpleadoFamilia empleadoFamilia) throws DatoException, LogicaException {
+		
+			Integer resultado=null;
+			
+			try {
+				FamiliaDAO familiaDAO = new FamiliaDAO(dg_rrhh);
+				resultado = familiaDAO.editarEmpleadoFamilia(empleadoFamilia);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return resultado;
+	}
+	
+
+	/**
+     * Deshabilitar un familiar de empleado.
+     * @param EmpleadoFamilia. la relacion EmpleadoFamilia.
+     * @return Integer. El número de filas afectadas.
+     */
+    public Integer deshabilitarEmpleadoFamilia(EmpleadoFamilia empleadoFamilia) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			FamiliaDAO FamiliaDAO = new FamiliaDAO(dg_rrhh);
+			empleadoFamilia.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resultado = FamiliaDAO.actualizarEstadoEmpleadoFamilia(empleadoFamilia);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+	
+    /**
+     * Habilitar un familiar de empleado.
+     * @param EmpleadoFamilia. la relacion EmpleadoFamilia.
+     * @return Integer. El número de filas afectadas.
+     */
+    public Integer habilitarEmpleadoFamilia(EmpleadoFamilia empleadoFamilia) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			FamiliaDAO FamiliaDAO = new FamiliaDAO(dg_rrhh);
+			empleadoFamilia.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resultado = FamiliaDAO.actualizarEstadoEmpleadoFamilia(empleadoFamilia);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+}

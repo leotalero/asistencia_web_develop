@@ -1,0 +1,72 @@
+package co.sistemcobro.rrhh.constante;
+
+public class Constante {
+
+	public static final String FS = System.getProperty("file.separator");
+	public static final String FILE_CONFIG_RRHH = "config_rrhh";
+	public static String ROOT_FILE_TEMPORARY = "";
+	public static String USUARIO_SESSION = "usuariosession";
+	public static String USUARIO_SESSION_RECUPERA = "usuariosessionrecupera";
+	public static String USUARIO_LIDER = "usuariolider";
+	public static String APLICACION_SESSION = "aplicacionsession";
+	public static String USUARIOS_EN_CONTEXTO = "usuariosencontexto";
+	public static String CAPTCHA_ACTIVADO = "estacaptchaactivado";
+
+	public String getROOT_FILE_TEMPORARY() {
+		return ROOT_FILE_TEMPORARY;
+	}
+
+	public void setROOT_FILE_TEMPORARY(String rOOT_FILE_TEMPORARY) {
+		ROOT_FILE_TEMPORARY = rOOT_FILE_TEMPORARY;
+	}
+
+	public String getUSUARIO_SESSION() {
+		return USUARIO_SESSION;
+	}
+
+	public void setUSUARIO_SESSION(String uSUARIO_SESSION) {
+		USUARIO_SESSION = uSUARIO_SESSION;
+	}
+
+	
+
+	public static String getUSUARIO_SESSION_RECUPERA() {
+		return USUARIO_SESSION_RECUPERA;
+	}
+
+	public static void setUSUARIO_SESSION_RECUPERA(String uSUARIO_SESSION_RECUPERA) {
+		USUARIO_SESSION_RECUPERA = uSUARIO_SESSION_RECUPERA;
+	}
+
+	public String getAPLICACION_SESSION() {
+		return APLICACION_SESSION;
+	}
+
+	public void setAPLICACION_SESSION(String aPLICACION_SESSION) {
+		APLICACION_SESSION = aPLICACION_SESSION;
+	}
+
+	public  String getUSUARIO_LIDER() {
+		return USUARIO_LIDER;
+	}
+
+	public  void setUSUARIO_LIDER(String uSUARIO_LIDER) {
+		USUARIO_LIDER = uSUARIO_LIDER;
+	}
+	public String getUSUARIOS_EN_CONTEXTO() {
+		return USUARIOS_EN_CONTEXTO;
+	}
+
+	public void setUSUARIOS_EN_CONTEXTO(String uSUARIOS_EN_CONTEXTO) {
+		USUARIOS_EN_CONTEXTO = uSUARIOS_EN_CONTEXTO;
+	}
+
+	public String getCAPTCHA_ACTIVADO() {
+		return CAPTCHA_ACTIVADO;
+	}
+
+	public void setCAPTCHA_ACTIVADO(String cAPTCHA_ACTIVADO) {
+		CAPTCHA_ACTIVADO = cAPTCHA_ACTIVADO;
+	}
+	
+}

@@ -1,0 +1,47 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Time;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class Hora implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private String  horastring;
+	
+	private Time horatime;
+	
+	
+	
+
+	public String getHorastring() {
+		return horastring;
+	}
+
+	public void setHorastring(String horastring) {
+		this.horastring = horastring;
+	}
+
+	public Time getHoratime() {
+		return horatime;
+	}
+
+	public void setHoratime(Time horatime) {
+		this.horatime = horatime;
+	}
+	
+
+	
+	
+	
+
+
+	
+
+
+}

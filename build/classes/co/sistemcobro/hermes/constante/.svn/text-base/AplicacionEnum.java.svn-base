@@ -1,0 +1,112 @@
+package co.sistemcobro.hermes.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum AplicacionEnum {
+	ELESPECTADOR_VENTAS(1),
+	TELMEX_VENTAS(2),
+	ALTITUDE(3),
+	KONFIGURA(4),
+	DAVIPLATA(5),
+	KONFIGURA_AVALUO(6),
+	COLSUBSIDIO(7),
+	DAVIVIENDA(8),
+	HERMES(9),
+	IVR_MONITOREO(10),
+	GARANTIA(11),
+	CLAROMOVIL(12),
+	LOCALIZACION(13),
+	COOMEVA(14),
+	PROSPERAR(15),
+	BANCOAGRARIO(16),
+	ETB(17),
+	REVISTAENTER(18),
+	CLAROADMINISTRATIVO(19),
+	CLAROPREJURIDICO(20),
+	CLAROPERSUASIVO(21),
+	CLAROPYME(22),
+	CLARO01(23),
+	KONFIGURA_FACTURA(24),
+	DAVIPLATA_FAMILIAACCION(25),
+	TIGO(26),
+	LA_POLAR(27),
+	MOVISTAR(28),
+	CARTERAPROPIA(29),
+	MOVISTAR_MOVIL(30),
+	SOLICITUDWEB(31),
+	NATURA(32),
+	AMAZONAS_PREVENTIVA(33),
+	AMAZONAS_COBRANZA(34),
+	JURIDICO(35),
+	CLAROCASTIGO(36),
+	TICKETREGISTRO(37),
+	DAVIPLATA_FAMILIAACCION_FRONT(38),
+	GOBCUNDINAMARCA(39),
+	ETBVENTAS(40),
+	CMINVERSIONES(41),
+	CONEXRED(42),
+	FONDONACIONAL(43),
+	JURIDICO_ADMINISTRATIVO(44),
+	COLOMBIA_MAYOR_OUTBOUND(45),
+	CARTERASOCIO(46),
+	CARTERAESPECIAL(47),
+	CARTERAINVERSIONISTA(48),
+	COLSUBSIDIOAD(49),
+	DAVIPLATA_MICROSEGURO(50),
+	COLSUBSIDIONOTIFICACION(51),
+	ETBPQR(52),
+	COLSUBSIDIOCYD(53),
+	SEGUROSBOLIVAR(54),
+	BELCORP(55),
+	CONSTELACION(56),
+	CORONA(57),
+	UNE(58),
+	PUBLICAR(59),
+	SEGUROSBOLIVARPORTAFOLIO(60),
+	INNOVACION(61),
+	RRHH(62),
+	ASISTENCIA(63),
+	CONSULTASNRWEB(64),
+	PUBLICAR_VENTAS(65),
+	INTRANET(66),
+	BANCOOCCIDENTEVENTAS(68),
+	ADMINDAVIPLATA(67),
+	FARMATODO(69),
+	HSMESPECIALISTA(70),
+	HSMADMINISTRATIVA(71);
+
+	public static final Map<Integer, AplicacionEnum> mapByID = new HashMap<Integer, AplicacionEnum>();
+	public static final Map<String, AplicacionEnum> mapByNAME = new HashMap<String, AplicacionEnum>();
+
+	static {
+		for (AplicacionEnum s : EnumSet.allOf(AplicacionEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	AplicacionEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static AplicacionEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static AplicacionEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

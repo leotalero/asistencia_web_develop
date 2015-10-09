@@ -1,0 +1,100 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+
+public class ReporteProcesoDisciplinario implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	private EmpleadoBean empleado;
+	private Disciplina disciplina;
+	private Sancion sancion;
+	private Falta falta;
+	private FaltaTipo tipoFalta;
+	
+	private DisciplinaEstado estado;
+	private DisciplinaHistorial disciplinaHistorial;
+	private DisciplinaArchivoTipo tipoArchivo;
+	private DisciplinaArchivo disciplinaArchivo;
+	
+	private Contrato ultimoContrato;
+	
+	public EmpleadoBean getEmpleado() {
+		return empleado;
+	}
+
+	public void setEmpleado(EmpleadoBean empleado) {
+		this.empleado = empleado;
+	}
+
+	public Disciplina getDisciplina() {
+		return disciplina;
+	}
+
+	public void setDisciplina(Disciplina disciplina) {
+		this.disciplina = disciplina;
+	}
+
+	public Sancion getSancion() {
+		return sancion;
+	}
+
+	public void setSancion(Sancion sancion) {
+		this.sancion = sancion;
+	}
+
+	public Falta getFalta() {
+		return falta;
+	}
+
+	public void setFalta(Falta falta) {
+		this.falta = falta;
+	}
+
+	public FaltaTipo getTipoFalta() {
+		return tipoFalta;
+	}
+
+	public void setTipoFalta(FaltaTipo tipoFalta) {
+		this.tipoFalta = tipoFalta;
+	}
+
+	public DisciplinaEstado getEstado() {
+		return estado;
+	}
+
+	public void setEstado(DisciplinaEstado estado) {
+		this.estado = estado;
+	}
+
+	public DisciplinaHistorial getDisciplinaHistorial() {
+		return disciplinaHistorial;
+	}
+
+	public void setDisciplinaHistorial(DisciplinaHistorial disciplinaHistorial) {
+		this.disciplinaHistorial = disciplinaHistorial;
+	}
+
+	public DisciplinaArchivoTipo getTipoArchivo() {
+		return tipoArchivo;
+	}
+
+	public void setTipoArchivo(DisciplinaArchivoTipo tipoArchivo) {
+		this.tipoArchivo = tipoArchivo;
+	}
+
+	public DisciplinaArchivo getDisciplinaArchivo() {
+		return disciplinaArchivo;
+	}
+
+	public void setDisciplinaArchivo(DisciplinaArchivo disciplinaArchivo) {
+		this.disciplinaArchivo = disciplinaArchivo;
+	}
+
+	public Contrato getUltimoContrato() {
+		return ultimoContrato;
+	}
+
+	public void setUltimoContrato(Contrato ultimoContrato) {
+		this.ultimoContrato = ultimoContrato;
+	}
+}

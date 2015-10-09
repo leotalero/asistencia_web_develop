@@ -1,0 +1,250 @@
+package co.sistemcobro.all.util;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.Part;
+
+public final class Archivo {
+
+	public static final byte[] convertFileToArrayByte(File fichero) {
+
+		// Creamos un array de bytes para almacenar los datos leídos por fs.
+		byte[] data = new byte[(int) fichero.length()];
+		FileInputStream fs = null;
+		try {
+			// Archivo en modo binario
+			fs = new FileInputStream(fichero);
+			// Y guardamos los datos en el array data
+
+			fs.read(data, 0, (int) fichero.length());
+
+		} catch (FileNotFoundException e) {
+
+			e.printStackTrace();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		} finally {
+			try {
+				fs.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return data;
+	}
+
+	public static final File convertArrayByteToFile(byte[] data) {
+		// FileOutputStream fs = new FileOutputStream(fichero);
+		return null;
+	}
+
+	public static final void escribirArchivo(InputStream iStream, String destino)
+			throws IOException {
+		OutputStream bos = new FileOutputStream(destino);
+		int bytesRead = 0;
+		byte[] buffer = new byte[8192];
+		while ((bytesRead = iStream.read(buffer, 0, 8192)) != -1) {
+			bos.write(buffer, 0, bytesRead);
+		}
+		bos.close();
+	}
+
+	/*
+	 * param origen: ruta absoluta param destino: ruta absoluta
+	 */
+	public static final void copiarArchivo(String origen, String destino)
+			throws IOException {
+		// try {
+		File o = new File(origen);
+		File d = new File(destino);
+
+		BufferedInputStream in = new BufferedInputStream(new FileInputStream(o));
+		BufferedOutputStream out = new BufferedOutputStream(
+				new FileOutputStream(d));
+
+		int bytesRead = 0;
+		byte[] buffer = new byte[8192];
+		while ((bytesRead = in.read(buffer, 0, 8192)) != -1) {
+			out.write(buffer, 0, bytesRead);
+		}
+		in.close();
+		out.flush();
+		out.close();
+		// } catch (Exception e) {
+		// Debug.println("NO SE ENCUNTRA LA CARPETA " + e.getMessage());
+		// }
+	}
+
+	public static final void crearDirectorio(String dir) throws IOException {
+		File d = new File(dir);
+		if (!d.exists()) {
+			boolean rc = d.mkdir();
+			if (!rc) {
+				System.out.println("No se pudo crear el directorio: " + dir);
+			}
+		}
+	}
+
+	public static final boolean eliminarDirectorio(String dir) {
+		boolean ok = false;
+		try {
+			File carpeta = new File(dir);
+			if (carpeta.exists()) {
+				eliminaraSubcarpetas(carpeta);
+				if (carpeta.delete()) {
+					System.out.println("Archivo: eliminarDirectorio: "
+							+ carpeta.getPath());
+				}
+			}
+			ok = true;
+		} catch (Exception e) {
+			System.out
+					.println("Archivo: eliminarDirectorio: " + e.getMessage());
+		}
+		return ok;
+	}
+
+	public static void eliminaraSubcarpetas(File carpeta) {
+		try {
+			if (carpeta.delete()) {
+			} else {
+				File[] a = carpeta.listFiles();
+				for (int w = 0; w < a.length; w++) {
+					if (a[w].delete()) {
+						carpeta.delete();
+					} else {
+						Archivo.eliminaraSubcarpetas(a[w]);
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("No se pudo eliminar la carpeta "
+					+ e.getMessage());
+		}
+	}
+
+	public static String getParameter(Part part) throws IOException {
+		String value = null;
+		if (null != part) {
+			InputStream is = part.getInputStream();
+			if (is != null) {
+				Writer writer = new StringWriter();
+
+				char[] buffer = new char[1024];
+				try {
+					Reader reader = new BufferedReader(new InputStreamReader(
+							is, "iso-8859-1"));
+					int n;
+					while ((n = reader.read(buffer)) != -1) {
+						writer.write(buffer, 0, n);
+					}
+				} finally {
+					is.close();
+				}
+				value = writer.toString();
+			}
+		}
+		return value;
+	}
+
+	public static boolean getZipFile(List<File> archivos, File zipname) {
+		boolean resultado = false;
+		// Create a buffer for reading the files
+		byte[] buf = new byte[1024];
+
+		try {
+			// Create the ZIP file		
+			ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipname));
+
+			// Compress the files
+			for (File archivo : archivos) {
+				FileInputStream in = new FileInputStream(archivo);
+
+				// Add ZIP entry to output stream.
+				out.putNextEntry(new ZipEntry(archivo.getName()));
+
+				// Transfer bytes from the file to the ZIP file
+				int len;
+				while ((len = in.read(buf)) > 0) {
+					out.write(buf, 0, len);
+				}
+
+				// Complete the entry
+				out.closeEntry();
+				in.close();
+			}
+
+			// Complete the ZIP file
+			out.close();
+			resultado = true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return resultado;
+	}
+
+	public static String getFileName(String file) {
+		String value = "";
+		if (null != file) {
+			int a = file.lastIndexOf(".");
+			if (-1 == a) {
+				value = file;
+			} else {
+				value = file.substring(0, a);
+			}
+		}
+		return value;
+	}
+
+	public static String getFileExtension(String file) {
+		String value = "";
+		if (null != file) {
+			int a = file.lastIndexOf(".");
+			if (-1 < a) {
+				value = file.substring(a + 1, file.length());
+			}
+		}
+		return value;
+	}
+
+	public static String getFullName(Part part) {
+		String partHeader = part.getHeader("content-disposition");
+		System.out.println("partHeader: " + partHeader);
+		for (String cd : partHeader.split(";")) {
+			String header = cd.trim();
+			if (header.startsWith("filename")) {
+				String fullpath = header.substring(header.indexOf('=') + 1)
+						.trim();
+				String findfile[] = fullpath.split("\\\\");
+				if (findfile.length > 0) {
+					return fullpath.substring(fullpath.lastIndexOf("\\") + 1)
+							.trim().replace("\"", "");
+				} else {
+					return fullpath.replace("\"", "");
+				}
+			}
+		}
+		return null;
+
+	}
+}

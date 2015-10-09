@@ -1,0 +1,419 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.ContratoProceso;
+import co.sistemcobro.rrhh.bean.ContratoProcesoPropiedad;
+import co.sistemcobro.rrhh.bean.ContratoRespuesta;
+import co.sistemcobro.rrhh.bean.EstadoDesvinculacion;
+import co.sistemcobro.rrhh.bean.Opcion;
+import co.sistemcobro.rrhh.bean.Pregunta;
+import co.sistemcobro.rrhh.bean.Proceso;
+import co.sistemcobro.rrhh.bean.ProcesoEstado;
+import co.sistemcobro.rrhh.bean.ProcesoPropiedad;
+import co.sistemcobro.rrhh.bean.Respuesta;
+import co.sistemcobro.rrhh.dao.DesvinculacionDAO;
+
+/**
+ * 
+ * @author Leoardo Talero
+ * 
+ */
+@Stateless
+public class DesvinculacionEJB extends BaseEJB {
+
+	private Logger logger = Logger.getLogger(DesvinculacionEJB.class);
+
+	public DesvinculacionEJB() {
+	}
+	
+	
+	
+	public List<Pregunta> getPreguntasporIdCuestionarioActivas(Long idcuestionario) throws DatoException, LogicaException {
+		
+		List<Pregunta> preguntas;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			preguntas=desvinculacionDAO.getPreguntasporCuestionarioActivas(idcuestionario);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return preguntas;	
+	}
+		
+public List<Pregunta> getPreguntasporIdCuestionarioTodas(Long idcuestionario) throws DatoException, LogicaException {
+		
+		List<Pregunta> preguntas;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			preguntas=desvinculacionDAO.getPreguntasporCuestionarioTodas(idcuestionario);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return preguntas;	
+	}
+	public List<Opcion> getOpcionesporPreguntaActivo(Long idpregunta) throws DatoException, LogicaException {
+
+
+		List<Opcion> opciones;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			opciones=desvinculacionDAO.getOpcionesporPreguntaActivos(idpregunta);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return opciones;	
+	}	
+	public List<Opcion> getOpcionesporPregunta(Long idpregunta) throws DatoException, LogicaException {
+
+
+		List<Opcion> opciones;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			opciones=desvinculacionDAO.getOpcionesporPregunta(idpregunta);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return opciones;	
+	}	
+	public List<ContratoRespuesta> getRespuestasporContratoPreguntaActiva(Long idcontrato) throws DatoException, LogicaException {
+		List<ContratoRespuesta> contratorespuestas;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			contratorespuestas=desvinculacionDAO.getRespuestasporContratoPreguntaActiva(idcontrato);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contratorespuestas;
+	}
+	
+	public List<ContratoRespuesta> getRespuestasporContratoTodasPreguntas(Long idcontrato) throws DatoException, LogicaException {
+		List<ContratoRespuesta> contratorespuestas;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			contratorespuestas=desvinculacionDAO.getRespuestasporContratoTodasPreguntas(idcontrato);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contratorespuestas;
+	}
+	public Integer ActualizarRespuestasDesvinculacion(List<Respuesta> respuestas) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dg_rrhh);
+			 resu = desvinculacionDAO.ActualizarRespuestasDesvinculacion(respuestas);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		
+		return resu;
+	}
+		
+	public List<ContratoRespuesta> insertarRespuestasDesvinculacion(List<Respuesta> respuestas,Long idcontrato) throws DatoException, LogicaException {
+		List<ContratoRespuesta> resu;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dg_rrhh);
+			 respuestas = desvinculacionDAO.insertarRespuestasDesvinculacion(respuestas);
+			 ContratoRespuesta contratorespuesta=new ContratoRespuesta();
+			 List<ContratoRespuesta> contratorespuestas=new ArrayList<ContratoRespuesta>();
+			 for(Respuesta r:respuestas){
+				 contratorespuesta=new ContratoRespuesta();
+				 contratorespuesta.setIdcontrato(idcontrato);
+				 contratorespuesta.setIdrespuesta(r.getIdrespuesta());
+				 contratorespuesta.setIdusuariocrea(r.getIdusuariocrea());
+				 contratorespuesta.setEstado(EstadoEnum.ACTIVO.getIndex());
+				
+				 contratorespuestas.add(contratorespuesta);
+			 }
+			 resu = desvinculacionDAO.insertarContratoRespuestas(contratorespuestas);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		
+		return resu;
+	}
+		
+	public Integer deshabilitarRespuestasDesvinculacion(List<ContratoRespuesta> con_respuestas) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dg_rrhh);
+			for(ContratoRespuesta cr:con_respuestas){
+				cr.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			}
+			 resu = desvinculacionDAO.deshabilitarRespuestasDesvinculacion(con_respuestas);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		
+		return resu;
+	}
+	
+	public List<Proceso> getAllProcesos() throws DatoException, LogicaException {
+		List<Proceso> procesos;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			procesos=desvinculacionDAO.getAllProcesos();
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return procesos;
+	}
+	
+	public List<ContratoProceso> insertarContratoProceso(List<ContratoProceso> con_proceso) throws DatoException, LogicaException {
+		
+		List<ContratoProceso>  contratoprocesos;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dg_rrhh);
+			contratoprocesos = desvinculacionDAO.insertarContratoProceso(con_proceso);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contratoprocesos;
+	}
+
+	public List<EstadoDesvinculacion> getAllEstadosDesvinculacion() throws DatoException, LogicaException {
+		List<EstadoDesvinculacion> estados;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			estados = desvinculacionDAO.getAllEstadosDesvinculacion();
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return estados;
+	}
+		
+	public EstadoDesvinculacion getAllEstadosDesvinculacionbyId( Long iddesvinculacion) throws DatoException, LogicaException {
+		EstadoDesvinculacion estado;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			estado = desvinculacionDAO.getAllEstadosDesvinculacionbyId(iddesvinculacion);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return estado;
+	}
+		
+		
+	public List<ContratoProceso> getAllContratoProcesoporContrato(Long idcontrato) throws DatoException, LogicaException {
+		List<ContratoProceso> contratoprocesos;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			contratoprocesos = desvinculacionDAO.getAllContratoProcesoporContrato(idcontrato);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contratoprocesos;
+	}
+	
+	public List<ContratoProcesoPropiedad> getAllPropiedadProcesoporContrato(Long idcontrato,Long idproceso) throws DatoException, LogicaException {
+		List<ContratoProcesoPropiedad> contratoprocesospropiedad;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			contratoprocesospropiedad = desvinculacionDAO.getAllPropiedadProcesoporContrato(idcontrato,idproceso);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contratoprocesospropiedad;
+	}
+	public List<ProcesoEstado> getAllprocesoEstados() throws DatoException, LogicaException {
+		List<ProcesoEstado> procesoestados;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			procesoestados = desvinculacionDAO.getAllprocesoEstados();
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return procesoestados;
+	}
+	public ContratoProceso getContratoProcesoporIdContratoyIdproceso(Long idcontrato,Long idproceso ) throws DatoException, LogicaException {
+		ContratoProceso contratoproceso;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			contratoproceso = desvinculacionDAO.getContratoProcesoporIdContratoyIdproceso(idcontrato,idproceso);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contratoproceso;
+	}
+		
+	public ContratoProceso getContratoProcesoporId(Long idcontratoproceso ) throws DatoException, LogicaException {
+		ContratoProceso contratoproceso;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			contratoproceso = desvinculacionDAO.getContratoProcesoporId(idcontratoproceso);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return contratoproceso;
+	}
+	
+	public List<ProcesoPropiedad> getAllProcesoPropiedadporIdproceso(Long idproceso) throws DatoException, LogicaException {
+		List<ProcesoPropiedad> procesopropiedades;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			procesopropiedades = desvinculacionDAO.getAllProcesoPropiedadporIdproceso(idproceso);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return procesopropiedades;
+	}
+
+	
+	public ProcesoPropiedad getProcesoPropiedadporIdprocesopropiedad(Long idprocesoropiedad) throws DatoException, LogicaException {
+		ProcesoPropiedad procesopropiedad;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			procesopropiedad = desvinculacionDAO.getProcesoPropiedadporIdprocesopropiedad(idprocesoropiedad);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return procesopropiedad;
+	}
+	
+	public ContratoProcesoPropiedad insertarContratoprocesopropiedad(ContratoProcesoPropiedad contratoprocesopropiedad) throws DatoException, LogicaException {
+		ContratoProcesoPropiedad resu;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dg_rrhh);
+			resu = desvinculacionDAO.insertarContratoprocesopropiedad(contratoprocesopropiedad);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	public ContratoProcesoPropiedad ActualizarContratoprocesoPropiedadcompleto(ContratoProcesoPropiedad contratoprocesopropiedad) throws DatoException, LogicaException {
+		ContratoProcesoPropiedad resu;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dg_rrhh);
+			resu = desvinculacionDAO.ActualizarContratoprocesoPropiedadcompleto(contratoprocesopropiedad);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	
+	public ContratoProceso ActualizarContratoproceso(ContratoProceso contratoproceso) throws DatoException, LogicaException {
+		ContratoProceso resu;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dg_rrhh);
+			resu = desvinculacionDAO.ActualizarContratoproceso(contratoproceso);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+		
+	public ContratoProcesoPropiedad getPropiedadProcesoporId(Long idcontratoprocesopropiedad) throws DatoException, LogicaException {
+		ContratoProcesoPropiedad resu;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dc_rrhh);
+			resu = desvinculacionDAO.getPropiedadProcesoporId(idcontratoprocesopropiedad);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+		
+	public ContratoProcesoPropiedad deshabilitarContratoprocesopropiedad(ContratoProcesoPropiedad contratoprocesopropiedad) throws DatoException, LogicaException {
+		ContratoProcesoPropiedad resu;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dg_rrhh);
+			resu = desvinculacionDAO.ActualizarContratoprocesopropiedad(contratoprocesopropiedad);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+		
+		
+	public ContratoProcesoPropiedad ActivarContratoprocesopropiedad(ContratoProcesoPropiedad contratoprocesopropiedad) throws DatoException, LogicaException {
+		ContratoProcesoPropiedad resu;
+		try {
+			DesvinculacionDAO desvinculacionDAO = new DesvinculacionDAO(dg_rrhh);
+			resu = desvinculacionDAO.ActualizarContratoprocesopropiedad(contratoprocesopropiedad);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+		
+		
+}

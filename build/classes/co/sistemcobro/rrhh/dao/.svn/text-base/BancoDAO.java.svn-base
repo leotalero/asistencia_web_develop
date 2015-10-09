@@ -1,0 +1,337 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.rrhh.bean.Banco;
+import co.sistemcobro.rrhh.bean.EmpleadoBanco;
+
+/**
+ * Para la gestión de cuentas bancarias de los empleados.
+ * @author jpuentes
+ * 
+ */
+
+public class BancoDAO extends BaseDAO {
+
+	/**
+	 * Constructor.
+	 */
+	public BancoDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	
+	/**
+	 * Obtener todos los bancos.
+	 * @return List<Banco>. La lista de bancos.
+	 */
+	public List<Banco> getBancos() throws DatoException {
+		List<Banco> listaDeBancos = new ArrayList<Banco>();
+		Banco banco = null;
+
+		try {
+
+			String consulta = "select idbanco,nombrebanco,observacion,idusuariocrea as idcrea,fechacrea,idusuariomod as idmod,fechamod,estado "
+					+ "from rrhh.banco";
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				banco = new Banco();
+
+				banco.setIdbanco(rs.getLong("idbanco"));
+				banco.setNombrebanco(rs.getString("nombrebanco"));
+				banco.setObservacion(rs.getString("observacion"));
+				banco.setIdusuariocrea(rs.getInt("idcrea"));
+				banco.setFechacrea(rs.getTimestamp("fechacrea"));
+				banco.setIdusuariomod(rs.getInt("idmod"));
+				banco.setFechamod(rs.getTimestamp("fechamod"));
+				banco.setEstado(rs.getInt("estado"));
+
+				listaDeBancos.add(banco);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaDeBancos;
+	}
+
+	
+	/**
+	 * Obtener todos los bancos asociados a un empleado.
+	 * @return: List<Banco>. La lista de bancos asociados a un empleado.
+	 * @param : idempleado.
+	 */
+	public List<Banco> obtenerBancosPorEmpleado(Long idempleado) throws DatoException {
+
+		List<Banco> listaDeBancosEmpleado = new ArrayList<Banco>();
+		Banco banco = null;
+
+		try {
+
+			String consulta = "select distinct b.idbanco,b.nombrebanco,b.observacion,b.idusuariocrea,b.fechacrea,b.idusuariomod,b.fechamod,b.estado"
+					+ "from rrhh.empleado_banco eb, rrhh.banco b, rrhh.empleado e"
+					+ "where b.idbanco = eb.idbanco" + "and eb.idempleado = "+idempleado;
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				banco = new Banco();
+
+				banco.setIdbanco(rs.getLong("idbanco"));
+				banco.setNombrebanco(rs.getString("nombrebanco"));
+				banco.setObservacion(rs.getString("observacion"));
+				banco.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				banco.setFechacrea(rs.getTimestamp("fechacrea"));
+				banco.setIdusuariomod(rs.getInt("idusuariomod"));
+				banco.setFechamod(rs.getTimestamp("fechamod"));
+				banco.setEstado(rs.getInt("estado"));
+
+				listaDeBancosEmpleado.add(banco);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaDeBancosEmpleado;
+	}
+
+	
+	/**
+	 * Registrar un nuevo banco a un empleado.
+	 * @param: EmpleadoBanco a insertar.
+	 * @return: EmpleadoBanco. El empleadoBanco registrado.
+	 */
+	public EmpleadoBanco insertarEmpleadoBanco(EmpleadoBanco empleadoBanco) throws DatoException{
+		
+		Util.registerConverters();
+		try {
+			
+			String consulta = "insert into rrhh.empleado_banco(idempleado,idbanco,numerocuenta,vigentedesde,idusuariocrea,fechacrea,estado)"
+					        + "values(?,?,?,?,?,getdate(),?)";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta,Statement.RETURN_GENERATED_KEYS);
+			ps.setLong(1,empleadoBanco.getIdempleado());
+			ps.setLong(2, empleadoBanco.getIdbanco());
+			ps.setString(3, empleadoBanco.getNumerocuenta());
+			ps.setTimestamp(4, empleadoBanco.getVigentedesde());
+			ps.setLong(5, empleadoBanco.getIdusuariocrea());
+			ps.setInt(6, empleadoBanco.getEstado());
+			
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			
+			if (rs.next()) {
+				empleadoBanco.setIdempleadobanco(rs.getLong(1));
+			} else {
+				throw new SQLException(
+						"EmpleadoBanco, no se pudo generar su IDEmpleado.");
+			}
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		
+		return empleadoBanco;
+	}
+	
+	
+	/**
+	 *  Obtener los datos de la relacion entre empleado y banco.
+	 *  @param idempleado. El id del empleadio.
+	 *  @return List<EmpleadoBanco>. La lista de empleadoBanco asociados a un empleado.
+	 */
+	public List<EmpleadoBanco> obtenerBancosDeEmpleadoPorId(Long idEmpleado) throws DatoException{
+		
+		List<EmpleadoBanco> listaEmpleadoBanco = new ArrayList<EmpleadoBanco>();
+		EmpleadoBanco empleadoBanco = null;
+		Banco banco  = null;
+		
+		try {
+
+			String consulta = "select eb.idempleadobanco,eb.idempleado,eb.idbanco,eb.numerocuenta, eb.vigentedesde,eb.idusuariocrea,eb.fechacrea,eb.idusuariomod,eb.fechamod,eb.estado,b.idbanco,b.nombrebanco"
+			                +" from rrhh.empleado_banco eb,rrhh.banco b "
+			                +" where eb.idbanco = b.idbanco"
+			                +" and eb.idempleado = "+idEmpleado;
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				
+				empleadoBanco =  new EmpleadoBanco();
+				banco = new Banco();
+
+				empleadoBanco.setIdempleadobanco(rs.getLong("idempleadobanco"));
+				empleadoBanco.setIdempleado(rs.getLong("idempleado"));
+				empleadoBanco.setIdbanco(rs.getLong("idbanco"));
+				empleadoBanco.setNumerocuenta(rs.getString("numerocuenta"));
+				empleadoBanco.setVigentedesde(rs.getTimestamp("vigentedesde"));
+				empleadoBanco.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoBanco.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoBanco.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoBanco.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoBanco.setEstado(rs.getInt("estado"));
+				
+				banco.setIdbanco(rs.getLong("idbanco"));
+				banco.setNombrebanco(rs.getString("nombrebanco"));
+				
+				empleadoBanco.setBanco(banco);			
+			
+				listaEmpleadoBanco.add(empleadoBanco);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaEmpleadoBanco;
+	}
+	
+	/**
+	 *  Metodo para actualizar el estado de EmpleadoBanco.
+	 *  @param EmpleadoBanco. El empleado banco a cambiarle el estado.
+	 *  @return Integer, Numero de filas alteradas.
+	 */
+	public Integer actualizarEstadoEmpleadoBanco(EmpleadoBanco empleadobanco) throws DatoException {
+		Integer estatus = 0;
+		
+		try {
+
+			String query = "update rrhh.empleado_banco set estado=?,idusuariomod=?,fechamod=getdate() where idempleadobanco=?";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(query);
+
+			ps.setInt(1, empleadobanco.getEstado());
+			ps.setInt(2, empleadobanco.getIdusuariomod());
+			ps.setLong(3, empleadobanco.getIdempleadobanco());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	/**
+	 * Obtener un empleadoBanco por id.
+	 * @param idEmpladoBanco
+	 * @return EmpleadoBanco.
+	 */
+	public EmpleadoBanco obtenerEmpleadoBancoPorId(Long idEmpleadoBanco)throws DatoException,IOException{
+		EmpleadoBanco empleadoBanco = null; 
+		
+		try{
+			String consulta = "select eb.idempleadobanco,eb.idempleado,eb.idbanco,eb.numerocuenta, eb.vigentedesde,eb.idusuariocrea,eb.fechacrea,eb.idusuariomod,eb.fechamod,eb.estado,b.idbanco,b.nombrebanco"
+								+" from rrhh.empleado_banco eb,rrhh.banco b" 
+								+" where eb.idbanco = b.idbanco"
+								+" and eb.idempleadobanco = ?";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+			ps.setLong(1, idEmpleadoBanco);
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				empleadoBanco= new EmpleadoBanco();
+			    
+				empleadoBanco.setIdempleadobanco(rs.getLong("idempleadobanco"));
+				empleadoBanco.setIdempleado(rs.getLong("idempleado"));
+				empleadoBanco.setIdbanco(rs.getLong("idbanco"));
+				empleadoBanco.setNumerocuenta(rs.getString("numerocuenta"));
+				empleadoBanco.setVigentedesde(rs.getTimestamp("vigentedesde"));
+				empleadoBanco.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoBanco.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoBanco.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoBanco.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoBanco.setEstado(rs.getInt("estado"));
+				
+				Banco banco =  new Banco();
+				banco.setIdbanco(rs.getLong("idbanco"));
+				banco.setNombrebanco(rs.getString("nombrebanco"));
+				
+				empleadoBanco.setBanco(banco);
+			}
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoBanco;
+	}
+	
+	/**
+	 * Editar EmpleadoBanco.
+	 * @param EmpleadoBanco, El empleadoBanco a editar.
+	 * @return Integer. El numero de filas afectadas.
+	 */
+	public Integer editarEmpleadoBanco(EmpleadoBanco empleadobanco) throws DatoException {
+		Integer estatus = 0;
+		
+		try {
+
+			String actualizacion = "update rrhh.empleado_banco set idbanco=?,numerocuenta=?, vigentedesde=?,estado=?, idusuariomod=?, fechamod=getdate() where idempleadobanco=?";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setLong(1, empleadobanco.getIdbanco());
+			ps.setString(2, empleadobanco.getNumerocuenta());
+			ps.setTimestamp(3,empleadobanco.getVigentedesde());
+			ps.setInt(4,empleadobanco.getEstado());
+			ps.setInt(5, empleadobanco.getIdusuariomod());
+			ps.setLong(6, empleadobanco.getIdempleadobanco());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+	}
+	
+}

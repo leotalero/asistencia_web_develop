@@ -1,0 +1,39 @@
+package co.sistemcobro.all.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum DatePartEnum {
+	YEAR("yyyy"), QUARTER("qq"), MONTH("mm"), DATEOFDAY("dy"), DAY("dd"), WEEK(
+			"ww"), WEEKDAY("dw"), HOUR("hh"), MINUTE("mi"), SECOND("ss");
+
+	public static final Map<String, DatePartEnum> mapByID = new HashMap<String, DatePartEnum>();
+	public static final Map<String, DatePartEnum> mapByNAME = new HashMap<String, DatePartEnum>();
+
+	static {
+		for (DatePartEnum s : EnumSet.allOf(DatePartEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private String index;
+
+	DatePartEnum(String index) {
+		this.index = index;
+	}
+
+	public String getIndex() {
+		return index;
+	}
+
+	public static DatePartEnum getById(String id) {
+		return mapByID.get(id);
+	}
+
+	public static DatePartEnum getByName(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

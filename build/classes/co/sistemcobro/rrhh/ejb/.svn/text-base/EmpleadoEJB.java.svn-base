@@ -1,0 +1,801 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.Contrato;
+import co.sistemcobro.rrhh.bean.DocumentoConfiguracion;
+import co.sistemcobro.rrhh.bean.EmpleadoDocumentoGenerado;
+import co.sistemcobro.rrhh.bean.EmpleadoIdentificacion;
+import co.sistemcobro.rrhh.bean.EmpleadoPropiedad;
+import co.sistemcobro.rrhh.bean.Empresa;
+import co.sistemcobro.rrhh.bean.EmpresaSucursal;
+import co.sistemcobro.rrhh.bean.Genero;
+import co.sistemcobro.rrhh.bean.IdentificacionTipo;
+import co.sistemcobro.rrhh.bean.Prioridad;
+import co.sistemcobro.rrhh.bean.Propiedad;
+import co.sistemcobro.rrhh.bean.ReporteAsignacion;
+import co.sistemcobro.rrhh.bean.Sucursal;
+import co.sistemcobro.hermes.bean.UsuarioBean;
+import co.sistemcobro.hermes.constante.UsuarioTipoBusquedaEnum;
+import co.sistemcobro.hermes.dao.UsuarioDAO;
+import co.sistemcobro.rrhh.bean.EmpleadoBean;
+import co.sistemcobro.rrhh.constante.ActualEnum;
+import co.sistemcobro.rrhh.constante.EmpleadoTipoBusquedaEnum;
+import co.sistemcobro.rrhh.dao.EmpleadoDAO;
+import co.sistemcobro.rrhh.dao.HorarioDAO;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+@Stateless
+public class EmpleadoEJB extends BaseEJB  {
+
+	private Logger logger = Logger.getLogger(EmpleadoEJB.class);
+
+	public EmpleadoEJB() {
+	}
+	
+	
+
+	public List<IdentificacionTipo> getIdentifiacionTipo() throws DatoException, LogicaException {
+		List<IdentificacionTipo> identificaciontipo = new ArrayList<IdentificacionTipo>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			identificaciontipo = empleadoDAO.getIdentificacionTipo();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return identificaciontipo;
+		
+	}
+	public IdentificacionTipo getIdentificacionTipoporid(Long identificaciontipo) throws DatoException, LogicaException {
+		IdentificacionTipo identificaciontipoobjeto = new IdentificacionTipo();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			identificaciontipoobjeto = empleadoDAO.getIdentificacionTipoporid(identificaciontipo);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return identificaciontipoobjeto;
+	}
+
+	public List<EmpleadoBean> buscarEmpleados(String desde, String hasta, String valor, UsuarioTipoBusquedaEnum tipobusqueda) throws LogicaException {
+		try {
+			if (EmpleadoTipoBusquedaEnum.NOMBRE.getIndex() == tipobusqueda.getIndex() || EmpleadoTipoBusquedaEnum.NUMIDENTIFICACION.getIndex() == tipobusqueda.getIndex() || EmpleadoTipoBusquedaEnum.USUARIO.getIndex() == tipobusqueda.getIndex()) {
+				if (null != valor && valor.length() > 0) {
+					valor = "%" + valor.trim().replace(" ", "%") + "%";
+				} else {
+					valor = "%";
+				}
+			}
+
+			EmpleadoDAO empleadoDAOc = new EmpleadoDAO(dc_rrhh);
+			List<EmpleadoBean> empleadosbuscados = empleadoDAOc.buscarEmpleados(desde, hasta, valor, tipobusqueda);
+			List<EmpleadoBean> empleadossalida = new ArrayList<EmpleadoBean>();
+			List<EmpleadoBean> empleadosdefinitivos = new ArrayList<EmpleadoBean>();
+			UsuarioDAO usuarioDAOc = new UsuarioDAO(dc_hermes);
+			for( EmpleadoBean x:empleadosbuscados){
+				if(x.getEmpleadoidentificacion().getActual()!=null){
+					if(x.getEmpleadoidentificacion().getActual()!=ActualEnum.ACTUAL.getIndex()){
+						EmpleadoBean empleado = empleadoDAOc.buscarEmpleadosporId(x.getIdempleado());
+						
+						empleadossalida.add(empleado);
+					}else{
+							
+						/*busca en hermes informacion
+						 * if(x.getEmpleadoidentificacion().getNumeroidentificacion()!=null &&  x.getEmpleadoidentificacion().getIdidentificaciontipo()!=null){
+							UsuarioBean usauriohermes = usuarioDAOc.getUsuarioPorIdentificacionyTipo(x.getEmpleadoidentificacion().getNumeroidentificacion(), x.getEmpleadoidentificacion().getIdidentificaciontipo());
+							x.setUsuariohermes(usauriohermes);	
+							if(usauriohermes!=null){
+								//x.setCodempleado(usauriohermes.getCodusuario().toString());
+							}
+								
+						}*/
+						empleadossalida.add(x);
+					}	
+				}
+				
+				
+				
+			}
+
+			if(empleadossalida.size()>0){
+
+          	   Long temp=Long.valueOf(0);
+					for(EmpleadoBean x:empleadossalida){
+              		 if(x !=null && x.getIdempleado()!=null){
+	              			Long idempleado = x.getIdempleado();
+	               		   if(temp.equals(idempleado)){
+	                 	   }else{
+	                  		   empleadosdefinitivos.add(x);
+	                  	   }
+	                  	  temp = x.getIdempleado(); 
+              		 }else{
+              			//throw new LogicaException("el empleado"+x.getNombres()+" "+x.getApellidos()+" no tiene id empleado"); 
+              		 }
+              		
+                	   
+                 	   
+                    }
+              }
+             
+			
+			return empleadosdefinitivos;
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+	
+	}
+	
+	public EmpleadoBean buscarEmpleadosporId(Long idempleado) throws DatoException, LogicaException {
+		logger.info("Entro a consulta un empleado.");
+		 EmpleadoBean empleado = new EmpleadoBean();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			UsuarioDAO usuarioDAOc = new UsuarioDAO(dc_hermes);
+			empleado = empleadoDAO.buscarEmpleadosporId(idempleado);
+			if(empleado!=null && empleado.getEmpleadoidentificacion()!=null){
+				if(empleado.getEmpleadoidentificacion().getNumeroidentificacion()!=null &&  empleado.getEmpleadoidentificacion().getIdidentificaciontipo()!=null){
+					UsuarioBean usauriohermes = usuarioDAOc.getUsuarioPorIdentificacionyTipo(empleado.getEmpleadoidentificacion().getNumeroidentificacion(), empleado.getEmpleadoidentificacion().getIdidentificaciontipo());
+					empleado.setUsuariohermes(usauriohermes);
+					if(usauriohermes!=null){
+						//empleado.setCodempleado(usauriohermes.getCodusuario().toString());
+					}
+					
+				}
+			}
+					
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		logger.info("Todo bien con el empleado.");
+		return empleado;	
+	}
+
+		
+	
+	public List<Empresa> getEmpresas() throws DatoException, LogicaException {
+		List<Empresa> empresas = new ArrayList<Empresa>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			empresas = empleadoDAO.getEmpresas();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return empresas;
+		
+	}
+	public List<EmpleadoBean> getEmpleados(List<String> estados) throws DatoException, LogicaException {
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			empleados = empleadoDAO.getEmpleados(estados);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return empleados;
+		
+	}
+	
+	public List<EmpleadoBean> getEmpleadosporfechacumple(String fechahasta) throws DatoException, LogicaException {
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			empleados = empleadoDAO.getEmpleadosporfechacumple(fechahasta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return empleados;
+		
+	}
+	public List<Empresa> getEmpresasporId(Long idempresa) throws DatoException, LogicaException {
+		List<Empresa> empresas = new ArrayList<Empresa>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			empresas = empleadoDAO.getEmpresasporId(idempresa);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return empresas;	
+	}
+		
+		
+	public List<Genero> getGeneros() throws DatoException, LogicaException {
+		List<Genero> generos = new ArrayList<Genero>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			generos = empleadoDAO.getGeneros();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return generos;
+		
+	}
+	public List<Sucursal> getSucursalesporEmpresa(Long idempresa) throws DatoException, LogicaException {
+		List<EmpresaSucursal> empresassucursales = new ArrayList<EmpresaSucursal>();
+		List<Sucursal> sucursales = new ArrayList<Sucursal>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+			sucursales=empleadoDAO.getSucursalesporEmpresasucursal(empresassucursales);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return sucursales;
+		
+	}
+	public Sucursal getSucursalesporid(Long idsucursal) throws DatoException, LogicaException {
+		//List<EmpresaSucursal> empresassucursales = new ArrayList<EmpresaSucursal>();
+		Sucursal sucursal = new Sucursal();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			//empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+			sucursal=empleadoDAO.getSucursalesporId(idsucursal);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return sucursal;
+	}
+	
+	
+	public Integer insertarEmpleado(EmpleadoBean empleado) throws DatoException, LogicaException {
+	
+	
+		Integer resultado=null;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			//empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+			
+			 empleado = empleadoDAO.insertarEmpleado(empleado);
+			 empleado.getEmpleadoidentificacion().setIdempleado(empleado.getIdempleado());
+			 resultado = empleadoDAO.insertarEmpleadoIdentificacion(empleado.getEmpleadoidentificacion());
+				
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+	public EmpleadoIdentificacion getEmpleadoIdentificacionActual(Long idempleado) throws DatoException, LogicaException {
+		
+		EmpleadoIdentificacion empleadoidentificacion= new EmpleadoIdentificacion();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			//empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+			empleadoidentificacion=empleadoDAO.getEmpleadoIdentificacionActual(idempleado);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return empleadoidentificacion;
+	}
+		
+	public Integer actualizaEmpleado(EmpleadoBean empleado) throws DatoException, LogicaException {
+		//EmpleadoIdentificacion empleadoidentificacion= new EmpleadoIdentificacion();
+		
+		Integer resu;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			//empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+		
+			resu=empleadoDAO.actualizaEmpleado(empleado);
+			empleado.getEmpleadoidentificacion().setIdempleado(empleado.getIdempleado());
+			
+			resu = empleadoDAO.actualizaEmpleadoIdentificacion(empleado.getEmpleadoidentificacion());
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	
+	public Integer actualizaEmpleadoestadofoto(EmpleadoBean empleado) throws DatoException, LogicaException {
+		//EmpleadoIdentificacion empleadoidentificacion= new EmpleadoIdentificacion();
+		
+		Integer resu;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			//empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+		
+			resu=empleadoDAO.actualizaEmpleadoestadofoto(empleado);
+		
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	public Integer actualizaEmpleadofoto(EmpleadoBean empleado) throws DatoException, LogicaException {
+		//EmpleadoIdentificacion empleadoidentificacion= new EmpleadoIdentificacion();
+		
+		Integer resu;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			//empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+		
+			resu=empleadoDAO.actualizaEmpleadofoto(empleado);
+
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+		
+	public Integer actualizaEmpleadoIdentificacion(EmpleadoIdentificacion empleadoidenti) throws DatoException, LogicaException {
+		//EmpleadoIdentificacion empleadoidentificacion= new EmpleadoIdentificacion();
+		
+		Integer resu;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			resu=empleadoDAO.actualizaEmpleadoIdentificacion(empleadoidenti);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	
+	public Integer deshabilitarEstadoEmpleado(EmpleadoBean empleado) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			empleado.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resu=empleadoDAO.actualizarEstadoEmpleado(empleado);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+		
+	
+	public Integer habilitarEstadoEmpleado(EmpleadoBean empleado) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=empleadoDAO.actualizarEstadoEmpleado(empleado);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+			
+	public List<EmpleadoPropiedad>  getEmpeladoPropiedadesporidEmpleado(Long idempleado) throws DatoException, LogicaException {
+		
+		List<EmpleadoPropiedad> resu=new ArrayList<EmpleadoPropiedad>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=empleadoDAO.getEmpeladoPropiedadesporidEmpleado(idempleado);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	
+	
+	/**
+	 * Este método permite obtener las propiedades de correspondencia (Correo y Direccion).
+	 * Para el envio de la liquidación.
+	 * @param Long. idempleado.
+	 * @return List. EmpleadoPropiedad.
+	 * */
+	public List<EmpleadoPropiedad>  obtenerPropiedadesDeCorrespondencia(Long idempleado) throws DatoException, LogicaException {
+		
+		List<EmpleadoPropiedad> resu=new ArrayList<EmpleadoPropiedad>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			resu=empleadoDAO.obtenerPropiedadesDeCorrespondenciaPorIdEmpleado(idempleado);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	
+	
+	public EmpleadoPropiedad  getEmpeladoPropiedadesporid(Long idempleadopropiedad) throws DatoException, LogicaException {
+	EmpleadoPropiedad resu=new EmpleadoPropiedad();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=empleadoDAO.getEmpeladoPropiedadesporid(idempleadopropiedad);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+		
+		
+	public List<Propiedad>  getPropiedades() throws DatoException, LogicaException {
+		List<Propiedad> resu=new ArrayList<Propiedad>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=empleadoDAO.getPropiedades();
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	
+
+	public List<Propiedad>  getPropiedadesDeCorrespondencia() throws DatoException, LogicaException {
+		List<Propiedad> resu=new ArrayList<Propiedad>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			resu=empleadoDAO.getPropiedadesDeCorrespondencia();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	
+	
+	public Propiedad  getPropiedadesporId(Long idpropiedad) throws DatoException, LogicaException {
+		Propiedad resu=new Propiedad();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=empleadoDAO.getPropiedadesporId(idpropiedad);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	public Integer deshabilitarEmpleadoPropiedad(EmpleadoPropiedad empleadopropiedad) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			empleadopropiedad.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resu=empleadoDAO.actualizarEstadoEmpleadoPropiedad(empleadopropiedad);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	public Integer habilitarEmpleadoPropiedad(EmpleadoPropiedad empleadopropiedad) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			empleadopropiedad.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=empleadoDAO.actualizarEstadoEmpleadoPropiedad(empleadopropiedad);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	public List<Prioridad>  getPrioridades() throws DatoException, LogicaException {
+		List<Prioridad> resu=new ArrayList<Prioridad>();
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+			//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=empleadoDAO.getPrioridades();
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;
+	}
+	public EmpleadoPropiedad insertarEmpleadoPropiedad(EmpleadoPropiedad empleadopropiedad) throws DatoException, LogicaException {
+		
+		
+		EmpleadoPropiedad resultado=null;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			//empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+			
+			 resultado = empleadoDAO.insertarEmpleadoPropiedad(empleadopropiedad);
+				
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+public Integer editarEmpleadoPropiedad(EmpleadoPropiedad empleadopropiedad) throws DatoException, LogicaException {
+		
+		
+		Integer resultado=null;
+		try {
+			EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+			//empresassucursales = empleadoDAO.getSucursalesporEmpresa(idempresa);
+			
+			 resultado = empleadoDAO.editarEmpleadoPropiedad(empleadopropiedad);
+				
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+
+public List<EmpleadoBean> buscarEmpleadospornumeroidentificacion(String numeroidentificacion) throws DatoException, LogicaException {
+	List<EmpleadoBean> empleados=new ArrayList<EmpleadoBean>();
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+		//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+		empleados=empleadoDAO.buscarEmpleadospornumeroidentificacion(numeroidentificacion);
+		
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleados;
+}
+
+public List<EmpleadoBean> buscarEmpleadosporUsuarioWindows(String usuariowin) throws DatoException, LogicaException {
+	List<EmpleadoBean> empleados=new ArrayList<EmpleadoBean>();
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+		//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+		empleados=empleadoDAO.buscarEmpleadosporUsuarioWindows(usuariowin);
+		
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleados;
+}
+
+public List<EmpleadoBean> buscarEmpleadospornumeroidentificacionActivo(String numeroidentificacion) throws DatoException, LogicaException {
+	List<EmpleadoBean> empleados=new ArrayList<EmpleadoBean>();
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+		//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+		empleados=empleadoDAO.buscarEmpleadospornumeroidentificacionActivo(numeroidentificacion);
+		
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleados;
+}
+public List<EmpleadoBean> buscarEmpleadosporCodigoIdentificacion(String codigoidentificacion) throws DatoException, LogicaException {
+	List<EmpleadoBean> empleados=new ArrayList<EmpleadoBean>();
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+		//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+		empleados=empleadoDAO.buscarEmpleadosporCodigoIdentificacion(codigoidentificacion);
+		
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleados;
+}
+
+public List<EmpleadoBean> buscarEmpleadosSinHorario(String fechahasta,String fechadesde,List<String> idarea) throws DatoException, LogicaException {
+	List<EmpleadoBean> empleados=new ArrayList<EmpleadoBean>();
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+		HorarioDAO horarioDAO = new HorarioDAO(dc_rrhh);
+		//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+		//empleados=empleadoDAO.buscarEmpleadosSinHorario(fechahasta,fechadesde,idarea);
+		List<ReporteAsignacion> rsu = horarioDAO.Reporteasignacion(fechadesde, fechahasta,idarea);
+		List<Long> idempleadosconhorario=new ArrayList<Long>();
+		for(ReporteAsignacion rs:rsu){
+			if(rs.getEmpleado()!=null){
+				idempleadosconhorario.add(rs.getEmpleado().getIdempleado());	
+			}
+			
+		}
+		empleados=empleadoDAO.buscarEmpleadosSinHorarioV2(fechahasta,fechadesde,idarea,idempleadosconhorario);
+		
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleados;
+}
+
+public List<EmpleadoBean> ReporteHorariosAsignados(String fechadesde,String fechahasta) throws DatoException, LogicaException {
+	List<EmpleadoBean> empleados=new ArrayList<EmpleadoBean>();
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+		//empleado.setEstado(EstadoEnum.ACTIVO.getIndex());
+		//empleados=empleadoDAO.buscarEmpleadosSinHorario(fechahasta);
+		
+//	} catch (DatoException e) {
+//		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleados;
+}
+public List<DocumentoConfiguracion>  getDocumentoConfiguracion(Long iddocumentotipo) throws DatoException, LogicaException {
+	List<DocumentoConfiguracion> docconfiguraciones=new ArrayList<DocumentoConfiguracion>();
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+
+		docconfiguraciones=empleadoDAO.getDocumentoConfiguracion(iddocumentotipo);
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return docconfiguraciones;
+}
+
+public EmpleadoDocumentoGenerado insertarEmpleadoDocumentogenerado(EmpleadoDocumentoGenerado empleadodocumentogenerado) throws DatoException, LogicaException {
+	//EmpleadoDocumentoGenerado docconfiguraciones=new ArrayList<EmpleadoDocumentoGenerado>();
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+
+		empleadodocumentogenerado=empleadoDAO.insertarEmpleadoDocumentogenerado(empleadodocumentogenerado);
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleadodocumentogenerado;
+}
+	
+public EmpleadoDocumentoGenerado actualizarEmpleadoDocumentoGenerado(EmpleadoDocumentoGenerado empleadodocu) throws DatoException, LogicaException {
+	EmpleadoDocumentoGenerado resu;
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dg_rrhh);
+
+		resu=empleadoDAO.actualizarEmpleadoDocumentoGenerado(empleadodocu);
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return resu;
+}
+	
+	
+
+public List<EmpleadoDocumentoGenerado> buscarCertificadosGenerados(String desde, String hasta, String valor, UsuarioTipoBusquedaEnum tipobusqueda) throws LogicaException {
+	try {
+		if (EmpleadoTipoBusquedaEnum.NOMBRE.getIndex() == tipobusqueda.getIndex() || EmpleadoTipoBusquedaEnum.NUMIDENTIFICACION.getIndex() == tipobusqueda.getIndex() || EmpleadoTipoBusquedaEnum.USUARIO.getIndex() == tipobusqueda.getIndex()  || EmpleadoTipoBusquedaEnum.NUMEROCERTIFICADO.getIndex() == tipobusqueda.getIndex()) {
+			if (null != valor && valor.length() > 0) {
+				valor = "%" + valor.trim().replace(" ", "%") + "%";
+			} else {
+				valor = "%";
+			}
+		}
+
+		EmpleadoDAO empleadoDAOc = new EmpleadoDAO(dc_rrhh);
+		List<EmpleadoDocumentoGenerado> certificadosbuscados = empleadoDAOc.buscarCertificadosGenerados(desde, hasta, valor, tipobusqueda);
+	
+			
+		
+
+		
+		return certificadosbuscados;
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+
+}
+public EmpleadoDocumentoGenerado  buscarEmpleadoDocumentoGenerado(Long idempleadodocumento) throws DatoException, LogicaException {
+	EmpleadoDocumentoGenerado empleadodocumentogenerado;
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+
+		empleadodocumentogenerado=empleadoDAO.buscarEmpleadoDocumentoGenerado(idempleadodocumento);
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleadodocumentogenerado;
+}
+	
+public List<EmpleadoDocumentoGenerado> buscarCertificadosGeneradosporEmpleado(Long idempleado) throws DatoException, LogicaException {
+	List<EmpleadoDocumentoGenerado> empleadodocumentogenerado;
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+
+		empleadodocumentogenerado=empleadoDAO.buscarCertificadosGeneradosporEmpleado(idempleado);
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleadodocumentogenerado;
+}
+	
+public List<EmpleadoDocumentoGenerado> buscarCertificadosGeneradosporEmpleadoyfecha(Long idempleado,Date fecha) throws DatoException, LogicaException {
+	List<EmpleadoDocumentoGenerado> empleadodocumentogenerado;
+	try {
+		EmpleadoDAO empleadoDAO = new EmpleadoDAO(dc_rrhh);
+
+		empleadodocumentogenerado=empleadoDAO.buscarCertificadosGeneradosporEmpleadoyfecha(idempleado,fecha);
+	} catch (DatoException e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	} catch (Exception e) {
+		throw new LogicaException(e.toString(), e.getCause());
+	}
+	return empleadodocumentogenerado;
+}
+	
+	
+}

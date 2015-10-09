@@ -1,0 +1,43 @@
+package co.sistemcobro.rrhh.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum DocumentoTipoEnum {
+	CERTIFICADO_LABORAL(1);
+
+	public static final Map<Integer, DocumentoTipoEnum> mapByID = new HashMap<Integer, DocumentoTipoEnum>();
+	public static final Map<String, DocumentoTipoEnum> mapByNAME = new HashMap<String, DocumentoTipoEnum>();
+
+	static {
+		for (DocumentoTipoEnum s : EnumSet
+				.allOf(DocumentoTipoEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	DocumentoTipoEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static DocumentoTipoEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static DocumentoTipoEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

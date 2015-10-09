@@ -1,0 +1,90 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class GrupoBean implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Integer idgrupo;
+	private Integer idgrupotipo;
+	private Integer codgrupo;
+	private String nombre;
+	private Integer estado;
+
+	private GrupoTipoBean grupotipo;
+	private Estado estadob;
+	private Integer iddirectivared;
+
+	public Integer getIdgrupotipo() {
+		return idgrupotipo;
+	}
+
+	public void setIdgrupotipo(Integer idgrupotipo) {
+		this.idgrupotipo = idgrupotipo;
+	}
+
+	public GrupoTipoBean getGrupotipo() {
+		return grupotipo;
+	}
+
+	public void setGrupotipo(GrupoTipoBean grupotipo) {
+		this.grupotipo = grupotipo;
+	}
+
+	public Integer getIdgrupo() {
+		return idgrupo;
+	}
+
+	public void setIdgrupo(Integer idgrupo) {
+		this.idgrupo = idgrupo;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public Integer getCodgrupo() {
+		return codgrupo;
+	}
+
+	public void setCodgrupo(Integer codgrupo) {
+		this.codgrupo = codgrupo;
+	}
+
+	public Estado getEstadob() {
+		return estadob;
+	}
+
+	public void setEstadob(Estado estadob) {
+		this.estadob = estadob;
+	}
+
+	public Integer getIddirectivared() {
+		return iddirectivared;
+	}
+
+	public void setIddirectivared(Integer iddirectivared) {
+		this.iddirectivared = iddirectivared;
+	}	
+
+	
+	
+}

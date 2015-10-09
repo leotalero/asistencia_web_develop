@@ -1,0 +1,42 @@
+package co.sistemcobro.hermes.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum AccesoTipoEnum {
+	VERIFICANDO(1), ACCCESO_CONCEDIDO(2), AUTENTICACION_FALLIDA(3), ACCCESO_BLOQUEADO(4), NO_CUENTA_CON_PERMISO(5);
+
+	public static final Map<Integer, AccesoTipoEnum> mapByID = new HashMap<Integer, AccesoTipoEnum>();
+	public static final Map<String, AccesoTipoEnum> mapByNAME = new HashMap<String, AccesoTipoEnum>();
+
+	static {
+		for (AccesoTipoEnum s : EnumSet.allOf(AccesoTipoEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	AccesoTipoEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static AccesoTipoEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static AccesoTipoEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

@@ -1,0 +1,282 @@
+/**
+ * 
+ */
+package co.sistemcobro.rrhh.util;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ResourceBundle;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.all.util.Ftp;
+import co.sistemcobro.rrhh.constante.Constante;
+
+/**
+ * <p>
+ * Clase que provee las utilidades necesarias para el manejo de archivos FTP
+ * </p>
+ * 
+ * @author Leonardo talero - Sistemcobro S.A
+ */
+public class FtpUtilCliente {
+
+	private static Logger logger = Logger.getLogger(FtpUtilCliente.class);
+
+	private static ResourceBundle config = ResourceBundle
+			.getBundle(Constante.FILE_CONFIG_RRHH);
+
+	/**
+	 * <p>
+	 * Metodo que realiza la conexion a un servidor FTP y almacena el archivo
+	 * file en este servidor en caso de que la conexion se haya logrado, retorna
+	 * true si se almaceno con exito el archivo en el servidor FTP.
+	 * 
+	 * Si no se logro conectar al servidor retorna false.
+	 * </p>
+	 * 
+	 * @author Cristian Nieto - Sistemcobro S.A
+	 * @param file
+	 *            - Archivo a almacenar en el servidor FTP
+	 * @throws FileNotFoundException
+	 *             Exepcion Generada en caso de que el archivo a subir no se
+	 *             encuentre
+	 * @throws IOException
+	 *             Excepcion generada por que el archivo file no se puede leer
+	 * @throws LogicaException
+	 *             Excepcion generada en cado de no poderse conectar al Servidor
+	 *             FTP
+	 */
+	@SuppressWarnings("static-access")
+	public static boolean uploadFTP(File file, String ruta) throws FileNotFoundException, IOException, LogicaException {
+		String serverFTP = config.getString("rrhh.ftp.server");
+		FTPClient ftp = null;
+		boolean respuesta = false;
+		String user = config.getString("rrhh.ftp.user");
+		String pass = config.getString("rrhh.ftp.password");
+		ftp = (new Ftp()).getFTPConnect(serverFTP, user, pass);
+		
+		if (ftp.isConnected()) {
+			boolean respu = checkDirectoryExists(ftp, ruta);
+			boolean dirres = false;
+			if (respu) {
+				// ftp.changeWorkingDirectory("ruta");
+				dirres = true;
+			} else {
+
+				dirres = ftp.makeDirectory(ruta);
+
+			}
+			if (dirres) {
+				// ftp.changeWorkingDirectory("ruta");
+				// Hace el cargue del archivo en el repositorio FTP
+				// correspondiente
+				FileInputStream in = new FileInputStream(file);
+				ftp.setFileType(ftp.BINARY_FILE_TYPE);
+				String archivo = "/" + ruta + "/" + file.getName();
+				boolean res = ftp.storeFile(archivo, in);
+				logger.info("Resultado de subir el archivo [" + file.getName()
+						+ "] a FTP [" + res + "]");
+				respu = true;
+				respuesta = true;
+			}
+			ftp.disconnect();
+		} else {
+			for (int i = 0; i < 5; i++) {
+				try {
+					Thread.sleep(100);
+					ftp = (new Ftp()).getFTPConnect(serverFTP,
+							config.getString("rrhh.ftp.user"),
+							config.getString("rrhh.ftp.password"));
+					if (ftp.isConnected()) {
+						boolean respu = checkDirectoryExists(ftp, ruta);
+						boolean dirres = false;
+						if (respu) {
+							// ftp.changeWorkingDirectory("ruta");
+							dirres = true;
+						} else {
+
+							dirres = ftp.makeDirectory(ruta);
+
+						}
+						if (dirres) {
+							// ftp.changeWorkingDirectory("ruta");
+							// Hace el cargue del archivo en el repositorio FTP
+							// correspondiente
+							FileInputStream in = new FileInputStream(file);
+							ftp.setFileType(ftp.BINARY_FILE_TYPE);
+							String archivo = "/" + ruta + "/" + file.getName();
+							boolean res = ftp.storeFile(archivo, in);
+							logger.info("Resultado de subir el archivo ["
+									+ file.getName() + "] a FTP [" + res + "]");
+							respuesta = true;
+							respu = true;
+						}
+
+						break;
+					} else {
+						respuesta = false;
+						throw new LogicaException(
+								"Error: No fue posible conectarse al FTP ["
+										+ serverFTP + "]");
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+		}
+
+		return respuesta;
+
+	}
+
+	/**
+	 * <p>
+	 * Metodo que realiza la conexion a un servidor FTP y tra el archivo en
+	 * BYTES
+	 * 
+	 * Si no se logro conectar al servidor lanza una Excepcion LogicaException
+	 * 
+	 * </p>
+	 * 
+	 * @author Cristian Nieto - Sistemcobro S.A
+	 * @param file
+	 *            - Archivo a almacenar en el servidor FTP
+	 * @throws FileNotFoundException
+	 *             Exepcion Generada en caso de que el archivo a subir no se
+	 *             encuentre
+	 * @throws IOException
+	 *             Excepcion generada por que el archivo file no se puede leer
+	 * @throws LogicaException
+	 *             Excepcion generada en cado de no poderse conectar al Servidor
+	 *             FTP
+	 */
+	public static byte[] downloadFTP(String file, String ruta)
+			throws FileNotFoundException, IOException, LogicaException {
+		String serverFTP = config.getString("rrhh.ftp.server");
+		FTPClient ftp = null;
+
+		ftp = (new Ftp()).getFTPConnect(serverFTP,
+				config.getString("rrhh.ftp.user"),
+				config.getString("rrhh.ftp.password"));
+
+		if (ftp.isConnected()) {
+			boolean respu = checkDirectoryExists(ftp, ruta);
+			boolean dirres = false;
+			if (respu) {
+				// ftp.changeWorkingDirectory("ruta");
+				dirres = true;
+			} else {
+
+				dirres = ftp.makeDirectory(ruta);
+
+			}
+			if (dirres) {
+
+				ftp.changeWorkingDirectory("ruta");
+				ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+				String archivo = "/" + ruta + "/" + file;
+				InputStream res = ftp.retrieveFileStream(archivo);
+
+				byte[] bytes = IOUtils.toByteArray(res);
+				logger.info("Resultado de bajar el archivo [" + file
+						+ "] a FTP [" + res + "]");
+				ftp.disconnect();
+				return bytes;
+			}
+
+		}
+		throw new LogicaException("Error: No fue posible conectarse al FTP ["
+				+ serverFTP + "]");
+
+	}
+
+	/**
+	 * <p>
+	 * Metodo que realiza la conexion a un servidor FTP y borra el archivo file
+	 * del servidor en caso de que la conexion se haya logrado
+	 * 
+	 * Si no se logro conectar al servidor lanza una Excepcion LogicaException
+	 * 
+	 * </p>
+	 * 
+	 * @author Cristian Nieto - Sistemcobro S.A
+	 * @param file
+	 *            - Archivo a almacenar en el servidor FTP
+	 * @throws FileNotFoundException
+	 *             Exepcion Generada en caso de que el archivo a subir no se
+	 *             encuentre
+	 * @throws IOException
+	 *             Excepcion generada por que el archivo file no se puede leer
+	 * @throws LogicaException
+	 *             Excepcion generada en cado de no poderse conectar al Servidor
+	 *             FTP
+	 */
+	public static void deleteFtp(File file, String ruta)
+			throws LogicaException, IOException {
+		logger.info("Inicio de borrado del archivo FTP");
+		String serverFTP = config.getString("rrhh.ftp.server");
+		FTPClient ftp = null;
+		ftp = (new Ftp()).getFTPConnect(serverFTP,
+				config.getString("rrhh.ftp.user"),
+				config.getString("rrhh.ftp.password"));
+		if (ftp.isConnected()) {
+
+			logger.info("Se va a borrar el archivo FTP de la ruta "
+					+ file.getName());
+
+			ftp.deleteFile("/" + ruta + "/" + file.getName());
+
+			logger.info("Se borro el archivo " + file.getName()
+					+ " de forma exitosa [OK]");
+
+		} else {
+			throw new LogicaException(
+					"Error: No fue posible borrar el archivo subido por FTP ");
+		}
+
+	}
+
+	static boolean checkDirectoryExists(FTPClient ftpClient, String dirPath)
+			throws IOException {
+		ftpClient.changeWorkingDirectory(dirPath);
+		int returnCode = ftpClient.getReplyCode();
+		if (returnCode == 550) {
+			return false;
+		}
+		return true;
+	}
+
+	public static Boolean checkconexion() throws FileNotFoundException,
+			IOException, LogicaException {
+		String serverFTP = config.getString("rrhh.ftp.server");
+		FTPClient ftp = null;
+		Boolean resu = false;
+		ftp = (new Ftp()).getFTPConnect(serverFTP,
+				config.getString("rrhh.ftp.user"),
+				config.getString("rrhh.ftp.password"));
+
+		if (ftp.isConnected()) {
+
+			logger.info("Resultado de conexion");
+			ftp.disconnect();
+			resu = true;
+		} else {
+			resu=false;
+			//throw new LogicaException(
+			//		"Error: No fue posible conectarse al FTP [" + serverFTP
+			//				+ "]");
+		}
+		return resu;
+
+	}
+}

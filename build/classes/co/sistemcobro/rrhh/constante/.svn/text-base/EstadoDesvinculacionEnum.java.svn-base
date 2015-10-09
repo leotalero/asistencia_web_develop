@@ -1,0 +1,43 @@
+package co.sistemcobro.rrhh.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum EstadoDesvinculacionEnum {
+	RETENER(1),PROCEDER_RETIRO(2);
+
+	public static final Map<Integer, EstadoDesvinculacionEnum> mapByID = new HashMap<Integer, EstadoDesvinculacionEnum>();
+	public static final Map<String, EstadoDesvinculacionEnum> mapByNAME = new HashMap<String, EstadoDesvinculacionEnum>();
+
+	static {
+		for (EstadoDesvinculacionEnum s : EnumSet
+				.allOf(EstadoDesvinculacionEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	EstadoDesvinculacionEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static EstadoDesvinculacionEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static EstadoDesvinculacionEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

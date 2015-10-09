@@ -1,0 +1,74 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+public class Parentesco implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idparentesco;
+	private String nombreparentesco;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	public Long getIdparentesco() {
+		return idparentesco;
+	}
+
+	public void setIdparentesco(Long idparentesco) {
+		this.idparentesco = idparentesco;
+	}
+
+	public String getNombreparentesco() {
+		return nombreparentesco;
+	}
+
+	public void setNombreparentesco(String nombreparentesco) {
+		this.nombreparentesco = nombreparentesco;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+}

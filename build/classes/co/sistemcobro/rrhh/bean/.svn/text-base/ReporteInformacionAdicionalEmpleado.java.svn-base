@@ -1,0 +1,190 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+
+/**
+ * Esta clase sirve para encapsular la información que se mostrará en el reporte: Reporte Información Adicional de Empleados.
+ * @author jpuentes
+ * */
+public class ReporteInformacionAdicionalEmpleado implements Serializable {
+
+	
+	private static final long serialVersionUID = 1L;
+	
+	private EmpleadoBean empleado;
+	
+	//Informacion de bancos.
+	private EmpleadoBanco empleadoBanco;
+	private Banco banco;
+	
+	//Informacion de afiliaciones
+	private EmpleadoAfiliacion empleadoAfiliacion;
+	private AfiliacionTipo afiliacionTipo;
+	private AfiliacionEntidad afiliacionEntidad;
+	
+	//Informacion de educacion.
+	private EmpleadoEducacion empleadoEducacion;
+	private EducacionNivel educacionNivel;
+	private EducacionEstado educacionEstado;
+	
+	//Informacion de familia
+	private EmpleadoFamilia empleadoFamilia;
+	private Parentesco parentesco;
+	private Genero genero;
+	private IdentificacionTipo tipoId;
+	
+	//Información de documentos.
+	private EmpleadoDocumentoPersonal empleadoDocumento;
+	private EmpleadoDocumentoTipo tipoDocumento;
+	
+	
+	//Informacion de propiedades
+	private EmpleadoPropiedad empleadoPropiedad;
+	private Prioridad prioridad;
+	private Propiedad propiedad;
+	
+	public EmpleadoBean getEmpleado() {
+		return empleado;
+	}
+
+	public void setEmpleado(EmpleadoBean empleado) {
+		this.empleado = empleado;
+	}
+
+	public EmpleadoBanco getEmpleadoBanco() {
+		return empleadoBanco;
+	}
+
+	public void setEmpleadoBanco(EmpleadoBanco empleadoBanco) {
+		this.empleadoBanco = empleadoBanco;
+	}
+
+	public Banco getBanco() {
+		return banco;
+	}
+
+	public void setBanco(Banco banco) {
+		this.banco = banco;
+	}
+
+	public EmpleadoAfiliacion getEmpleadoAfiliacion() {
+		return empleadoAfiliacion;
+	}
+
+	public void setEmpleadoAfiliacion(EmpleadoAfiliacion empleadoAfiliacion) {
+		this.empleadoAfiliacion = empleadoAfiliacion;
+	}
+
+	public AfiliacionTipo getAfiliacionTipo() {
+		return afiliacionTipo;
+	}
+
+	public void setAfiliacionTipo(AfiliacionTipo afiliacionTipo) {
+		this.afiliacionTipo = afiliacionTipo;
+	}
+
+	public AfiliacionEntidad getAfiliacionEntidad() {
+		return afiliacionEntidad;
+	}
+
+	public void setAfiliacionEntidad(AfiliacionEntidad afiliacionEntidad) {
+		this.afiliacionEntidad = afiliacionEntidad;
+	}
+
+	public EmpleadoEducacion getEmpleadoEducacion() {
+		return empleadoEducacion;
+	}
+
+	public void setEmpleadoEducacion(EmpleadoEducacion empleadoEducacion) {
+		this.empleadoEducacion = empleadoEducacion;
+	}
+
+	public EducacionNivel getEducacionNivel() {
+		return educacionNivel;
+	}
+
+	public void setEducacionNivel(EducacionNivel educacionNivel) {
+		this.educacionNivel = educacionNivel;
+	}
+
+	public EducacionEstado getEducacionEstado() {
+		return educacionEstado;
+	}
+
+	public void setEducacionEstado(EducacionEstado educacionEstado) {
+		this.educacionEstado = educacionEstado;
+	}
+
+	public EmpleadoFamilia getEmpleadoFamilia() {
+		return empleadoFamilia;
+	}
+
+	public void setEmpleadoFamilia(EmpleadoFamilia empleadoFamilia) {
+		this.empleadoFamilia = empleadoFamilia;
+	}
+
+	public Parentesco getParentesco() {
+		return parentesco;
+	}
+
+	public void setParentesco(Parentesco parentesco) {
+		this.parentesco = parentesco;
+	}
+
+	public Genero getGenero() {
+		return genero;
+	}
+
+	public void setGenero(Genero genero) {
+		this.genero = genero;
+	}
+
+	public IdentificacionTipo getTipoId() {
+		return tipoId;
+	}
+
+	public void setTipoId(IdentificacionTipo tipoId) {
+		this.tipoId = tipoId;
+	}
+
+	public EmpleadoDocumentoPersonal getEmpleadoDocumento() {
+		return empleadoDocumento;
+	}
+
+	public void setEmpleadoDocumento(EmpleadoDocumentoPersonal empleadoDocumento) {
+		this.empleadoDocumento = empleadoDocumento;
+	}
+
+	public EmpleadoDocumentoTipo getTipoDocumento() {
+		return tipoDocumento;
+	}
+
+	public void setTipoDocumento(EmpleadoDocumentoTipo tipoDocumento) {
+		this.tipoDocumento = tipoDocumento;
+	}
+
+	public EmpleadoPropiedad getEmpleadoPropiedad() {
+		return empleadoPropiedad;
+	}
+
+	public void setEmpleadoPropiedad(EmpleadoPropiedad empleadoPropiedad) {
+		this.empleadoPropiedad = empleadoPropiedad;
+	}
+
+	public Prioridad getPrioridad() {
+		return prioridad;
+	}
+
+	public void setPrioridad(Prioridad prioridad) {
+		this.prioridad = prioridad;
+	}
+
+	public Propiedad getPropiedad() {
+		return propiedad;
+	}
+
+	public void setPropiedad(Propiedad propiedad) {
+		this.propiedad = propiedad;
+	}
+	
+}

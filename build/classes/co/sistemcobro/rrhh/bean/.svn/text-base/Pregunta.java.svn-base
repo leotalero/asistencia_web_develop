@@ -1,0 +1,109 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+/**
+ * 
+ * @author leonardo talero
+ * 
+ */
+public class Pregunta implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idpregunta;
+	
+	private Long idcuestionario;
+	private Long idpreguntatipo;
+	private String pregunta;
+	private Integer obligatorio;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	private List<Opcion> opciones;
+	
+	public Long getIdpregunta() {
+		return idpregunta;
+	}
+	public void setIdpregunta(Long idpregunta) {
+		this.idpregunta = idpregunta;
+	}
+	public Long getIdcuestionario() {
+		return idcuestionario;
+	}
+	public void setIdcuestionario(Long idcuestionario) {
+		this.idcuestionario = idcuestionario;
+	}
+	public Long getIdpreguntatipo() {
+		return idpreguntatipo;
+	}
+	public void setIdpreguntatipo(Long idpreguntatipo) {
+		this.idpreguntatipo = idpreguntatipo;
+	}
+	public String getPregunta() {
+		return pregunta;
+	}
+	public void setPregunta(String pregunta) {
+		this.pregunta = pregunta;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public List<Opcion> getOpciones() {
+		return opciones;
+	}
+	public void setOpciones(List<Opcion> opciones) {
+		this.opciones = opciones;
+	}
+	public Integer getObligatorio() {
+		return obligatorio;
+	}
+	public void setObligatorio(Integer obligatorio) {
+		this.obligatorio = obligatorio;
+	}
+
+	
+	
+	
+	
+	
+
+	
+	
+	
+
+	
+
+
+}

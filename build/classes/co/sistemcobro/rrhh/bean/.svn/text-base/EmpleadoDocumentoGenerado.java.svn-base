@@ -1,0 +1,116 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class EmpleadoDocumentoGenerado implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idempleadodocumentogenerado;
+	private Long idempleado;
+	private Long iddocumentotipo;
+	private String nombredocumento;
+	private String nombreamostrar;
+	private String codigoverificacion;
+	private String codigocertificado;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	private EmpleadoBean empleado;
+	
+	public Long getIdempleadodocumentogenerado() {
+		return idempleadodocumentogenerado;
+	}
+	public void setIdempleadodocumentogenerado(Long idempleadodocumentogenerado) {
+		this.idempleadodocumentogenerado = idempleadodocumentogenerado;
+	}
+	public Long getIdempleado() {
+		return idempleado;
+	}
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+	public Long getIddocumentotipo() {
+		return iddocumentotipo;
+	}
+	public void setIddocumentotipo(Long iddocumentotipo) {
+		this.iddocumentotipo = iddocumentotipo;
+	}
+	public String getNombredocumento() {
+		return nombredocumento;
+	}
+	public void setNombredocumento(String nombredocumento) {
+		this.nombredocumento = nombredocumento;
+	}
+	public String getNombreamostrar() {
+		return nombreamostrar;
+	}
+	public void setNombreamostrar(String nombreamostrar) {
+		this.nombreamostrar = nombreamostrar;
+	}
+	public String getCodigoverificacion() {
+		return codigoverificacion;
+	}
+	public void setCodigoverificacion(String codigoverificacion) {
+		this.codigoverificacion = codigoverificacion;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public EmpleadoBean getEmpleado() {
+		return empleado;
+	}
+	public void setEmpleado(EmpleadoBean empleado) {
+		this.empleado = empleado;
+	}
+	public String getCodigocertificado() {
+		return codigocertificado;
+	}
+	public void setCodigocertificado(String codigocertificado) {
+		this.codigocertificado = codigocertificado;
+	}
+	
+	
+	
+
+	
+	
+	
+	
+	
+}

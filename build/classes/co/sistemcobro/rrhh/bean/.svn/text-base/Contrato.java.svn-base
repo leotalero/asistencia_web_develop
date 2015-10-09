@@ -1,0 +1,235 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @autho Leonardo talero
+ * 
+ */
+public class Contrato implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idcontrato;
+	private Long idempleado;
+	private Long idempresa;
+	private Long idsucursal;
+	private Long idcargo;
+	private Long idarea;
+	private Long idareaasignada;
+	private Long idestadodesvinculacion;
+	
+	private Long idretiromotivo;
+	private Long idcontratotipo;
+	private String salario;
+	
+	private String numerocontrato;
+	private Timestamp fechainicio;
+	private Timestamp fechafirma;
+	private Timestamp fechafin;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	
+	private Empresa empresa;
+	private Sucursal sucursal;
+	private Area area;
+	private Area areaasignada;
+	private Cargo cargo;
+	private RetiroMotivo retiromotivo;
+	private ContratoTipo contratotipo;
+	private EmpleadoSalario contratoSalario;
+	private TipoMoneda tipoMoneda;
+	
+	private String infosalarial;
+		
+	public Long getIdcontrato() {
+		return idcontrato;
+	}
+	public void setIdcontrato(Long idcontrato) {
+		this.idcontrato = idcontrato;
+	}
+	public Long getIdempleado() {
+		return idempleado;
+	}
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+	public Long getIdempresa() {
+		return idempresa;
+	}
+	public void setIdempresa(Long idempresa) {
+		this.idempresa = idempresa;
+	}
+	public Long getIdsucursal() {
+		return idsucursal;
+	}
+	public void setIdsucursal(Long idsucursal) {
+		this.idsucursal = idsucursal;
+	}
+	public Long getIdcargo() {
+		return idcargo;
+	}
+	public void setIdcargo(Long idcargo) {
+		this.idcargo = idcargo;
+	}
+	public Long getIdarea() {
+		return idarea;
+	}
+	public void setIdarea(Long idarea) {
+		this.idarea = idarea;
+	}
+	
+	public Long getIdareaasignada() {
+		return idareaasignada;
+	}
+	public void setIdareaasignada(Long idareaasignada) {
+		this.idareaasignada = idareaasignada;
+	}
+	public Long getIdretiromotivo() {
+		return idretiromotivo;
+	}
+	public void setIdretiromotivo(Long idretiromotivo) {
+		this.idretiromotivo = idretiromotivo;
+	}
+	public String getNumerocontrato() {
+		return numerocontrato;
+	}
+	public void setNumerocontrato(String numerocontrato) {
+		this.numerocontrato = numerocontrato;
+	}
+	public Timestamp getFechainicio() {
+		return fechainicio;
+	}
+	public void setFechainicio(Timestamp fechainicio) {
+		this.fechainicio = fechainicio;
+	}
+	public Timestamp getFechafirma() {
+		return fechafirma;
+	}
+	public void setFechafirma(Timestamp fechafirma) {
+		this.fechafirma = fechafirma;
+	}
+	public Timestamp getFechafin() {
+		return fechafin;
+	}
+	public void setFechafin(Timestamp fechafin) {
+		this.fechafin = fechafin;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public Empresa getEmpresa() {
+		return empresa;
+	}
+	public void setEmpresa(Empresa empresa) {
+		this.empresa = empresa;
+	}
+	public Sucursal getSucursal() {
+		return sucursal;
+	}
+	public void setSucursal(Sucursal sucursal) {
+		this.sucursal = sucursal;
+	}
+	public Area getArea() {
+		return area;
+	}
+	public void setArea(Area area) {
+		this.area = area;
+	}
+	public Cargo getCargo() {
+		return cargo;
+	}
+	public void setCargo(Cargo cargo) {
+		this.cargo = cargo;
+	}
+	public RetiroMotivo getRetiromotivo() {
+		return retiromotivo;
+	}
+	public void setRetiromotivo(RetiroMotivo retiromotivo) {
+		this.retiromotivo = retiromotivo;
+	}
+	public Area getAreaasignada() {
+		return areaasignada;
+	}
+	public void setAreaasignada(Area areaasignada) {
+		this.areaasignada = areaasignada;
+	}
+	public Long getIdestadodesvinculacion() {
+		return idestadodesvinculacion;
+	}
+	public void setIdestadodesvinculacion(Long idestadodesvinculacion) {
+		this.idestadodesvinculacion = idestadodesvinculacion;
+	}
+	public Long getIdcontratotipo() {
+		return idcontratotipo;
+	}
+	public void setIdcontratotipo(Long idcontratotipo) {
+		this.idcontratotipo = idcontratotipo;
+	}
+	public ContratoTipo getContratotipo() {
+		return contratotipo;
+	}
+	public void setContratotipo(ContratoTipo contratotipo) {
+		this.contratotipo = contratotipo;
+	}
+	public String getSalario() {
+		return salario;
+	}
+	public void setSalario(String salario) {
+		this.salario = salario;
+	}
+	public String getInfosalarial() {
+		return infosalarial;
+	}
+	public void setInfosalarial(String infosalarial) {
+		this.infosalarial = infosalarial;
+	}
+	public EmpleadoSalario getContratoSalario() {
+		return contratoSalario;
+	}
+	public void setContratoSalario(EmpleadoSalario contratoSalario) {
+		this.contratoSalario = contratoSalario;
+	}
+	public TipoMoneda getTipoMoneda() {
+		return tipoMoneda;
+	}
+	public void setTipoMoneda(TipoMoneda tipoMoneda) {
+		this.tipoMoneda = tipoMoneda;
+	}
+	
+	
+	
+}

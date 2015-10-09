@@ -1,0 +1,61 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.hermes.bean.Sucursal;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class SucursalDAO extends BaseDAO {
+
+	public SucursalDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public List<Sucursal> getSucursales(String estados) throws DatoException {
+		List<Sucursal> sucursales = new ArrayList<Sucursal>();
+		Sucursal sucursal = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select s.idsucursal, s.nombre, s.idusuariocrea, s.fechacrea, s.idusuariomod, s.fechamod, s.estado ");
+			q.append("from hermes.sucursal s where s.estado in (" + estados + ") ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				int t = 1;
+				sucursal = new Sucursal();
+				sucursal.setIdsucursal(rs.getInt(t++));
+				sucursal.setNombre(rs.getString(t++));
+				sucursal.setIdusuariocrea(rs.getInt(t++));
+				sucursal.setFechacrea(rs.getTimestamp(t++));
+				sucursal.setIdusuariomod(rs.getInt(t++));
+				sucursal.setFechamod(rs.getTimestamp(t++));
+				sucursal.setEstado(rs.getInt(t++));
+				sucursales.add(sucursal);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return sucursales;
+
+	}
+
+}

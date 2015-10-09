@@ -1,0 +1,343 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.hermes.bean.AccesoHistorial;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class AccesoHistorialDAO extends BaseDAO {
+
+	@SuppressWarnings("unused")
+	private Logger logger = Logger.getLogger(AccesoHistorialDAO.class);
+
+	public AccesoHistorialDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public List<AccesoHistorial> getAccesoHistorialUltimosPorIdsusuarioTipoYBase(Integer idusuario, Integer idaccesotipo, Integer idaccesotipobase) throws DatoException {
+		List<AccesoHistorial> accesoshistorial = new ArrayList<AccesoHistorial>();
+		AccesoHistorial accesohistorial = null;
+		try {
+			StringBuilder q = new StringBuilder();
+			q.append("select ah.idaccesohistorial, ah.idusuario, ah.idaplicacion, ah.idaccesotipo, ah.idusuariocrea, ");
+			q.append("ah.fechacrea, ah.idusuariomod, ah.fechamod, ah.estado, datediff(mi, ah.fechacrea, getdate()) as tiempotrascurrido ");
+			q.append("from hermes.acceso_historial ah ");
+			q.append("where ah.estado = 2 ");
+			q.append("and ah.idusuario=?  ");
+			q.append("and idaccesotipo = ?  ");
+			q.append("and ah.idaccesohistorial > (select top(1) aht.idaccesohistorial   ");
+			q.append("from hermes.acceso_historial aht  ");
+			q.append("where aht.idusuario=ah.idusuario and aht.estado = 2 and idaccesotipo = ? order by aht.fechacrea desc)");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+			ps.setInt(2, idaccesotipo);
+			ps.setInt(3, idaccesotipobase);
+
+			rs = ps.executeQuery();
+
+			int i = 1;
+			while (rs.next()) {
+				i = 1;
+				accesohistorial = new AccesoHistorial();
+				accesohistorial.setIdaccesohistorial(rs.getLong(i++));
+				accesohistorial.setIdusuario(rs.getInt(i++));
+				accesohistorial.setIdaplicacion(rs.getInt(i++));
+				accesohistorial.setIdaccesotipo(rs.getInt(i++));
+				accesohistorial.setIdusuariocrea(rs.getInt(i++));
+				accesohistorial.setFechacrea(rs.getTimestamp(i++));
+				accesohistorial.setIdusuariomod(rs.getInt(i++));
+				accesohistorial.setFechamod(rs.getTimestamp(i++));
+				accesohistorial.setEstado(rs.getInt(i++));
+				accesohistorial.setTiempotrascurrido(rs.getLong(i++));
+
+				accesoshistorial.add(accesohistorial);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return accesoshistorial;
+
+	}
+	@SuppressWarnings("unused")
+	public AccesoHistorial getAccesoHistorialUltimosPorId(Long idaccesohistorial) throws DatoException {
+		List<AccesoHistorial> accesoshistorial = new ArrayList<AccesoHistorial>();
+		AccesoHistorial accesohistorial = null;
+		try {
+			StringBuilder q = new StringBuilder();
+			q.append("select ah.idaccesohistorial, ah.idusuario, ah.idaplicacion, ah.idaccesotipo,ah.sessionserializada,ah.estadosession,ah.codigosessiondb, ah.idusuariocrea, ");
+			q.append("ah.fechacrea, ah.idusuariomod, ah.fechamod, ah.estado, datediff(mi, ah.fechacrea, getdate()) as tiempotrascurrido ");
+			q.append("from hermes.acceso_historial ah ");
+			//q.append("where  ");
+			
+			
+			q.append("where  ah.estado = 2 and ah.estadosession = 2 and ah.idaccesohistorial = ? ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, idaccesohistorial);
+		
+
+			rs = ps.executeQuery();
+
+			int i = 1;
+			while (rs.next()) {
+				i = 1;
+				accesohistorial = new AccesoHistorial();
+				accesohistorial.setIdaccesohistorial(rs.getLong(i++));
+				accesohistorial.setIdusuario(rs.getInt(i++));
+				accesohistorial.setIdaplicacion(rs.getInt(i++));
+				accesohistorial.setIdaccesotipo(rs.getInt(i++));
+				
+				
+				accesohistorial.setSessionserializada(rs.getBytes(i++));
+				accesohistorial.setEstadosession(rs.getInt(i++));
+				accesohistorial.setCodigosessiondb(rs.getString(i++));
+				
+				accesohistorial.setIdusuariocrea(rs.getInt(i++));
+				accesohistorial.setFechacrea(rs.getTimestamp(i++));
+				accesohistorial.setIdusuariomod(rs.getInt(i++));
+				accesohistorial.setFechamod(rs.getTimestamp(i++));
+				accesohistorial.setEstado(rs.getInt(i++));
+				accesohistorial.setTiempotrascurrido(rs.getLong(i++));
+
+			//	accesoshistorial.add(accesohistorial);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return accesohistorial;
+
+	}
+
+	public List<AccesoHistorial> getAccesoHistorialUltimosPorIdsusuarioYTipo(Integer idusuario, Integer idaccesotipo, Integer ultimosdias) throws DatoException {
+		List<AccesoHistorial> accesoshistorial = new ArrayList<AccesoHistorial>();
+		AccesoHistorial accesohistorial = null;
+		try {
+			StringBuilder q = new StringBuilder();
+			q.append("select ah.idaccesohistorial, ah.idusuario, ah.idaplicacion, ah.idaccesotipo,ah.sessionserializada,ah.estadosession,ah.codigosessiondb, ah.idusuariocrea,  ");
+			q.append("ah.fechacrea, ah.idusuariomod, ah.fechamod, ah.estado, datediff(mi, ah.fechacrea, getdate()) as tiempotrascurrido ");
+			q.append("from hermes.acceso_historial ah ");
+			q.append("where ah.idaccesohistorial in ( ");
+			q.append("select top(" + ultimosdias + ") aht.idaccesohistorial  ");
+			q.append("from hermes.acceso_historial aht ");
+			q.append("where aht.idusuario=? and aht.estado = 2 ");
+			q.append("order by fechacrea desc ");
+			q.append(") ");
+			q.append("and idaccesotipo = ? ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+			ps.setInt(2, idaccesotipo);
+
+			rs = ps.executeQuery();
+
+			int i = 1;
+			while (rs.next()) {
+				i = 1;
+				accesohistorial = new AccesoHistorial();
+				accesohistorial.setIdaccesohistorial(rs.getLong(i++));
+				accesohistorial.setIdusuario(rs.getInt(i++));
+				accesohistorial.setIdaplicacion(rs.getInt(i++));
+				accesohistorial.setIdaccesotipo(rs.getInt(i++));
+				
+				accesohistorial.setSessionserializada(rs.getBytes(i++));
+				accesohistorial.setEstadosession(rs.getInt(i++));
+				accesohistorial.setCodigosessiondb(rs.getString(i++));
+				
+				accesohistorial.setIdusuariocrea(rs.getInt(i++));
+				accesohistorial.setFechacrea(rs.getTimestamp(i++));
+				accesohistorial.setIdusuariomod(rs.getInt(i++));
+				accesohistorial.setFechamod(rs.getTimestamp(i++));
+				accesohistorial.setEstado(rs.getInt(i++));
+				accesohistorial.setTiempotrascurrido(rs.getLong(i++));
+
+				accesoshistorial.add(accesohistorial);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return accesoshistorial;
+
+	}
+
+	public Integer actualizarAccesoHistorial(AccesoHistorial accesohistorial) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update hermes.acceso_historial set  idaccesotipo=?,sessionserializada=?,estadosession=?,codigosessiondb=?, idusuariomod=?, fechamod=getdate()  ");
+			q.append("where idaccesohistorial =? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+
+			
+			ps.setInt(c++, accesohistorial.getIdaccesotipo());
+			
+			if(accesohistorial.getSessionserializada()== null){
+				ps.setNull(c++, java.sql.Types.VARBINARY);
+			}else{
+				ps.setBytes(c++, accesohistorial.getSessionserializada());
+			}
+			if(accesohistorial.getEstadosession()== null){
+				ps.setNull(c++, java.sql.Types.INTEGER);
+			}else{
+				ps.setInt(c++, accesohistorial.getEstadosession());
+			}
+			
+			
+			if(accesohistorial.getCodigosessiondb()== null){
+				ps.setNull(c++, java.sql.Types.NVARCHAR);
+			}else{
+				ps.setString(c++, accesohistorial.getCodigosessiondb());
+			}
+			//ps.setInt(c++, accesohistorial.getEstadosession());
+			ps.setInt(c++, accesohistorial.getIdusuariomod());
+			ps.setLong(c++, accesohistorial.getIdaccesohistorial());
+
+			estatus = estatus + ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+	}
+
+	
+	public Integer actualizarAccesoHistoriallistado(List<AccesoHistorial> accesohistorial) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update hermes.acceso_historial set  idaccesotipo=?,sessionserializada=?,estadosession=?,codigosessiondb=?, idusuariomod=?, fechamod=getdate()  ");
+			q.append("where idaccesohistorial =? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			for(AccesoHistorial ah:accesohistorial){
+				c = 1;
+
+				
+				
+				ps.setInt(c++, ah.getIdaccesotipo());
+				
+				if(ah.getSessionserializada()== null){
+					ps.setNull(c++, java.sql.Types.VARBINARY);
+				}else{
+					ps.setBytes(c++, ah.getSessionserializada());
+				}
+				if(ah.getEstadosession()== null){
+					ps.setNull(c++, java.sql.Types.INTEGER);
+				}else{
+					ps.setInt(c++, ah.getEstadosession());
+				}
+				
+				
+				if(ah.getCodigosessiondb()== null){
+					ps.setNull(c++, java.sql.Types.NVARCHAR);
+				}else{
+					ps.setString(c++, ah.getCodigosessiondb());
+				}
+				//ps.setInt(c++, accesohistorial.getEstadosession());
+				ps.setInt(c++, ah.getIdusuariomod());
+				ps.setLong(c++, ah.getIdaccesohistorial());
+
+				estatus = estatus + ps.executeUpdate();
+			}
+			
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+	}
+	public Integer insertarAccesoHistorial(AccesoHistorial accesohistorial) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("insert hermes.acceso_historial (idusuario, idaplicacion, idaccesotipo, idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,getdate(),?) ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(), Statement.RETURN_GENERATED_KEYS);
+			c = 1;
+
+			ps.setInt(c++, accesohistorial.getIdusuario());
+			ps.setInt(c++, accesohistorial.getIdaplicacion());
+			ps.setInt(c++, accesohistorial.getIdaccesotipo());
+			ps.setInt(c++, accesohistorial.getIdusuariocrea());
+			ps.setInt(c++, accesohistorial.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				accesohistorial.setIdaccesohistorial(rs.getLong(1));
+			} else {
+				throw new SQLException("AccesoHistorial, no se pudo generar su idaccesohistorial.");
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+	}
+
+}

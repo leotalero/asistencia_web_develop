@@ -1,0 +1,43 @@
+package co.sistemcobro.rrhh.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum ProcesosEnum {
+	Entrega_de_Activos(1),Usuarios_deshabilitados(2),Cargue_de_Archivos(3);
+
+	public static final Map<Integer, ProcesosEnum> mapByID = new HashMap<Integer, ProcesosEnum>();
+	public static final Map<String, ProcesosEnum> mapByNAME = new HashMap<String, ProcesosEnum>();
+
+	static {
+		for (ProcesosEnum s : EnumSet
+				.allOf(ProcesosEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	ProcesosEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static ProcesosEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static ProcesosEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

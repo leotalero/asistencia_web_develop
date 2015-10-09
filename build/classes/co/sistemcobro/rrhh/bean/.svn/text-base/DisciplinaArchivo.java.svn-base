@@ -1,0 +1,101 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+public class DisciplinaArchivo implements Serializable {
+
+	
+	private static final long serialVersionUID = 1L;
+	
+	private Long iddisciplinaarchivo;
+	private Long iddisciplinaarchivotipo;
+	private Long iddisciplinahistorial;
+	private String nombrearchivo;
+	private String rutaarchivo;
+	private Long tamanio;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	private DisciplinaArchivoTipo disciplinaArchivoTipo;
+	
+	public Long getIddisciplinaarchivo() {
+		return iddisciplinaarchivo;
+	}
+	public void setIddisciplinaarchivo(Long iddisciplinaarchivo) {
+		this.iddisciplinaarchivo = iddisciplinaarchivo;
+	}
+	public Long getIddisciplinaarchivotipo() {
+		return iddisciplinaarchivotipo;
+	}
+	public void setIddisciplinaarchivotipo(Long iddisciplinaarchivotipo) {
+		this.iddisciplinaarchivotipo = iddisciplinaarchivotipo;
+	}
+	public Long getIddisciplinahistorial() {
+		return iddisciplinahistorial;
+	}
+	public void setIddisciplinahistorial(Long iddisciplinahistorial) {
+		this.iddisciplinahistorial = iddisciplinahistorial;
+	}
+	public String getNombrearchivo() {
+		return nombrearchivo;
+	}
+	public void setNombrearchivo(String nombrearchivo) {
+		this.nombrearchivo = nombrearchivo;
+	}
+	public String getRutaarchivo() {
+		return rutaarchivo;
+	}
+	public void setRutaarchivo(String rutaarchivo) {
+		this.rutaarchivo = rutaarchivo;
+	}
+	public Long getTamanio() {
+		return tamanio;
+	}
+	public void setTamanio(Long tamanio) {
+		this.tamanio = tamanio;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	public DisciplinaArchivoTipo getDisciplinaArchivoTipo() {
+		return disciplinaArchivoTipo;
+	}
+	public void setDisciplinaArchivoTipo(DisciplinaArchivoTipo disciplinaArchivoTipo) {
+		this.disciplinaArchivoTipo = disciplinaArchivoTipo;
+	}
+	
+}

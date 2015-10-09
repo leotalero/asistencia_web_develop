@@ -1,0 +1,43 @@
+package co.sistemcobro.asistencia.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum AsistenciaFuenteEnum {
+	MODULOASISTENCIA(1),ALTITUDE(2),TORNIQUETES(3);
+
+	public static final Map<Integer, AsistenciaFuenteEnum> mapByID = new HashMap<Integer, AsistenciaFuenteEnum>();
+	public static final Map<String, AsistenciaFuenteEnum> mapByNAME = new HashMap<String, AsistenciaFuenteEnum>();
+
+	static {
+		for (AsistenciaFuenteEnum s : EnumSet
+				.allOf(AsistenciaFuenteEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	AsistenciaFuenteEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static AsistenciaFuenteEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static AsistenciaFuenteEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

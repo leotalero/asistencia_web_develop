@@ -1,0 +1,87 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author leonardo talero
+ * 
+ */
+public class FrecuenciaAsignacion implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idfrecuenciaasignacion;
+	private String nombrefrecuencia;
+	private int nocturno;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	
+	
+	
+	
+	
+
+
+	public Long getIdfrecuenciaasignacion() {
+		return idfrecuenciaasignacion;
+	}
+	public void setIdfrecuenciaasignacion(Long idfrecuenciaasignacion) {
+		this.idfrecuenciaasignacion = idfrecuenciaasignacion;
+	}
+	public String getNombrefrecuencia() {
+		return nombrefrecuencia;
+	}
+	public void setNombrefrecuencia(String nombrefrecuencia) {
+		this.nombrefrecuencia = nombrefrecuencia;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public int getNocturno() {
+		return nocturno;
+	}
+	public void setNocturno(int nocturno) {
+		this.nocturno = nocturno;
+	}
+	
+	
+	
+	
+
+	
+
+
+}

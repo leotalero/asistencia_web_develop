@@ -1,0 +1,154 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.EmpleadoDocumentoPersonal;
+import co.sistemcobro.rrhh.bean.EmpleadoDocumentoTipo;
+import co.sistemcobro.rrhh.dao.DocumentoPersonalDAO;
+
+/**
+ * Session Bean implementation class DocumentoPersonal
+ * @author jpuentes
+ */
+@Stateless
+public class DocumentoPersonalEJB extends BaseEJB {
+
+    /**
+     * Constructor. 
+     */
+    public DocumentoPersonalEJB() {
+    }
+
+    /**
+     * Este método consulta la relación de EmpleadoDocumentoPersonal por id de empleado.
+     * @param Long. El idempleado.
+     * @return List. La lista de EmpleadoDocumentoPersonal. 
+     */
+    public List<EmpleadoDocumentoPersonal> buscarEmpleadoDocumentoPorIdEmpleado(Long idempleado) throws DatoException, LogicaException{
+    	List<EmpleadoDocumentoPersonal> listaEmpleadoDocumento = null;
+		try {
+			DocumentoPersonalDAO documentoDAO = new DocumentoPersonalDAO(dc_rrhh);
+			listaEmpleadoDocumento = documentoDAO.obtenerDocumentoDeEmpleadoPorIdEmpleado(idempleado);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaEmpleadoDocumento;
+    }
+    
+    /**
+     * Este método permite cambiar el estado de la relación EmpleadoDocumentoPersonal.
+     * @param idempleadodocumentopersonal 
+     * @throws LogicaException 
+     */
+    public Integer deshabilitarEmpleadoDocumentoPersonal(EmpleadoDocumentoPersonal empleadoDocumentoPersonal) throws LogicaException{
+    	Integer resultado = null;
+		try {
+			DocumentoPersonalDAO documentoDAO = new DocumentoPersonalDAO(dg_rrhh);
+			empleadoDocumentoPersonal.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resultado = documentoDAO.actualizarEstadoEmpleadoDocumentoPersonal(empleadoDocumentoPersonal);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	    	
+    }
+   
+    /**
+     * Este método permite cambiar el estado de la relación EmpleadoDocumentoPersonal.
+     * @param idempleadodocumentopersonal 
+     * @throws LogicaException 
+     */
+    public Integer habilitarEmpleadoDocumentoPersonal(EmpleadoDocumentoPersonal empleadoDocumentoPersonal) throws LogicaException{
+    	Integer resultado = null;
+		try {
+			DocumentoPersonalDAO documentoDAO = new DocumentoPersonalDAO(dg_rrhh);
+			empleadoDocumentoPersonal.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resultado = documentoDAO.actualizarEstadoEmpleadoDocumentoPersonal(empleadoDocumentoPersonal);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	    	
+    }
+    
+
+    /**
+     * Este método devuelve la lista de tipo de documentos personales.
+     * @return List. La lista de EmpleadoDocumentoTpo. 
+     */
+    public List<EmpleadoDocumentoTipo> obtenerTiposDeDocumentos() throws DatoException, LogicaException{
+    	List<EmpleadoDocumentoTipo> listaTiposDeDocumentos = null;
+		try {
+			DocumentoPersonalDAO documentoDAO = new DocumentoPersonalDAO(dc_rrhh);
+			listaTiposDeDocumentos = documentoDAO.obtenerTiposDeDocumentosPersonales();
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaTiposDeDocumentos;
+    }
+ 
+    /**
+     * Método para insertar un nuevo EmpleadoDocumentoPersonal.
+     * @param  EmpleadoDocumentoPersonal. El objeto que representa la relación a insertar.
+     * @return EmpleadoDocumentoPersonal. La relación insertada.
+     */
+    public EmpleadoDocumentoPersonal insertarEmpleadoDocumentoPersonal(EmpleadoDocumentoPersonal documentoPersonal) throws DatoException, LogicaException {
+    	EmpleadoDocumentoPersonal resultado = null;
+		try {
+			DocumentoPersonalDAO documentoPersonalDAO = new DocumentoPersonalDAO(dg_rrhh);
+			resultado = documentoPersonalDAO.insertarEmpleadoDocumentoPersonal(documentoPersonal);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+
+    /**
+     * Este método permite actualizar la información de la relación EmpleadoDocumentoPersonal.
+     * @param EmpleadoDocumentoPersonal. La relación a actualizar.
+     * @return EmpleadoDocumentoPersonal. La relación actualizada.
+     */
+    public EmpleadoDocumentoPersonal activarEmpleadoDocumentoPersonal(EmpleadoDocumentoPersonal documentoPersonal) throws DatoException, LogicaException {
+    	EmpleadoDocumentoPersonal resultado = null;
+		try {
+			DocumentoPersonalDAO documentoPersonalDAO = new DocumentoPersonalDAO(dg_rrhh);
+			resultado = documentoPersonalDAO.ActualizarEmpleadoDocumentoPersonal(documentoPersonal);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+    
+    
+//    obtenerEmpleadoDocumentoPorId(Long.valueOf(idEmpleadoDocumentoPersonal));
+    /**
+     * Este método permite actualizar la información de la relación EmpleadoDocumentoPersonal.
+     * @param EmpleadoDocumentoPersonal. La relación a actualizar.
+     * @return EmpleadoDocumentoPersonal. La relación actualizada.
+     */
+    public EmpleadoDocumentoPersonal obtenerEmpleadoDocumentoPorId(Long idEmpleadoDocumento) throws DatoException, LogicaException {
+    	EmpleadoDocumentoPersonal relacion = null;
+		try {
+			DocumentoPersonalDAO documentoPersonalDAO = new DocumentoPersonalDAO(dc_rrhh);
+			relacion = documentoPersonalDAO.obtenerEmpleadoDocumentoPersonalPorId(idEmpleadoDocumento);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return relacion;
+	}
+}

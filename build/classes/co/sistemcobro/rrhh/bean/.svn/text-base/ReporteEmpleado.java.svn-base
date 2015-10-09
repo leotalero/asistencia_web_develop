@@ -1,0 +1,175 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class ReporteEmpleado implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private EmpleadoBean empleado;
+	private Contrato contrato;
+	private IdentificacionTipo identificaciontipo;
+	private EmpleadoIdentificacion empleadoidentificacion;
+	private Cargo cargo;
+	private Area area;
+	
+	//Novedadades reportes. (04/05/2015)
+	private Banco banco;
+	private EmpleadoBanco empleadoBanco;
+	private EmpleadoAfiliacion empleadoAfiliacionSalud;
+	private EmpleadoAfiliacion empleadoAfiliacionPension;
+	private EmpleadoAfiliacion empleadoAfiliacionCesantias;
+	private EmpleadoAfiliacion empleadoAfiliacionCajaCompensacion;
+	private AfiliacionTipo afiliacionTipo;
+	private AfiliacionEntidad afiliacionEntidadSalud;
+	private AfiliacionEntidad afiliacionEntidadPension;
+	private AfiliacionEntidad afiliacionEntidadCesantias;
+	private AfiliacionEntidad afiliacionEntidadCajaCompensacion;
+	private EmpleadoEducacion empleadoEducacion;
+	private EducacionNivel educacionNivel;
+	private TipoMoneda tipoDemoneda;
+	private EmpleadoSalario empleadoSalario;
+	
+	
+	public EmpleadoBean getEmpleado() {
+		return empleado;
+	}
+	public void setEmpleado(EmpleadoBean empleado) {
+		this.empleado = empleado;
+	}
+	public Contrato getContrato() {
+		return contrato;
+	}
+	public void setContrato(Contrato contrato) {
+		this.contrato = contrato;
+	}
+	public IdentificacionTipo getIdentificaciontipo() {
+		return identificaciontipo;
+	}
+	public void setIdentificaciontipo(IdentificacionTipo identificaciontipo) {
+		this.identificaciontipo = identificaciontipo;
+	}
+	public EmpleadoIdentificacion getEmpleadoidentificacion() {
+		return empleadoidentificacion;
+	}
+	public void setEmpleadoidentificacion(
+			EmpleadoIdentificacion empleadoidentificacion) {
+		this.empleadoidentificacion = empleadoidentificacion;
+	}
+	public Cargo getCargo() {
+		return cargo;
+	}
+	public void setCargo(Cargo cargo) {
+		this.cargo = cargo;
+	}
+	public Area getArea() {
+		return area;
+	}
+	public void setArea(Area area) {
+		this.area = area;
+	}
+	public Banco getBanco() {
+		return banco;
+	}
+	public void setBanco(Banco banco) {
+		this.banco = banco;
+	}
+	public EmpleadoBanco getEmpleadoBanco() {
+		return empleadoBanco;
+	}
+	public void setEmpleadoBanco(EmpleadoBanco empleadoBanco) {
+		this.empleadoBanco = empleadoBanco;
+	}
+	
+	public AfiliacionTipo getAfiliacionTipo() {
+		return afiliacionTipo;
+	}
+	public void setAfiliacionTipo(AfiliacionTipo afiliacionTipo) {
+		this.afiliacionTipo = afiliacionTipo;
+	}
+	public AfiliacionEntidad getAfiliacionEntidadSalud() {
+		return afiliacionEntidadSalud;
+	}
+	public void setAfiliacionEntidadSalud(AfiliacionEntidad afiliacionEntidadSalud) {
+		this.afiliacionEntidadSalud = afiliacionEntidadSalud;
+	}
+	public AfiliacionEntidad getAfiliacionEntidadCesantias() {
+		return afiliacionEntidadCesantias;
+	}
+	public void setAfiliacionEntidadCesantias(
+			AfiliacionEntidad afiliacionEntidadCesantias) {
+		this.afiliacionEntidadCesantias = afiliacionEntidadCesantias;
+	}
+	public AfiliacionEntidad getAfiliacionEntidadPension() {
+		return afiliacionEntidadPension;
+	}
+	public void setAfiliacionEntidadPension(
+			AfiliacionEntidad afiliacionEntidadPension) {
+		this.afiliacionEntidadPension = afiliacionEntidadPension;
+	}
+	public AfiliacionEntidad getAfiliacionEntidadCajaCompensacion() {
+		return afiliacionEntidadCajaCompensacion;
+	}
+	public void setAfiliacionEntidadCajaCompensacion(
+			AfiliacionEntidad afiliacionEntidadCajaCompensacion) {
+		this.afiliacionEntidadCajaCompensacion = afiliacionEntidadCajaCompensacion;
+	}
+	public EmpleadoEducacion getEmpleadoEducacion() {
+		return empleadoEducacion;
+	}
+	public void setEmpleadoEducacion(EmpleadoEducacion empleadoEducacion) {
+		this.empleadoEducacion = empleadoEducacion;
+	}
+	public EducacionNivel getEducacionNivel() {
+		return educacionNivel;
+	}
+	public void setEducacionNivel(EducacionNivel educacionNivel) {
+		this.educacionNivel = educacionNivel;
+	}
+	public EmpleadoAfiliacion getEmpleadoAfiliacionSalud() {
+		return empleadoAfiliacionSalud;
+	}
+	public void setEmpleadoAfiliacionSalud(
+			EmpleadoAfiliacion empleadoAfiliacionSalud) {
+		this.empleadoAfiliacionSalud = empleadoAfiliacionSalud;
+	}
+	public EmpleadoAfiliacion getEmpleadoAfiliacionPension() {
+		return empleadoAfiliacionPension;
+	}
+	public void setEmpleadoAfiliacionPension(
+			EmpleadoAfiliacion empleadoAfiliacionPension) {
+		this.empleadoAfiliacionPension = empleadoAfiliacionPension;
+	}
+	public EmpleadoAfiliacion getEmpleadoAfiliacionCesantias() {
+		return empleadoAfiliacionCesantias;
+	}
+	public void setEmpleadoAfiliacionCesantias(
+			EmpleadoAfiliacion empleadoAfiliacionCesantias) {
+		this.empleadoAfiliacionCesantias = empleadoAfiliacionCesantias;
+	}
+	public EmpleadoAfiliacion getEmpleadoAfiliacionCajaCompensacion() {
+		return empleadoAfiliacionCajaCompensacion;
+	}
+	public void setEmpleadoAfiliacionCajaCompensacion(
+			EmpleadoAfiliacion empleadoAfiliacionCajaCompensacion) {
+		this.empleadoAfiliacionCajaCompensacion = empleadoAfiliacionCajaCompensacion;
+	}
+	public TipoMoneda getTipoDemoneda() {
+		return tipoDemoneda;
+	}
+	public void setTipoDemoneda(TipoMoneda tipoDemoneda) {
+		this.tipoDemoneda = tipoDemoneda;
+	}
+	public EmpleadoSalario getEmpleadoSalario() {
+		return empleadoSalario;
+	}
+	public void setEmpleadoSalario(EmpleadoSalario empleadoSalario) {
+		this.empleadoSalario = empleadoSalario;
+	}
+	
+}

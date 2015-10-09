@@ -1,0 +1,2651 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.hermes.bean.Estado;
+import co.sistemcobro.hermes.bean.UsuarioBean;
+import co.sistemcobro.rrhh.bean.Area;
+import co.sistemcobro.rrhh.bean.Contrato;
+import co.sistemcobro.rrhh.bean.Disciplina;
+import co.sistemcobro.rrhh.bean.DisciplinaArchivo;
+import co.sistemcobro.rrhh.bean.DisciplinaArchivoTipo;
+import co.sistemcobro.rrhh.bean.DisciplinaEstado;
+import co.sistemcobro.rrhh.bean.DisciplinaEstadoRol;
+import co.sistemcobro.rrhh.bean.DisciplinaHistorial;
+import co.sistemcobro.rrhh.bean.DisciplinaTestigo;
+import co.sistemcobro.rrhh.bean.EmpleadoBean;
+import co.sistemcobro.rrhh.bean.EmpleadoIdentificacion;
+import co.sistemcobro.rrhh.bean.Falta;
+import co.sistemcobro.rrhh.bean.FaltaTipo;
+import co.sistemcobro.rrhh.bean.Formato;
+import co.sistemcobro.rrhh.bean.Genero;
+import co.sistemcobro.rrhh.bean.IdentificacionTipo;
+import co.sistemcobro.rrhh.bean.ReporteInformacionAdicionalEmpleado;
+import co.sistemcobro.rrhh.bean.Sancion;
+import co.sistemcobro.rrhh.bean.SancionFormato;
+import co.sistemcobro.rrhh.constante.ActualEnum;
+import co.sistemcobro.rrhh.ejb.EmpleadoEJB;
+
+
+public class ProcesoDisciplinarioDAO extends BaseDAO{
+	
+	Logger log = Logger.getLogger(ProcesoDisciplinarioDAO.class);
+	
+	@EJB
+	EmpleadoEJB empleadoEJB;
+	
+	/**
+	 * Constructor.
+	 */
+	public ProcesoDisciplinarioDAO(DataSource ds) {
+		this.ds = ds;
+	}
+	
+	
+	/**
+	 * Este método consulta lso procesos disciplinarios por id contrato.
+	 * @param idocontrato. El id del contrato.
+	 * @return List<Disciplina>. La lista de datos de Disciplina.
+	 */
+	public List<Disciplina> obtenerDisciplinaPorIdContrato(Long idContrato) throws DatoException{
+		
+		List<Disciplina> listaDisciplina = new ArrayList<Disciplina>();
+		Disciplina disciplina = null;
+		Sancion sancion = null;
+		Falta falta = null;
+		FaltaTipo faltaTipo = null;
+		
+		try {
+
+			String consulta = "SELECT d.iddisciplina, d.idsancion,d.idcontrato, d.idusuariocrea, d.fechacrea, d.idusuariomod, d.fechamod, d.estado,d.recurrenciaporfalta,"
+							 +"s.idsancion,s.idfalta,s.nombresancion,s.recurrencia,s.procedimiento,s.responsable, "
+							 +"f.idfalta, f.idfaltatipo, f.faltanombre,"
+							 +"ft.idfaltatipo, ft.nombrefaltatipo "
+							 +"FROM rrhh.disciplina d, rrhh.sancion s, rrhh.falta f, rrhh.falta_tipo ft "
+							 +"WHERE d.idcontrato = "+idContrato+" "
+							 +"AND d.idsancion = s.idsancion "
+							 +"AND s.idfalta = f.idfalta "
+							 +"AND f.idfaltatipo = ft.idfaltatipo ";
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+			
+			while (rs.next()) {
+				disciplina = new Disciplina();
+				sancion = new Sancion();
+				falta = new Falta();
+				faltaTipo = new FaltaTipo();
+				
+				disciplina.setIddisciplina(rs.getLong("iddisciplina"));
+				disciplina.setIdsancion(rs.getLong("idsancion"));
+				disciplina.setIdcontrato(rs.getLong("idcontrato"));
+				disciplina.setRecurrenciaPorFalta(rs.getString("recurrenciaporfalta"));
+				disciplina.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				disciplina.setFechacrea(rs.getTimestamp("fechacrea"));
+				disciplina.setIdusuariomod(rs.getInt("idusuariomod"));
+				disciplina.setFechamod(rs.getTimestamp("fechamod"));
+				disciplina.setEstado(rs.getInt("estado"));
+				
+				sancion.setIdsancion(rs.getLong("idsancion"));
+				sancion.setIdfalta(rs.getLong("idfalta"));
+				sancion.setNombresancion(rs.getString("nombresancion"));
+				sancion.setRecurrencia(rs.getInt("recurrencia"));
+				sancion.setProcedimiento(rs.getString("procedimiento"));
+				sancion.setResponsable(rs.getString("responsable"));
+				
+				falta.setIdfalta(rs.getLong("idfalta"));
+				falta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				falta.setFaltanombre(rs.getString("faltanombre"));
+				
+				faltaTipo.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				faltaTipo.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+				
+				disciplina.setSancion(sancion);
+				disciplina.setFalta(falta);
+				disciplina.setFaltaTipo(faltaTipo);
+				
+				listaDisciplina.add(disciplina);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaDisciplina;
+	}
+	
+	
+	
+	/**
+	 * Este método consulta lso procesos disciplinarios por id contrato.
+	 * @param idocontrato. El id del contrato.
+	 * @return List<Disciplina>. La lista de datos de Disciplina.
+	 */
+	public List<Disciplina> obtenerHistoricoDisciplinaPorIdAreas(List<String> listaIdAreas,String desde,String hasta) throws DatoException{
+		
+		List<Disciplina> listaDisciplina = new ArrayList<Disciplina>();
+		Disciplina disciplina = null;
+		Sancion sancion = null;
+		Falta falta = null;
+		FaltaTipo faltaTipo = null;
+		Contrato contrato = null;
+		Area area = null;
+		EmpleadoBean empleado = null;
+		EmpleadoIdentificacion empleadoIdentificacion = null;
+		
+		try {
+
+			StringBuffer consulta = new StringBuffer();
+			
+			consulta.append("SELECT d.iddisciplina, d.idsancion,d.idcontrato, d.idusuariocrea, d.fechacrea, d.idusuariomod, d.fechamod, d.estado,d.recurrenciaporfalta,");
+			consulta.append("s.idsancion,s.idfalta,s.nombresancion,s.recurrencia,s.procedimiento,s.responsable, ");
+			consulta.append("f.idfalta, f.idfaltatipo, f.faltanombre,");
+			consulta.append("ft.idfaltatipo, ft.nombrefaltatipo,");
+			consulta.append("c.idcontrato,c.idempleado,c.idempresa,c.idsucursal,c.idcargo,c.idarea,c.idareaasignada,");
+			consulta.append("e.idempleado,e.codempleado,e.idgenero,e.nombres,e.apellidos,");
+			consulta.append("a.idarea, a.nombrearea,");
+			consulta.append("ei.idempleado,ei.ididentificaciontipo,ei.numeroidentificacion,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion ");
+			consulta.append("FROM rrhh.disciplina d ");
+			consulta.append("INNER JOIN rrhh.sancion s ON d.idsancion = s.idsancion ");
+			consulta.append("INNER JOIN rrhh.falta f ON s.idfalta = f.idfalta ");
+			consulta.append("INNER JOIN rrhh.falta_tipo ft ON f.idfaltatipo = ft.idfaltatipo ");
+			consulta.append("INNER JOIN rrhh.contrato c ON c.idcontrato = d.idcontrato ");
+			consulta.append("INNER JOIN rrhh.area a ON a.idarea = c.idarea ");
+			consulta.append("INNER JOIN rrhh.empleado e ON c.idempleado = e.idempleado ");
+			consulta.append("INNER JOIN rrhh.empleado_identificacion ei ON ei.idempleado = e.idempleado ");
+			consulta.append("WHERE c.estado="+EstadoEnum.ACTIVO.getIndex()+" ");
+			consulta.append("AND d.fechacrea >= convert(datetime,'" + desde + "',112) ");
+			consulta.append("AND d.fechacrea < convert(datetime,'"+ Util.addDays("yyyyMMdd", hasta, 1) + "',112) ");
+			consulta.append("AND (");
+			
+			String stringConcatenado = "";
+			if (listaIdAreas!= null && listaIdAreas.size() > 0) {
+				int i = 1;
+				String var = "";
+				for (String idArea : listaIdAreas) {
+					if (i == 1) {
+						var = " ";
+					} else {
+						var = " OR ";
+					}
+					stringConcatenado += var + " c.idarea ='"+ Integer.valueOf(idArea) + "' ";
+					i += 1;
+				}
+				consulta.append(stringConcatenado + " ");
+			}
+			
+			consulta.append(")");
+			
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta.toString());
+			
+			while (rs.next()) {
+				disciplina = new Disciplina();
+				sancion = new Sancion();
+				falta = new Falta();
+				faltaTipo = new FaltaTipo();
+				contrato = new Contrato();
+				area = new  Area();
+				empleado = new EmpleadoBean();
+				empleadoIdentificacion =  new EmpleadoIdentificacion();
+				
+				disciplina.setIddisciplina(rs.getLong("iddisciplina"));
+				disciplina.setIdsancion(rs.getLong("idsancion"));
+				disciplina.setIdcontrato(rs.getLong("idcontrato"));
+				disciplina.setRecurrenciaPorFalta(rs.getString("recurrenciaporfalta"));
+				disciplina.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				disciplina.setFechacrea(rs.getTimestamp("fechacrea"));
+				disciplina.setIdusuariomod(rs.getInt("idusuariomod"));
+				disciplina.setFechamod(rs.getTimestamp("fechamod"));
+				disciplina.setEstado(rs.getInt("estado"));
+				
+				sancion.setIdsancion(rs.getLong("idsancion"));
+				sancion.setIdfalta(rs.getLong("idfalta"));
+				sancion.setNombresancion(rs.getString("nombresancion"));
+				sancion.setRecurrencia(rs.getInt("recurrencia"));
+				sancion.setProcedimiento(rs.getString("procedimiento"));
+				sancion.setResponsable(rs.getString("responsable"));
+				
+				falta.setIdfalta(rs.getLong("idfalta"));
+				falta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				falta.setFaltanombre(rs.getString("faltanombre"));
+				
+				faltaTipo.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				faltaTipo.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+				
+				contrato.setIdcontrato(rs.getLong("idcontrato"));
+				contrato.setIdempleado(rs.getLong("idempleado"));
+				contrato.setIdempresa(rs.getLong("idempresa"));
+				contrato.setIdsucursal(rs.getLong("idsucursal"));
+				contrato.setIdcargo(rs.getLong("idcargo"));
+				contrato.setIdarea(rs.getLong("idarea"));
+				contrato.setIdareaasignada(rs.getLong("idareaasignada"));
+				
+				area.setIdarea(rs.getLong("idarea"));
+				area.setNombrearea(rs.getString("nombrearea"));
+				
+				empleado.setIdempleado(rs.getLong("idempleado"));
+				empleado.setCodempleado(rs.getString("codempleado"));
+				empleado.setIdgenero(rs.getLong("idgenero"));
+				empleado.setNombres(rs.getString("nombres"));
+				empleado.setApellidos(rs.getString("apellidos"));
+				
+				empleadoIdentificacion.setIdempleado(rs.getLong("idempleado"));
+				empleadoIdentificacion.setIdidentificaciontipo(rs.getLong("ididentificaciontipo"));
+				empleadoIdentificacion.setNumeroidentificacion(rs.getString("numeroidentificacion"));
+				empleadoIdentificacion.setCodigoidentificacion(rs.getString("codigoidentificacion"));
+				empleadoIdentificacion.setActual(rs.getInt("actual"));
+				empleadoIdentificacion.setCiudadexpedicion(rs.getString("ciudadexpedicion"));
+				
+				empleado.setEmpleadoidentificacion(empleadoIdentificacion);
+				
+				disciplina.setSancion(sancion);
+				disciplina.setFalta(falta);
+				disciplina.setFaltaTipo(faltaTipo);
+				disciplina.setArea(area);
+				disciplina.setContrato(contrato);
+				disciplina.setEmpleado(empleado);
+				
+				listaDisciplina.add(disciplina);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaDisciplina;
+	}
+	
+	
+	/**
+	 * Este método consulta lso procesos disciplinarios por id contrato.
+	 * @param idocontrato. El id del contrato.
+	 * @return List<Disciplina>. La lista de datos de Disciplina.
+	 */
+	public List<Disciplina> obtenerHistoricoDisciplinaPorIdAreas(List<String> listaIdAreas) throws DatoException{
+		
+		List<Disciplina> listaDisciplina = new ArrayList<Disciplina>();
+		Disciplina disciplina = null;
+		Sancion sancion = null;
+		Falta falta = null;
+		FaltaTipo faltaTipo = null;
+		Contrato contrato = null;
+		Area area = null;
+		EmpleadoBean empleado = null;
+		EmpleadoIdentificacion empleadoIdentificacion = null;
+		
+		try {
+
+			StringBuffer consulta = new StringBuffer();
+			
+			consulta.append("SELECT d.iddisciplina, d.idsancion,d.idcontrato, d.idusuariocrea, d.fechacrea, d.idusuariomod, d.fechamod, d.estado,d.recurrenciaporfalta,");
+			consulta.append("s.idsancion,s.idfalta,s.nombresancion,s.recurrencia,s.procedimiento,s.responsable, ");
+			consulta.append("f.idfalta, f.idfaltatipo, f.faltanombre,");
+			consulta.append("ft.idfaltatipo, ft.nombrefaltatipo,");
+			consulta.append("c.idcontrato,c.idempleado,c.idempresa,c.idsucursal,c.idcargo,c.idarea,c.idareaasignada,");
+			consulta.append("e.idempleado,e.codempleado,e.idgenero,e.nombres,e.apellidos,");
+			consulta.append("a.idarea, a.nombrearea,");
+			consulta.append("ei.idempleado,ei.ididentificaciontipo,ei.numeroidentificacion,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion ");
+			consulta.append("FROM rrhh.disciplina d ");
+			consulta.append("INNER JOIN rrhh.sancion s ON d.idsancion = s.idsancion ");
+			consulta.append("INNER JOIN rrhh.falta f ON s.idfalta = f.idfalta ");
+			consulta.append("INNER JOIN rrhh.falta_tipo ft ON f.idfaltatipo = ft.idfaltatipo ");
+			consulta.append("INNER JOIN rrhh.contrato c ON c.idcontrato = d.idcontrato ");
+			consulta.append("INNER JOIN rrhh.area a ON a.idarea = c.idarea ");
+			consulta.append("INNER JOIN rrhh.empleado e ON c.idempleado = e.idempleado ");
+			consulta.append("INNER JOIN rrhh.empleado_identificacion ei ON ei.idempleado = e.idempleado ");
+			consulta.append("WHERE c.estado="+EstadoEnum.ACTIVO.getIndex()+" ");
+//			consulta.append("AND d.fechacrea >= convert(datetime,'" + desde + "',112) ");
+//			consulta.append("AND d.fechacrea < convert(datetime,'"+ Util.addDays("yyyyMMdd", hasta, 1) + "',112) ");
+			consulta.append("AND (");
+			
+			String stringConcatenado = "";
+			if (listaIdAreas!= null && listaIdAreas.size() > 0) {
+				int i = 1;
+				String var = "";
+				for (String idArea : listaIdAreas) {
+					if (i == 1) {
+						var = " ";
+					} else {
+						var = " OR ";
+					}
+					stringConcatenado += var + " c.idarea ='"+ Integer.valueOf(idArea) + "' ";
+					i += 1;
+				}
+				consulta.append(stringConcatenado + " ");
+			}
+			
+			consulta.append(")");
+			
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta.toString());
+			
+			while (rs.next()) {
+				disciplina = new Disciplina();
+				sancion = new Sancion();
+				falta = new Falta();
+				faltaTipo = new FaltaTipo();
+				contrato = new Contrato();
+				area = new  Area();
+				empleado = new EmpleadoBean();
+				empleadoIdentificacion =  new EmpleadoIdentificacion();
+				
+				disciplina.setIddisciplina(rs.getLong("iddisciplina"));
+				disciplina.setIdsancion(rs.getLong("idsancion"));
+				disciplina.setIdcontrato(rs.getLong("idcontrato"));
+				disciplina.setRecurrenciaPorFalta(rs.getString("recurrenciaporfalta"));
+				disciplina.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				disciplina.setFechacrea(rs.getTimestamp("fechacrea"));
+				disciplina.setIdusuariomod(rs.getInt("idusuariomod"));
+				disciplina.setFechamod(rs.getTimestamp("fechamod"));
+				disciplina.setEstado(rs.getInt("estado"));
+				
+				sancion.setIdsancion(rs.getLong("idsancion"));
+				sancion.setIdfalta(rs.getLong("idfalta"));
+				sancion.setNombresancion(rs.getString("nombresancion"));
+				sancion.setRecurrencia(rs.getInt("recurrencia"));
+				sancion.setProcedimiento(rs.getString("procedimiento"));
+				sancion.setResponsable(rs.getString("responsable"));
+				
+				falta.setIdfalta(rs.getLong("idfalta"));
+				falta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				falta.setFaltanombre(rs.getString("faltanombre"));
+				
+				faltaTipo.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				faltaTipo.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+				
+				contrato.setIdcontrato(rs.getLong("idcontrato"));
+				contrato.setIdempleado(rs.getLong("idempleado"));
+				contrato.setIdempresa(rs.getLong("idempresa"));
+				contrato.setIdsucursal(rs.getLong("idsucursal"));
+				contrato.setIdcargo(rs.getLong("idcargo"));
+				contrato.setIdarea(rs.getLong("idarea"));
+				contrato.setIdareaasignada(rs.getLong("idareaasignada"));
+				
+				area.setIdarea(rs.getLong("idarea"));
+				area.setNombrearea(rs.getString("nombrearea"));
+				
+				empleado.setIdempleado(rs.getLong("idempleado"));
+				empleado.setCodempleado(rs.getString("codempleado"));
+				empleado.setIdgenero(rs.getLong("idgenero"));
+				empleado.setNombres(rs.getString("nombres"));
+				empleado.setApellidos(rs.getString("apellidos"));
+				
+				empleadoIdentificacion.setIdempleado(rs.getLong("idempleado"));
+				empleadoIdentificacion.setIdidentificaciontipo(rs.getLong("ididentificaciontipo"));
+				empleadoIdentificacion.setNumeroidentificacion(rs.getString("numeroidentificacion"));
+				empleadoIdentificacion.setCodigoidentificacion(rs.getString("codigoidentificacion"));
+				empleadoIdentificacion.setActual(rs.getInt("actual"));
+				empleadoIdentificacion.setCiudadexpedicion(rs.getString("ciudadexpedicion"));
+				
+				empleado.setEmpleadoidentificacion(empleadoIdentificacion);
+				
+				disciplina.setSancion(sancion);
+				disciplina.setFalta(falta);
+				disciplina.setFaltaTipo(faltaTipo);
+				disciplina.setArea(area);
+				disciplina.setContrato(contrato);
+				disciplina.setEmpleado(empleado);
+				
+				listaDisciplina.add(disciplina);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaDisciplina;
+	}
+	
+	/**
+	 * Consulta los tipos de faltas segun el reglamento interno y otras politicas de Sistemcobro
+	 * @return List. La lista de AfiliacionTipo.
+	 */
+	public List<FaltaTipo> obtenerTiposDeFaltas() throws DatoException {
+
+		List<FaltaTipo> listaTiposDeFaltas = new ArrayList<FaltaTipo>();
+		FaltaTipo tipoDeFalta = null;
+
+		try {
+
+			String consulta = "SELECT ft.idfaltatipo, ft.nombrefaltatipo, ft.idusuariocrea, ft.fechacrea, ft.idusuariomod, ft.fechamod, ft.estado "
+					         +"FROM rrhh.falta_tipo ft "
+					         +"WHERE ft.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				tipoDeFalta = new FaltaTipo();
+
+				tipoDeFalta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				tipoDeFalta.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+				tipoDeFalta.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				tipoDeFalta.setFechacrea(rs.getTimestamp("fechacrea"));
+				tipoDeFalta.setIdusuariomod(rs.getInt("idusuariomod"));
+				tipoDeFalta.setFechamod(rs.getTimestamp("fechamod"));
+				tipoDeFalta.setEstado(rs.getInt("estado"));
+				
+				listaTiposDeFaltas.add(tipoDeFalta);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaTiposDeFaltas;
+	}
+	
+	/**
+	 * Consulta las faltas segun el reglamento interno y otras politicas de Sistemcobro.
+	 * Estan clasificadas por el Falta.
+	 * @return List. Falta.
+	 */
+	public List<Falta> obtenerListaFaltas() throws DatoException {
+
+		List<Falta> listaDeFaltas = new ArrayList<Falta>();
+		Falta unaFalta = null;
+
+		try {
+			String consulta = "SELECT f.idfalta, f.idfaltatipo, f.faltanombre, f.idusuariocrea, f.fechacrea, f.idusuariomod, f.fechamod, f.estado "
+							 +"FROM rrhh.falta f "
+					         +"WHERE f.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				unaFalta = new Falta();
+
+				unaFalta.setIdfalta(rs.getLong("idfalta"));
+				unaFalta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				unaFalta.setFaltanombre(rs.getString("faltanombre"));
+				unaFalta.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				unaFalta.setFechacrea(rs.getTimestamp("fechacrea"));
+				unaFalta.setIdusuariomod(rs.getInt("idusuariomod"));
+				unaFalta.setFechamod(rs.getTimestamp("fechamod"));
+				unaFalta.setEstado(rs.getInt("estado"));
+				
+				listaDeFaltas.add(unaFalta);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaDeFaltas;
+	}	
+	
+	/**
+	 * Consulta las faltas segun el reglamento interno y otras politicas de Sistemcobro.
+	 * Estan clasificadas por el Falta.
+	 * @return List. Falta.
+	 */
+	public List<Falta> obtenerListaFaltasPorTipoFalta(Long idFaltaTipo) throws DatoException {
+
+		List<Falta> listaDeFaltas = new ArrayList<Falta>();
+		Falta unaFalta = null;
+
+		try {
+			String consulta = "SELECT f.idfalta, f.idfaltatipo, f.faltanombre, f.idusuariocrea, f.fechacrea, f.idusuariomod, f.fechamod, f.estado "
+							 +"FROM rrhh.falta f "
+					         +"WHERE f.idfaltatipo = "+idFaltaTipo+" "
+					         +"AND f.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				unaFalta = new Falta();
+
+				unaFalta.setIdfalta(rs.getLong("idfalta"));
+				unaFalta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				unaFalta.setFaltanombre(rs.getString("faltanombre"));
+				unaFalta.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				unaFalta.setFechacrea(rs.getTimestamp("fechacrea"));
+				unaFalta.setIdusuariomod(rs.getInt("idusuariomod"));
+				unaFalta.setFechamod(rs.getTimestamp("fechamod"));
+				unaFalta.setEstado(rs.getInt("estado"));
+				
+				listaDeFaltas.add(unaFalta);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaDeFaltas;
+	}	
+	
+	
+	/**
+	 * Consulta el listado de formatos existentes con estado ACTIVO:
+	 * @return List. La lista de AfiliacionTipo.
+	 */
+	public List<Formato> obtenerFormatos() throws DatoException {
+
+		List<Formato> listaFormatos = new ArrayList<Formato>();
+		Formato formato = null;
+
+		try {
+
+			String consulta = "SELECT f.idformato, f.nombreformato, f.rutaformato, f.idusuariocrea, f.fechacrea, f.idusuariomod,f.fechamod, f.estado "
+							 +"FROM rrhh.formato f "
+					         +"WHERE f.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				formato = new Formato();
+				
+				formato.setIdformato(rs.getLong("idformato"));
+				formato.setNombreformato(rs.getString("nombreformato"));
+				formato.setRutaformato(rs.getString("rutaformato"));
+				formato.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				formato.setFechacrea(rs.getTimestamp("fechacrea"));
+				formato.setIdusuariomod(rs.getInt("idusuariomod"));
+				formato.setFechamod(rs.getTimestamp("fechamod"));
+				formato.setEstado(rs.getInt("estado"));
+				
+				listaFormatos.add(formato);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaFormatos;
+	}
+	
+	/**
+	 * Consulta el listado de formatos existentes sin importar su estado.
+	 * @return List. La lista de AfiliacionTipo.
+	 */
+	public List<Formato> obtenerTodosFormatos() throws DatoException {
+
+		List<Formato> listaFormatos = new ArrayList<Formato>();
+		Formato formato = null;
+
+		try {
+
+			String consulta = "SELECT f.idformato, f.nombreformato, f.rutaformato, f.idusuariocrea, f.fechacrea, f.idusuariomod,f.fechamod, f.estado "
+							 +"FROM rrhh.formato f";
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				formato = new Formato();
+				
+				formato.setIdformato(rs.getLong("idformato"));
+				formato.setNombreformato(rs.getString("nombreformato"));
+				formato.setRutaformato(rs.getString("rutaformato"));
+				formato.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				formato.setFechacrea(rs.getTimestamp("fechacrea"));
+				formato.setIdusuariomod(rs.getInt("idusuariomod"));
+				formato.setFechamod(rs.getTimestamp("fechamod"));
+				formato.setEstado(rs.getInt("estado"));
+				
+				listaFormatos.add(formato);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaFormatos;
+	}
+	
+	
+	
+	/**
+	 * Consulta el número de veces que se ha cometida una falta por contrato.
+	 * Estan clasificadas por el Falta.
+	 * @return List. Falta.
+	 */
+	public Integer obtenerRecurrenciaDeFaltaPorContrato(Long idFalta,Long idContrato) throws DatoException {
+
+		Integer recurrencia = 0;
+		
+		try {
+			String consulta = "SELECT COUNT(*) AS recurrencia "
+							 +"FROM rrhh.disciplina d, rrhh.sancion s "
+							 +"WHERE d.idcontrato = "+idContrato+" "
+							 +"AND d.idsancion = s.idsancion " 
+							 +"AND s.idfalta = "+idFalta+" "
+							 +"AND d.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if(rs.next()) {
+				recurrencia = rs.getInt("recurrencia");
+			}
+		} catch (SQLException e) {
+			log.info("SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return recurrencia;
+	}
+	
+	
+	
+
+	/**
+	 * Consulta el número de veces que se ha cometida una falta por contrato.
+	 * Estan clasificadas por el Falta.
+	 * @return List. Falta.
+	 */
+	public Integer obtenerSiguienteRecurrenciaDeSancion(Long idFalta) throws DatoException {
+
+		Integer recurrencia = 0;
+		
+		try {
+			String consulta = "SELECT MAX(recurrencia)+1 AS siguiente_recurrencia "
+							 +"FROM rrhh.sancion " 
+		                     +"WHERE idfalta = "+idFalta+" "
+                             +"AND estado = 2";
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if(rs.next()) {
+				recurrencia = rs.getInt("siguiente_recurrencia");
+			}
+		} catch (SQLException e) {
+			log.info("SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return recurrencia;
+	}
+	
+	/**
+	 * Consulta La sancion por idsancion.
+	 * @param Long.idsancion.
+	 * @return List. Falta.
+	 */
+	public Sancion obtenerSancionDeFaltaPorIdFalta(Long idFalta, Integer recurrencia) throws DatoException {
+
+		FaltaTipo tipoFalta = null;
+		Falta falta = null;
+		Sancion sancion = null;
+		
+		try {
+			String consulta = "SELECT ft.idfaltatipo, ft.nombrefaltatipo,f.idfalta, f.idfaltatipo, f.faltanombre,"
+							 +"s.idsancion,s.idfalta,s.nombresancion,s.recurrencia,s.procedimiento,s.responsable, "
+							 +"s.idusuariocrea, s.fechacrea, s.idusuariomod, s.fechamod, s.estado "
+							 +"FROM rrhh.falta_tipo ft, rrhh.falta f, rrhh.sancion s "
+							 +"WHERE s.idfalta = "+idFalta+" "
+							 +"AND s.idfalta = f.idfalta "
+							 +"AND f.idfaltatipo = ft.idfaltatipo "
+							 +"AND s.recurrencia = "+recurrencia+" "
+							 +"AND s.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if(rs.next()) {
+				tipoFalta =new FaltaTipo();
+				falta = new Falta();
+				sancion = new Sancion();
+				
+				tipoFalta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				tipoFalta.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+				
+				falta.setIdfalta(rs.getLong("idfalta"));
+				falta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				falta.setFaltanombre(rs.getString("faltanombre"));
+				
+				sancion.setIdsancion(rs.getLong("idsancion"));
+				sancion.setIdfalta(rs.getLong("idfalta"));
+				sancion.setNombresancion(rs.getString("nombresancion"));
+				sancion.setRecurrencia(rs.getInt("recurrencia"));
+				sancion.setProcedimiento(rs.getString("procedimiento"));
+				sancion.setResponsable(rs.getString("responsable"));
+				sancion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				sancion.setFechacrea(rs.getTimestamp("fechacrea"));
+				sancion.setIdusuariomod(rs.getInt("idusuariomod"));
+				sancion.setFechamod(rs.getTimestamp("fechamod"));
+				sancion.setEstado(rs.getInt("estado"));
+				
+				sancion.setFaltaTipo(tipoFalta);
+				sancion.setFalta(falta);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return sancion;
+	}
+	
+	
+	/**
+	 * Consulta La sancion por idsancion.
+	 * @param Long.idsancion.
+	 * @return List. Falta.
+	 */
+	public Sancion obtenerSancionDeFaltaPorIdFaltaRecurrenciaYIdGrupo(Long idFalta, Integer recurrencia, Integer idGrupo) throws DatoException {
+
+		FaltaTipo tipoFalta = null;
+		Falta falta = null;
+		Sancion sancion = null;
+		
+		try {
+			String consulta = "SELECT ft.idfaltatipo, ft.nombrefaltatipo,f.idfalta, f.idfaltatipo, f.faltanombre,"
+							 +"s.idsancion,s.idfalta,s.nombresancion,s.recurrencia,s.procedimiento,s.responsable, "
+							 +"s.idusuariocrea, s.fechacrea, s.idusuariomod, s.fechamod, s.estado "
+							 +"FROM rrhh.falta_tipo ft, rrhh.falta f, rrhh.sancion s "
+							 +"WHERE s.idfalta = "+idFalta+" "
+							 +"AND s.idfalta = f.idfalta "
+							 +"AND f.idfaltatipo = ft.idfaltatipo "
+							 +"AND s.recurrencia = "+recurrencia+" "
+							 +"AND s.idgrupo = "+idGrupo+" "
+							 +"AND s.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if(rs.next()) {
+				tipoFalta =new FaltaTipo();
+				falta = new Falta();
+				sancion = new Sancion();
+				
+				tipoFalta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				tipoFalta.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+				
+				falta.setIdfalta(rs.getLong("idfalta"));
+				falta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				falta.setFaltanombre(rs.getString("faltanombre"));
+				
+				sancion.setIdsancion(rs.getLong("idsancion"));
+				sancion.setIdfalta(rs.getLong("idfalta"));
+				sancion.setNombresancion(rs.getString("nombresancion"));
+				sancion.setRecurrencia(rs.getInt("recurrencia"));
+				sancion.setProcedimiento(rs.getString("procedimiento"));
+				sancion.setResponsable(rs.getString("responsable"));
+				sancion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				sancion.setFechacrea(rs.getTimestamp("fechacrea"));
+				sancion.setIdusuariomod(rs.getInt("idusuariomod"));
+				sancion.setFechamod(rs.getTimestamp("fechamod"));
+				sancion.setEstado(rs.getInt("estado"));
+				
+				sancion.setFaltaTipo(tipoFalta);
+				sancion.setFalta(falta);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return sancion;
+	}
+	
+	/**
+	 * Consulta La sancion por idsancion.
+	 * @param Long.idsancion.
+	 * @return List. Falta.
+	 */
+	public Sancion obtenerSancionDeFaltaPorIdFaltaRecurrenciaYIdGrupo(Long idFalta, Integer recurrencia, Integer idGrupoUno,Integer idGrupoDos) throws DatoException {
+
+		FaltaTipo tipoFalta = null;
+		Falta falta = null;
+		Sancion sancion = null;
+		
+		try {
+			String consulta = "SELECT ft.idfaltatipo, ft.nombrefaltatipo,f.idfalta, f.idfaltatipo, f.faltanombre,"
+							 +"s.idsancion,s.idfalta,s.nombresancion,s.recurrencia,s.procedimiento,s.responsable, "
+							 +"s.idusuariocrea, s.fechacrea, s.idusuariomod, s.fechamod, s.estado "
+							 +"FROM rrhh.falta_tipo ft, rrhh.falta f, rrhh.sancion s "
+							 +"WHERE s.idfalta = "+idFalta+" "
+							 +"AND s.idfalta = f.idfalta "
+							 +"AND f.idfaltatipo = ft.idfaltatipo "
+							 +"AND s.recurrencia = "+recurrencia+" "
+							 +"AND (s.idgrupo = "+idGrupoUno+" OR s.idgrupo = "+idGrupoDos+") "
+							 +"AND s.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if(rs.next()) {
+				tipoFalta =new FaltaTipo();
+				falta = new Falta();
+				sancion = new Sancion();
+				
+				tipoFalta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				tipoFalta.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+				
+				falta.setIdfalta(rs.getLong("idfalta"));
+				falta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				falta.setFaltanombre(rs.getString("faltanombre"));
+				
+				sancion.setIdsancion(rs.getLong("idsancion"));
+				sancion.setIdfalta(rs.getLong("idfalta"));
+				sancion.setNombresancion(rs.getString("nombresancion"));
+				sancion.setRecurrencia(rs.getInt("recurrencia"));
+				sancion.setProcedimiento(rs.getString("procedimiento"));
+				sancion.setResponsable(rs.getString("responsable"));
+				sancion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				sancion.setFechacrea(rs.getTimestamp("fechacrea"));
+				sancion.setIdusuariomod(rs.getInt("idusuariomod"));
+				sancion.setFechamod(rs.getTimestamp("fechamod"));
+				sancion.setEstado(rs.getInt("estado"));
+				
+				sancion.setFaltaTipo(tipoFalta);
+				sancion.setFalta(falta);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return sancion;
+	}
+	
+	/**
+	 * Consulta La sancion por idsancion.
+	 * @param Long.idsancion.
+	 * @return List. Falta.
+	 */
+//	public Sancion obtenerSancionDeFaltaPorIdFalta(Long idFalta) throws DatoException {
+//
+//		FaltaTipo tipoFalta = null;
+//		Falta falta = null;
+//		Sancion sancion = null;
+//		
+//		try {
+//			String consulta = "SELECT ft.idfaltatipo, ft.nombrefaltatipo,f.idfalta, f.idfaltatipo, f.faltanombre,"
+//							 +"s.idsancion,s.idfalta,s.nombresancion,s.recurrencia,s.procedimiento,s.responsable, "
+//							 +"s.idusuariocrea, s.fechacrea, s.idusuariomod, s.fechamod, s.estado "
+//							 +"FROM rrhh.falta_tipo ft, rrhh.falta f, rrhh.sancion s "
+//							 +"WHERE s.idfalta = "+idFalta+" "
+//							 +"AND s.idfalta = f.idfalta "
+//							 +"AND f.idfaltatipo = ft.idfaltatipo "
+//							 +"AND s.estado = "+EstadoEnum.ACTIVO.getIndex();
+//			
+//			con = ds.getConnection();
+//			Statement sentencia = con.createStatement();
+//			rs = sentencia.executeQuery(consulta);
+//
+//			if(rs.next()) {
+//				tipoFalta =new FaltaTipo();
+//				falta = new Falta();
+//				sancion = new Sancion();
+//				
+//				tipoFalta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+//				tipoFalta.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+//				
+//				falta.setIdfalta(rs.getLong("idfalta"));
+//				falta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+//				falta.setFaltanombre(rs.getString("faltanombre"));
+//				
+//				sancion.setIdsancion(rs.getLong("idsancion"));
+//				sancion.setIdfalta(rs.getLong("idfalta"));
+//				sancion.setNombresancion(rs.getString("nombresancion"));
+//				sancion.setRecurrencia(rs.getInt("recurrencia"));
+//				sancion.setProcedimiento(rs.getString("procedimiento"));
+//				sancion.setResponsable(rs.getString("responsable"));
+//				sancion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+//				sancion.setFechacrea(rs.getTimestamp("fechacrea"));
+//				sancion.setIdusuariomod(rs.getInt("idusuariomod"));
+//				sancion.setFechamod(rs.getTimestamp("fechamod"));
+//				sancion.setEstado(rs.getInt("estado"));
+//				
+//				sancion.setFaltaTipo(tipoFalta);
+//				sancion.setFalta(falta);
+//			}
+//		} catch (SQLException e) {
+//			throw new DatoException(e.toString(), e.getCause());
+//		} catch (Exception e) {
+//			throw new DatoException(e.toString(), e.getCause());
+//		} finally {
+//			closeConexion();
+//		}
+//		return sancion;
+//	}
+	
+	
+
+	/**
+	 * Consulta La relaicón FaltaTipo por idFaltaTipo sin importar su estado.
+	 * @param Long. el idFaltaTipo
+	 * @return FaltaTipo. La relación consultada.
+	 */
+	public FaltaTipo obtenerFaltaTipoPorId(Long idFaltaTipo) throws DatoException {
+
+		FaltaTipo tipoFalta = null;
+		
+		try {
+			String consulta = "SELECT ft.idfaltatipo, ft.nombrefaltatipo, ft.idusuariocrea, ft.fechacrea, ft.idusuariomod, ft.fechamod, ft.estado "
+							 +"FROM rrhh.falta_tipo ft "
+							 +"WHERE ft.idfaltatipo = "+idFaltaTipo;
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if(rs.next()) {
+				tipoFalta =new FaltaTipo();
+				
+				tipoFalta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				tipoFalta.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+				tipoFalta.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				tipoFalta.setFechacrea(rs.getTimestamp("fechacrea"));
+				tipoFalta.setIdusuariomod(rs.getInt("idusuariomod"));
+				tipoFalta.setFechamod(rs.getTimestamp("fechamod"));
+				tipoFalta.setEstado(rs.getInt("estado"));
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return tipoFalta;
+	}
+	
+	
+	
+	/**
+	 * Consulta el listado de formatos que tiene una sanción.
+	 * Estan clasificadas por el Falta.
+	 * @return List. Falta.
+	 */
+	public List<SancionFormato> obtenerListaDeSancionFormato(Long idFalta) throws DatoException {
+
+		List<SancionFormato> listaDeSancionFormato = new ArrayList<SancionFormato>();
+		SancionFormato sancionFormato = null;
+		Formato unFormato = null;
+
+		try {
+			String consulta = "SELECT sf.idformato,sf.idsancion, sf.idusuariocrea, sf.fechacrea, sf.idusuariomod, sf.fechamod, sf.estado,"
+							 +"f.idformato,f.nombreformato,f.rutaformato,f.idusuariocrea, f.fechacrea, f.idusuariomod, f.fechamod, f.estado as estadoFormato "
+							 +"FROM rrhh.sancion_formato sf, rrhh.formato f, rrhh.sancion s "
+							 +"WHERE s.idfalta = "+idFalta+" "
+							 +"AND s.idsancion = sf.idsancion "
+							 +"AND sf.idformato = f.idformato "
+							 +"AND s.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				sancionFormato = new SancionFormato();
+				unFormato = new Formato();
+				
+				sancionFormato.setIdformato(rs.getLong("idformato"));
+				sancionFormato.setIdsancion(rs.getLong("idsancion"));
+				sancionFormato.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				sancionFormato.setFechacrea(rs.getTimestamp("fechacrea"));
+				sancionFormato.setIdusuariocrea(rs.getInt("idusuariomod"));
+				sancionFormato.setFechamod(rs.getTimestamp("fechamod"));
+				sancionFormato.setEstado(rs.getInt("estado"));
+				
+				unFormato.setIdformato(rs.getLong("idformato"));
+				unFormato.setNombreformato(rs.getString("nombreformato"));
+				unFormato.setRutaformato(rs.getString("rutaformato"));
+				unFormato.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				unFormato.setFechacrea(rs.getTimestamp("fechacrea"));
+				unFormato.setIdusuariomod(rs.getInt("idusuariomod"));
+				unFormato.setFechamod(rs.getTimestamp("fechamod"));
+				unFormato.setEstado(rs.getInt("estadoFormato"));
+	
+				sancionFormato.setFormato(unFormato);
+				listaDeSancionFormato.add(sancionFormato);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaDeSancionFormato;
+	}	
+	
+	
+
+	
+	/**
+	 * Consulta el listado de formatos que tiene una sanción.
+	 * Estan clasificadas por el Falta y recurrencia..
+	 * @return List. sancionFormato.
+	 */
+	public List<SancionFormato> obtenerListaDeSancioFormatoPorIdFaltaYRecurrencia(Long idFalta,Integer recurrencia) throws DatoException {
+
+		List<SancionFormato> listaDeSancionFormato = new ArrayList<SancionFormato>();
+		SancionFormato sancionFormato = null;
+		Formato unFormato = null;
+
+		try {
+			String consulta = "SELECT sf.idformato,sf.idsancion, sf.idusuariocrea, sf.fechacrea, sf.idusuariomod, sf.fechamod, sf.estado,"
+							 +"f.idformato,f.nombreformato,f.rutaformato,f.idusuariocrea, f.fechacrea, f.idusuariomod, f.fechamod, f.estado as estadoFormato "
+							 +"FROM rrhh.sancion_formato sf, rrhh.formato f, rrhh.sancion s "
+							 +"WHERE s.idfalta = "+idFalta+" "
+							 +"AND s.idsancion = sf.idsancion "
+							 +"AND s.recurrencia = "+recurrencia+" "
+							 +"AND sf.idformato = f.idformato "
+							 +"AND s.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				sancionFormato = new SancionFormato();
+				unFormato = new Formato();
+				
+				sancionFormato.setIdformato(rs.getLong("idformato"));
+				sancionFormato.setIdsancion(rs.getLong("idsancion"));
+				sancionFormato.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				sancionFormato.setFechacrea(rs.getTimestamp("fechacrea"));
+				sancionFormato.setIdusuariocrea(rs.getInt("idusuariomod"));
+				sancionFormato.setFechamod(rs.getTimestamp("fechamod"));
+				sancionFormato.setEstado(rs.getInt("estado"));
+				
+				unFormato.setIdformato(rs.getLong("idformato"));
+				unFormato.setNombreformato(rs.getString("nombreformato"));
+				unFormato.setRutaformato(rs.getString("rutaformato"));
+				unFormato.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				unFormato.setFechacrea(rs.getTimestamp("fechacrea"));
+				unFormato.setIdusuariomod(rs.getInt("idusuariomod"));
+				unFormato.setFechamod(rs.getTimestamp("fechamod"));
+				unFormato.setEstado(rs.getInt("estadoFormato"));
+	
+				sancionFormato.setFormato(unFormato);
+				listaDeSancionFormato.add(sancionFormato);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaDeSancionFormato;
+	}	
+	
+	
+	/**
+	 * Consulta un Formato por idFormato.
+	 * @param Long.idFormato.
+	 * @return List. Formato.
+	 */
+	public Formato obtenerFormatoPorId(Long idFormato) throws DatoException {
+
+		Formato formato = null;
+		
+		try {
+			String consulta = "SELECT f.idformato,f.nombreformato,f.rutaformato,f.idusuariocrea, f.fechacrea, f.idusuariomod, f.fechamod, f.estado "
+						     +"FROM rrhh.formato f "
+                             +"WHERE f.idformato = "+idFormato+" "
+                             +"AND f.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			
+			if(rs.next()) {
+				formato = new Formato();
+				
+				formato.setIdformato(rs.getLong("idformato"));
+				formato.setNombreformato(rs.getString("nombreformato"));
+				formato.setRutaformato(rs.getString("rutaformato"));
+				formato.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				formato.setFechacrea(rs.getTimestamp("fechacrea"));
+				formato.setIdusuariomod(rs.getInt("idusuariomod"));
+				formato.setFechamod(rs.getTimestamp("fechamod"));
+				formato.setEstado(rs.getInt("estado"));
+				
+				log.info("Ruta enconrada: "+formato.getRutaformato());
+				
+			}else{
+				log.info("No encontro nada en la base de datos.");
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return formato;
+	}
+	
+	
+
+	/**
+	 * Consulta un Formato por idFormato.
+	 * @param Long.idFormato.
+	 * @return List. Formato.
+	 */
+	public DisciplinaArchivo obtenerDisciplinaArchivoPorId(Long idDisciplinaArchivo) throws DatoException {
+
+		DisciplinaArchivo archivo = null;
+		
+		try {
+			String consulta = "SELECT da.iddisciplinaarchivo,da.iddisciplinaarchivotipo,da.iddisciplinahistorial,da.nombrearchivo,da.rutaarchivo,da.tamanio,da.idusuariocrea,da.fechacrea,da.idusuariomod,da.fechamod, da.estado "
+							 +"FROM rrhh.disciplina_archivo da "
+						     +"WHERE da.iddisciplinaarchivo = "+idDisciplinaArchivo;
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if(rs.next()) {
+				archivo = new DisciplinaArchivo();
+				
+				archivo.setIddisciplinaarchivo(rs.getLong("iddisciplinaarchivo"));
+				archivo.setIddisciplinaarchivotipo(rs.getLong("iddisciplinaarchivotipo"));
+				archivo.setIddisciplinahistorial(rs.getLong("iddisciplinahistorial"));
+				archivo.setNombrearchivo(rs.getString("nombrearchivo"));
+				archivo.setRutaarchivo(rs.getString("rutaarchivo"));
+				archivo.setTamanio(rs.getLong("tamanio"));
+				archivo.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				archivo.setFechacrea(rs.getTimestamp("fechacrea"));
+				archivo.setIdusuariomod(rs.getInt("idusuariomod"));
+				archivo.setFechamod(rs.getTimestamp("fechamod"));
+				archivo.setEstado(rs.getInt("estado"));
+				
+			}else{
+				log.info("No encontro nada en la base de datos.");
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return archivo;
+	}
+	
+	
+	/**
+	 * Consulta el listado de los tipos de archivos a cargar al iniciar un proceso disciplinario.
+	 * @return List. DisciplinaArchivoTipo.
+	 */
+	public List<DisciplinaArchivoTipo> obtenerListaDeDisciplinaArchivoTipo() throws DatoException {
+
+		List<DisciplinaArchivoTipo> listaTiposDeArchivos = new ArrayList<DisciplinaArchivoTipo>();
+		DisciplinaArchivoTipo tipoArchivo = null;
+
+		try {
+			String consulta = "SELECT adt.iddisciplinaarchivotipo,adt.nombretipoarchivo,adt.idusuariocrea, adt.fechacrea, adt.idusuariomod, adt.fechamod, adt.estado "
+							 +"FROM rrhh.disciplina_archivo_tipo adt "
+							 +"WHERE adt.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				tipoArchivo = new DisciplinaArchivoTipo();
+				
+				tipoArchivo.setIddisciplinaarchivotipo(rs.getLong("iddisciplinaarchivotipo"));
+				tipoArchivo.setNombretipoarchivo(rs.getString("nombretipoarchivo"));
+				tipoArchivo.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				tipoArchivo.setFechacrea(rs.getTimestamp("fechacrea"));
+				tipoArchivo.setIdusuariocrea(rs.getInt("idusuariomod"));
+				tipoArchivo.setFechamod(rs.getTimestamp("fechamod"));
+				tipoArchivo.setEstado(rs.getInt("estado"));
+				
+				listaTiposDeArchivos.add(tipoArchivo);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaTiposDeArchivos;
+	}
+	
+	
+	/**
+	 * Consulta UN objeto Sancion por idsancion.
+	 * @param Long.idsancion.
+	 * @return Sancion. Falta.
+	 */
+	public Sancion obtenerSancionPorIdFalta(Long idFalta) throws DatoException {
+
+		Sancion sancion = null;
+		
+		try {
+			String consulta = "SELECT s.idsancion,s.idfalta,s.nombresancion,s.recurrencia,s.procedimiento,s.responsable, s.idusuariocrea, s.fechacrea, s.idusuariomod, s.fechamod, s.estado "
+							 +"FROM rrhh.sancion s "
+						     +"WHERE s.idfalta="+idFalta;
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if(rs.next()) {
+				log.info("Obtuvo una sancion-.");
+				sancion = new Sancion();
+				
+				sancion.setIdsancion(rs.getLong("idsancion"));
+				sancion.setIdfalta(rs.getLong("idfalta"));
+				sancion.setNombresancion(rs.getString("nombresancion"));
+				sancion.setRecurrencia(rs.getInt("recurrencia"));
+				sancion.setProcedimiento(rs.getString("procedimiento"));
+				sancion.setResponsable(rs.getString("responsable"));
+				sancion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				sancion.setFechacrea(rs.getTimestamp("fechacrea"));
+				sancion.setIdusuariomod(rs.getInt("idusuariomod"));
+				sancion.setFechamod(rs.getTimestamp("fechamod"));
+				sancion.setEstado(rs.getInt("estado"));
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return sancion;
+	}
+	
+	
+	/**
+	 * Registrar una ueva afiliación a un empleado.
+	 * @param: EmpleadoAfiliacion a insertar.
+	 * @return: EmpleadoAfiliacion. El empleadoAfiliacion registrada.
+	 */
+	public Disciplina insertarDisciplina(Disciplina disciplina) throws DatoException{
+		
+		log.info("Entro a insertar nueva Disciplina");
+		
+		Util.registerConverters();
+		try {
+						
+			String insercion ="INSERT INTO rrhh.disciplina(idsancion,idcontrato,idusuariocrea,fechacrea,estado,recurrenciaporfalta) "
+							+ "VALUES(?,?,?,GETDATE(),?,?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setLong(1,disciplina.getIdsancion());
+			ps.setLong(2,disciplina.getIdcontrato());
+			ps.setLong(3,disciplina.getIdusuariocrea());
+			ps.setLong(4,disciplina.getEstado());
+			ps.setString(5,disciplina.getRecurrenciaPorFalta());
+			
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			
+			if (rs.next()) {
+				disciplina.setIddisciplina(rs.getLong(1));
+			} else {
+				throw new SQLException("Disciplina, no se pudo generar su idDisciplina.");
+			}
+			
+		} catch (SQLException e) {
+			log.info("insertarDisciplina.SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("insertarDisciplina.Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return disciplina;
+	}
+	
+	
+	/**
+	 * Registrar un nuevo tipo de Falta.
+	 * @param: FaltaTipo a insertar.
+	 * @return: FaltaTipo. el elemento registrada.
+	 */
+	public boolean insertarTipoDeFalta(FaltaTipo tipoFalta) throws DatoException{
+		
+		boolean correcto = false;
+		Util.registerConverters();
+		try {
+						
+			String insercion ="INSERT INTO rrhh.falta_tipo(idfaltatipo,nombrefaltatipo,idusuariocrea,fechacrea,estado) "
+							+ "VALUES(?,?,?,GETDATE(),?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion);
+			
+			ps.setLong(1,tipoFalta.getIdfaltatipo());
+			ps.setString(2,tipoFalta.getNombrefaltatipo());
+			ps.setInt(3,tipoFalta.getIdusuariocrea());
+			ps.setLong(4,tipoFalta.getEstado());
+			
+			ps.executeUpdate();
+			correcto = true;
+			
+		} catch (SQLException e) {
+			log.info("insertarTipoDeFalta.SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("insertarTipoDeFalta.Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return correcto;
+	}
+	
+	
+	/**
+	 * Registrar una nueva Falta.
+	 * @param: Falta a insertar.
+	 * @return: Falta. La Falta registrada.
+	 */
+	public boolean insertarFalta(Falta falta) throws DatoException{
+		boolean inserto = false;
+		Util.registerConverters();
+		
+		try {
+						
+			String insercion ="INSERT INTO rrhh.falta(idfalta,idfaltatipo,faltanombre,idusuariocrea,fechacrea,estado) "
+							+ "VALUES(?,?,?,?,GETDATE(),?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion);
+			
+			ps.setLong(1,falta.getIdfalta());
+			ps.setLong(2,falta.getIdfaltatipo());
+			ps.setString(3,falta.getFaltanombre());
+			ps.setInt(4,falta.getIdusuariocrea());
+			ps.setInt(5,falta.getEstado());
+			
+			ps.executeUpdate();
+			
+			inserto = true;
+			
+		} catch (SQLException e) {
+			log.info("insertarFalta.SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("insertarFalta.Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return inserto;
+	}
+	
+	
+	/**
+	 * Registrar una nueva Falta.
+	 * @param: Falta a insertar.
+	 * @return: Falta. La Falta registrada.
+	 */
+	public Sancion insertarSancion(Sancion sancion) throws DatoException{
+		
+		Util.registerConverters();
+		
+		try {
+						
+			String insercion ="INSERT INTO rrhh.sancion(idfalta,nombresancion,recurrencia,procedimiento,responsable,idusuariocrea,fechacrea,estado) "
+							+ "VALUES(?,?,?,?,?,?,GETDATE(),?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			
+			ps.setLong(1,sancion.getIdfalta());
+			ps.setString(2,sancion.getNombresancion());
+			ps.setInt(3,sancion.getRecurrencia());
+			ps.setString(4,sancion.getProcedimiento());
+			ps.setString(5,sancion.getResponsable());
+			ps.setInt(6,sancion.getIdusuariocrea());
+			ps.setInt(7,sancion.getEstado());
+			
+			ps.executeUpdate();
+			
+			rs = ps.getGeneratedKeys();
+			
+			if(rs.next()){
+				sancion.setIdsancion(Long.valueOf(rs.getLong(1)));
+			}
+			
+			
+		} catch (SQLException e) {
+			log.info("insertarSanción.SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("insertarSanción.Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return sancion;
+	}
+	
+
+	/**
+	 * Actualizar la relacion rrhh.formato. (Cambiar el estado, actualiza la ruta)
+	 * @param Formato. El formato a actualizar.
+	 * @throws DatoException 
+	 * */
+	public Formato activarYActualizarFormato(Formato formato) throws DatoException{
+		Util.registerConverters();
+		
+		log.info("Ha llegado a activar el formato, estos son los datos:");
+		
+		try {
+
+			String actualizacion = "UPDATE rrhh.formato "
+								  +"SET rutaformato=?, idusuariomod=?, fechamod=GETDATE(), estado=? "
+			                      +"WHERE idformato = ?";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setString(1,formato.getRutaformato());
+			ps.setInt(2,formato.getIdusuariomod());
+			ps.setInt(3,formato.getEstado());
+			ps.setLong(4,formato.getIdformato());
+
+			ps.executeUpdate();
+			
+			log.info("Ejecutó la consulta correctamente.");
+			log.info("SQL = "+actualizacion);
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return formato;
+	}
+	
+	/**
+	 * Registrar una nueva relación Formato.
+	 * @param: Formato la relación a insertar.
+	 * @return: Formato. La Falta registrada.
+	 */
+	public boolean insertarFormato(Formato formato) throws DatoException{
+		
+		boolean inserto = false;
+		Util.registerConverters();
+		
+		try {
+						
+			String insercion ="INSERT INTO rrhh.formato(idformato,nombreformato,rutaformato,idusuariocrea,fechacrea,estado) "
+							+ "VALUES(?,?,?,?,GETDATE(),?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setLong(1,formato.getIdformato());
+			ps.setString(2,formato.getNombreformato());
+			ps.setString(3,formato.getRutaformato());
+			ps.setInt(4,formato.getIdusuariocrea());
+			ps.setInt(5,formato.getEstado());
+			
+			ps.executeUpdate();
+			
+			rs = ps.getGeneratedKeys();
+			
+			if(rs.next()){
+				inserto = true;
+			}
+			
+			
+		} catch (SQLException e) {
+			log.info("insertarSanción.SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("insertarSanción.Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return inserto;
+	}
+	
+	
+	/**
+	 * Registrar una nueva relacion Sancion_formato.
+	 * @param: SancionFormato. a insertar.
+	 * @return: boolean si la relacion fué registrada.
+	 */
+	public boolean insertarSancionFormato(SancionFormato sancionFormato) throws DatoException{
+		boolean inserto = false;
+		Util.registerConverters();
+		
+		try {
+						
+			String insercion ="INSERT INTO rrhh.sancion_formato(idformato,idsancion,idusuariocrea,fechacrea,estado) "
+							+ "VALUES(?,?,?,GETDATE(),?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setLong(1,sancionFormato.getIdformato());
+			ps.setLong(2,sancionFormato.getIdsancion());
+			ps.setInt(3,sancionFormato.getIdusuariocrea());
+			ps.setInt(4,sancionFormato.getEstado());
+			
+			ps.executeUpdate();
+			
+			rs = ps.getGeneratedKeys();
+			if(rs.next()){
+				inserto = true;
+			}
+			
+		} catch (SQLException e) {
+			log.info("insertarSancionFormato.SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("insertarSancionFormato.Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return inserto;
+	}
+	
+	
+	/**
+	 * Registrar un nuevo testigo un proceso disciplinario.
+	 * @param: EmpleadoAfiliacion a insertar.
+	 * @return: EmpleadoAfiliacion. El empleadoAfiliacion registrada.
+	 */
+	public DisciplinaTestigo insertarDisciplinaTestigo(DisciplinaTestigo disciplinaTestigo) throws DatoException{
+		
+		log.info("Entro a insertar testigpo.");
+		
+		Util.registerConverters();
+		try {
+						
+			String insercion ="INSERT INTO rrhh.disciplina_testigo(iddisciplina,idempleado,idusuariocrea,fechacrea,estado) "
+					        + "VALUES(?,?,?,GETDATE(),?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setLong(1,disciplinaTestigo.getIddisciplina());
+			ps.setLong(2,disciplinaTestigo.getIdempleado());
+			ps.setInt(3,disciplinaTestigo.getIdusuariocrea());
+			ps.setInt(4,disciplinaTestigo.getEstado());
+			
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			
+			if (rs.next()) {
+				log.info("ID generado= "+rs.getLong(1));
+				disciplinaTestigo.setIddisciplinatestigo(rs.getLong(1));
+			} else {
+				throw new SQLException("DisciplinaTestigo, no se pudo generar su idDisciplinaTestigo.");
+			}
+		} catch (SQLException e) {
+			log.info("insertarDisciplinaTestigo.SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("insertarDisciplinaTestigo.Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return disciplinaTestigo;
+	}
+	
+	
+	/**
+	 * Registrar un nuevo DisciplinaHistorial.
+	 * @param: DisciplinaHistorial a insertar.
+	 * @return: DisciplinaHistorial. La DisciplinaHistorial registrada.
+	 */
+	public DisciplinaHistorial insertarDisciplinaHistorial(DisciplinaHistorial disciplinaHistorial) throws DatoException{
+				
+		Util.registerConverters();
+		try {
+						
+			String insercion ="INSERT INTO rrhh.disciplina_historial(iddisciplina,iddisciplinaestado,observacion,idusuariocrea,fechacrea,estado,datocreador) "
+							 +"VALUES(?,?,?,?,GETDATE(),?,?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setLong(1,disciplinaHistorial.getIddisciplina());
+			ps.setLong(2,disciplinaHistorial.getIddisciplinaestado());
+			ps.setString(3,disciplinaHistorial.getObservacion());
+			ps.setInt(4,disciplinaHistorial.getIdusuariocrea());
+			ps.setInt(5,disciplinaHistorial.getEstado());
+			ps.setString(6,disciplinaHistorial.getCreadorProceso());
+			
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			
+			if (rs.next()) {
+				disciplinaHistorial.setIddisciplinahistorial(rs.getLong(1));
+			} else {
+				throw new SQLException("disciplinaHistorial, no se pudo generar su IddisciplinaHistorial.");
+			}
+		} catch (SQLException e) {
+			log.info("SQLException = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return disciplinaHistorial;
+	}
+	
+	
+	/**
+	 * Registrar un nuevo DisciplinaArchivo.
+	 * @param: DisciplinaArchivo a insertar.
+	 * @return: DisciplinaArchivo. La DisciplinaArchivo registrada.
+	 */
+	public DisciplinaArchivo insertarDisciplinaArchivo(DisciplinaArchivo disciplinaArchivo) throws DatoException{
+		
+		Util.registerConverters();
+		try {			
+			String insercion ="INSERT INTO rrhh.disciplina_archivo(iddisciplinaarchivotipo,iddisciplinahistorial,nombrearchivo,rutaarchivo,idusuariocrea,fechacrea,estado,tamanio) " 
+							 +"VALUES(?,?,?,?,?,GETDATE(),?,?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setLong(1,disciplinaArchivo.getIddisciplinaarchivotipo());
+			ps.setLong(2,disciplinaArchivo.getIddisciplinahistorial());
+			ps.setString(3,disciplinaArchivo.getNombrearchivo());
+			ps.setString(4,disciplinaArchivo.getRutaarchivo());
+			ps.setInt(5,disciplinaArchivo.getIdusuariocrea());
+			ps.setInt(6,disciplinaArchivo.getEstado());
+			ps.setLong(7,disciplinaArchivo.getTamanio());
+			
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			
+			if (rs.next()) {
+				disciplinaArchivo.setIddisciplinaarchivo(rs.getLong(1));
+			} else {
+				throw new SQLException("disciplinaArchivo, no se pudo generar su IddisciplinaArchivo.");
+			}
+		} catch (SQLException e) {
+			log.info("insertarDisciplinaArchivo.SQLException = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("insertarDisciplinaArchivo.Exception = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return disciplinaArchivo;
+	}
+	
+	
+	/**
+	 *  Actualiza los datos de la relación DisciplinaArchivo.
+	 *  @param DisciplinaArchivo. La relación a actualizar.
+	 *  @return DisciplinaArchivo. La relación actualizada.
+	 */
+	public DisciplinaArchivo actualizarRutaArchivoCargado(DisciplinaArchivo archivo)throws DatoException {
+
+		Util.registerConverters();
+		try {
+
+			String actualizacion = "UPDATE rrhh.disciplina_archivo "
+								  +"SET rutaarchivo=?, tamanio=?, idusuariomod=?, fechamod=GETDATE(), estado=? "
+			                      +"WHERE iddisciplinaarchivo = ?";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setString(1,archivo.getRutaarchivo());
+			ps.setLong(2,archivo.getTamanio());
+			ps.setInt(3,archivo.getIdusuariocrea());
+			ps.setInt(4,archivo.getEstado());
+			ps.setLong(5,archivo.getIddisciplinaarchivo());
+
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return archivo;
+	}
+	
+	
+	/**
+	 * Consulta los datos de Disciplina pro su idDisciplina.
+	 * @param idDisciplina. El id.
+	 * @return Disciplina. La relacion consultada.
+	 * @throws DatoException 
+	 */
+	public Disciplina obtenerDetalleProcesoDisciplinario(Long idDisciplina) throws DatoException{
+		
+		Disciplina disciplina = null;
+		Sancion sancion = null;
+		Falta falta = null;
+		FaltaTipo faltaTipo = null;
+		DisciplinaHistorial disciplinaHistorial = null;
+		
+		try {
+
+			String consulta = "SELECT d.iddisciplina, d.idsancion,d.idcontrato, d.idusuariocrea, d.fechacrea, d.idusuariomod, d.fechamod, d.estado,d.recurrenciaporfalta,"
+							 +"s.idsancion,s.idfalta,s.nombresancion,s.recurrencia,s.procedimiento,s.responsable, "
+							 +"f.idfalta, f.idfaltatipo, f.faltanombre,"
+							 +"ft.idfaltatipo, ft.nombrefaltatipo,"
+							 +"dh.iddisciplinahistorial,dh.iddisciplina,dh.iddisciplinaestado,dh.observacion,dh.datocreador "
+							 +"FROM rrhh.disciplina d, rrhh.sancion s, rrhh.falta f, rrhh.falta_tipo ft, rrhh.disciplina_historial dh "
+							 +"WHERE d.iddisciplina = "+idDisciplina+" "
+							 +"AND d.idsancion = s.idsancion "
+							 +"AND s.idfalta = f.idfalta "
+							 +"AND f.idfaltatipo = ft.idfaltatipo "
+							 +"AND d.iddisciplina = dh.iddisciplina";
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+			
+			if(rs.next()) {
+				disciplina = new Disciplina();
+				sancion = new Sancion();
+				falta = new Falta();
+				faltaTipo = new FaltaTipo();
+				disciplinaHistorial = new DisciplinaHistorial();
+				
+				disciplina.setIddisciplina(rs.getLong("iddisciplina"));
+				disciplina.setIdsancion(rs.getLong("idsancion"));
+				disciplina.setIdcontrato(rs.getLong("idcontrato"));
+				disciplina.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				disciplina.setFechacrea(rs.getTimestamp("fechacrea"));
+				disciplina.setIdusuariomod(rs.getInt("idusuariomod"));
+				disciplina.setFechamod(rs.getTimestamp("fechamod"));
+				disciplina.setEstado(rs.getInt("estado"));
+				disciplina.setRecurrenciaPorFalta(rs.getString("recurrenciaporfalta"));
+				
+				sancion.setIdsancion(rs.getLong("idsancion"));
+				sancion.setIdfalta(rs.getLong("idfalta"));
+				sancion.setNombresancion(rs.getString("nombresancion"));
+				sancion.setRecurrencia(rs.getInt("recurrencia"));
+				sancion.setProcedimiento(rs.getString("procedimiento"));
+				sancion.setResponsable(rs.getString("responsable"));
+				
+				falta.setIdfalta(rs.getLong("idfalta"));
+				falta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				falta.setFaltanombre(rs.getString("faltanombre"));
+				
+				faltaTipo.setIdfaltatipo(rs.getLong("idfaltatipo"));
+				faltaTipo.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+				
+				disciplinaHistorial.setIddisciplinahistorial(rs.getLong("iddisciplinahistorial"));
+				disciplinaHistorial.setIddisciplina(rs.getLong("iddisciplina"));
+				disciplinaHistorial.setIddisciplinaestado(rs.getLong("iddisciplinaestado"));
+				disciplinaHistorial.setObservacion(rs.getString("observacion"));
+				disciplinaHistorial.setCreadorProceso(rs.getString("datocreador"));
+				
+				disciplina.setSancion(sancion);
+				disciplina.setFalta(falta);
+				disciplina.setFaltaTipo(faltaTipo);
+				disciplina.setDisciplinaHistorial(disciplinaHistorial);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return disciplina;
+	}
+	
+	
+	/**
+	 * Consulta el listado de formatos asociados a una sancion.
+	 * @param Long. El idSancion a consultarle los formatos.
+	 * @return List. Formato.
+	 */
+	public List<Formato> obtenerListaDeFormatosPorIdSancion(Long idSancion) throws DatoException {
+
+		List<Formato> listaFormatos = new ArrayList<Formato>();
+		Formato formato = null;
+
+		try {
+			String consulta = "SELECT f.idformato,f.nombreformato,f.rutaformato,f.idusuariocrea, f.fechacrea, f.idusuariomod, f.fechamod, f.estado "
+							 +"FROM rrhh.sancion_formato sf, rrhh.formato f "
+							 +"WHERE sf.idformato = f.idformato "
+							 +"AND sf.idsancion = "+idSancion+" "
+							 +"AND f.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				formato = new Formato();
+				
+				formato.setIdformato(rs.getLong("idformato"));
+				formato.setNombreformato(rs.getString("nombreformato"));
+				formato.setRutaformato(rs.getString("rutaformato"));
+				formato.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				formato.setFechacrea(rs.getTimestamp("fechacrea"));
+				formato.setIdusuariocrea(rs.getInt("idusuariomod"));
+				formato.setFechamod(rs.getTimestamp("fechamod"));
+				formato.setEstado(rs.getInt("estado"));
+				
+				listaFormatos.add(formato);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaFormatos;
+	}
+	
+	
+	/**
+	 * Consulta el listado de testigos asociados a un proceso disciplinario.
+	 * @param Long. idDisciplina.
+	 * @return List. DisciplinaTestigo.
+	 */
+	public List<DisciplinaTestigo> obtenerListaDeTestigosPorIdDisciplina(Long idDisciplina) throws DatoException {
+
+		List<DisciplinaTestigo> listaTestigos = new ArrayList<DisciplinaTestigo>();
+		DisciplinaTestigo testigo= null;
+
+		try {
+			String consulta = "SELECT dt.iddisciplinatestigo, dt.iddisciplina, dt.idempleado, dt.idusuariocrea, dt.fechacrea, dt.idusuariomod, dt.fechamod, dt.estado "
+							 +"FROM rrhh.disciplina_testigo dt "
+							 +"where dt.iddisciplina = "+idDisciplina+" "
+							 +"AND dt.estado = "+EstadoEnum.ACTIVO.getIndex();
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				testigo = new DisciplinaTestigo();
+				
+				testigo.setIddisciplinatestigo(rs.getLong("iddisciplinatestigo"));
+				testigo.setIddisciplina(rs.getLong("iddisciplina"));
+				testigo.setIdempleado(rs.getLong("idempleado"));
+				testigo.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				testigo.setFechacrea(rs.getTimestamp("fechacrea"));
+				testigo.setIdusuariocrea(rs.getInt("idusuariomod"));
+				testigo.setFechamod(rs.getTimestamp("fechamod"));
+				testigo.setEstado(rs.getInt("estado"));
+				
+				listaTestigos.add(testigo);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaTestigos;
+	}
+	
+	
+	/**
+	 * Consulta el historial de un proceso disciplinario especifico.
+	 * @param Long. idDisciplina.
+	 * @return List. DisciplinaTestigo.
+	 */
+	public List<DisciplinaHistorial> obtenerListaDisicplinaHistorialPorIdDisciplina(Long idDisciplina) throws DatoException {
+
+		List<DisciplinaHistorial> ListaHistorial = new ArrayList<DisciplinaHistorial>();
+		DisciplinaHistorial historial = null;
+		DisciplinaEstado estado = null;
+
+		log.info("DAO 1");
+		
+		try {
+			String consulta = "SELECT dh.iddisciplinahistorial, dh.iddisciplina, dh.iddisciplinaestado, dh.observacion,dh.datocreador,dh.idusuariocrea, dh.fechacrea,dh.idusuariomod,dh.fechamod, dh.estado,"
+							 +"de.iddisciplinaestado, de.estadodisciplina "
+							 +"FROM rrhh.disciplina_historial dh, rrhh.disciplina_estado de "
+							 +"WHERE de.iddisciplinaestado = dh.iddisciplinaestado "
+							 +"AND dh.iddisciplina = "+idDisciplina+" "
+							 +"AND dh.estado = "+EstadoEnum.ACTIVO.getIndex();
+			log.info("DAO 2");							
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				historial = new DisciplinaHistorial();
+				estado = new DisciplinaEstado();
+				
+				historial.setIddisciplinahistorial(rs.getLong("iddisciplinahistorial"));
+				historial.setIddisciplina(rs.getLong("iddisciplina"));
+				historial.setIddisciplinaestado(rs.getLong("iddisciplinaestado"));
+				historial.setObservacion(rs.getString("observacion"));
+				historial.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				historial.setFechacrea(rs.getTimestamp("fechacrea"));
+				historial.setCreadorProceso(rs.getString("datocreador"));
+				
+//				historial.setIdusuariomod(iduser);
+//				historial.setFechamod(rs.getTimestamp("fechamod"));
+				historial.setEstado(rs.getInt("estado"));
+				estado.setIddisciplinaestado(rs.getLong("iddisciplinaestado"));
+				estado.setEstadodisciplina(rs.getString("estadodisciplina"));
+				historial.setDisciplinaEstado(estado);
+				ListaHistorial.add(historial);
+			}
+		} catch (SQLException e) {
+			log.info("obtenerListaDisicplinaHistorialPorIdDisciplina.SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("obtenerListaDisicplinaHistorialPorIdDisciplina.Exception e");
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return ListaHistorial;
+	}
+	
+	
+	 /**
+     * Método para obtener los archivos asociados a un proceso disciplinario.
+     * @return List. DisciplinaArchivo.
+     */
+	public List<DisciplinaArchivo> obtenerListaDisciplinaArchivoPorIdDisciplina(Long idDisciplina) throws DatoException {
+
+		List<DisciplinaArchivo> ListaArchivos = new ArrayList<DisciplinaArchivo>();
+		DisciplinaArchivo archivo = null;
+		DisciplinaArchivoTipo tipoArchivo = null;
+
+		try {
+			String consulta = "SELECT da.iddisciplinaarchivo,da.iddisciplinaarchivotipo,da.iddisciplinahistorial,da.nombrearchivo,da.rutaarchivo,da.tamanio,da.idusuariocrea,da.fechacrea,da.idusuariomod,da.fechamod, da.estado,"
+							 +"dat.iddisciplinaarchivotipo, dat.nombretipoarchivo "
+							 +"FROM rrhh.disciplina_historial dh "
+							 +"left join rrhh.disciplina_archivo da on da.iddisciplinahistorial = dh.iddisciplinahistorial "
+							 +"left join rrhh.disciplina_archivo_tipo dat on dat.iddisciplinaarchivotipo = da.iddisciplinaarchivotipo "
+							 +"WHERE dh.iddisciplina = "+idDisciplina+" "
+							 +"AND dh.estado = "+EstadoEnum.ACTIVO.getIndex()+" "
+							 +"AND da.estado = "+EstadoEnum.ACTIVO.getIndex();
+										
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				archivo = new DisciplinaArchivo();
+				tipoArchivo = new DisciplinaArchivoTipo();
+				
+				archivo.setIddisciplinaarchivo(rs.getLong("iddisciplinaarchivo"));
+				archivo.setIddisciplinaarchivotipo(rs.getLong("iddisciplinaarchivotipo"));
+				archivo.setIddisciplinahistorial(rs.getLong("iddisciplinahistorial"));
+				archivo.setNombrearchivo(rs.getString("nombrearchivo"));
+				archivo.setRutaarchivo(rs.getString("rutaarchivo"));
+				archivo.setTamanio(rs.getLong("tamanio"));
+				archivo.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				archivo.setFechacrea(rs.getTimestamp("fechacrea"));
+				archivo.setIdusuariomod(rs.getInt("idusuariomod"));
+				archivo.setFechamod(rs.getTimestamp("fechamod"));
+				archivo.setEstado(rs.getInt("estado"));
+				
+				tipoArchivo.setIddisciplinaarchivotipo(rs.getLong("iddisciplinaarchivotipo"));
+				tipoArchivo.setNombretipoarchivo(rs.getString("nombretipoarchivo"));
+				
+				archivo.setDisciplinaArchivoTipo(tipoArchivo);
+				
+				ListaArchivos.add(archivo);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return ListaArchivos;
+	}
+	
+	
+	/**
+	 * Método para obtener un empleado por su idempleado.
+	 * @param Long. idempleado.
+	 * @return EmpleadoBean. 
+	 * */
+	public EmpleadoBean buscarEmpleadosporId(Long idempleado)throws DatoException {
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado,e.fotonombre,   ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo");
+			q.append(" from rrhh.empleado e  ");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+
+			q.append(" where  e.idempleado=? ");
+
+			q.append(" and ei.actual=? ");
+			q.append("order by e.idempleado desc  ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, idempleado);
+			ps.setLong(2, ActualEnum.ACTUAL.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		log.info("GEnero  y cargo del empleado testigo : "+empleado.getGenero().getNombregenero());
+		return empleado;
+
+	}
+	
+	
+	/**
+	 *  Metodo para actualizar el estado de Disciplina.
+	 *  @param Disciplina. la relacion Disciplina a cambiarle el estado.
+	 *  @return Integer, Numero de filas alteradas.
+	 */
+	public Integer actualizarEstadoDisciplina(Disciplina disciplina) throws DatoException {
+		Integer filaAfectadas = 0;
+		
+		try {
+			String actualizacion = "UPDATE rrhh.disciplina "
+						  		  +"SET estado=?,idusuariomod=?,fechamod=getdate() "
+						          +"WHERE iddisciplina=?";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setInt(1, disciplina.getEstado());
+			ps.setInt(2, disciplina.getIdusuariomod());
+			ps.setLong(3, disciplina.getIddisciplina());
+
+			filaAfectadas = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return filaAfectadas;
+	}
+	
+
+	/**
+	 * Método para obtener el último estado de disciplina_historial.
+	 * @param Long. El idDisciplina.
+	 * @param Long. iddisciplina.
+	 * */
+	public DisciplinaEstado obtenerUltimoEstadoDisciplinaHistorial(Long idDisciplina)throws DatoException {
+		
+		DisciplinaEstado disciplinaEstado = null;
+
+		try {
+
+			String consulta = "SELECT TOP 1 de.iddisciplinaestado,de.estadodisciplina as estadoD,de.idusuariocrea, de.fechacrea, de.idusuariomod, de.fechamod, de.estado "
+							 +"FROM rrhh.disciplina_historial dh, rrhh.disciplina_estado de "
+							 +"WHERE dh.iddisciplinaestado = de.iddisciplinaestado "
+							 +"AND dh.iddisciplina = "+idDisciplina+" "
+							 +"ORDER BY dh.fechacrea desc";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				disciplinaEstado = new DisciplinaEstado();
+				
+				disciplinaEstado.setIddisciplinaestado(rs.getLong("iddisciplinaestado"));
+				disciplinaEstado.setEstadodisciplina(rs.getString("estadoD"));
+				disciplinaEstado.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				disciplinaEstado.setFechacrea(rs.getTimestamp("fechacrea"));
+				disciplinaEstado.setIdusuariomod(rs.getInt("idusuariomod"));
+				disciplinaEstado.setFechamod(rs.getTimestamp("fechamod"));
+				disciplinaEstado.setEstado(rs.getInt("estado"));
+				
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return disciplinaEstado;
+
+	}
+	
+	
+	/**
+	 * Método para saber si un empleado es testigo de un proceso.
+	 * @param Long. idEmpleado.
+	 * @param Long. idDisciplina.
+	 * */
+	public boolean empleadoEsTestigo(Long idEmpleado, Long idDisciplina)throws DatoException {
+		
+		boolean testigoRegistrado = false;
+
+		try {
+
+			String consulta = "SELECT dt.iddisciplinatestigo FROM rrhh.disciplina_testigo dt WHERE dt.idempleado = "+idEmpleado+" AND dt.iddisciplina = "+idDisciplina;
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				testigoRegistrado = true;
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return testigoRegistrado;
+
+	}
+
+	
+	 /**
+     * Método para obtener los estado de disciplina por grupo y estado.
+     * @param Integer. El idGrupo.
+     * @param Long. El idEstadoActual.
+     * @return List. DisciplinaEstado.
+     */
+	public List<DisciplinaEstado> obtenerListaEstadosPorGrupoYEstadoActual(Integer idGrupo, Long idEstadoActual) throws DatoException {
+
+		List<DisciplinaEstado> listaEstados = new ArrayList<DisciplinaEstado>();
+		DisciplinaEstado estado = null;
+		DisciplinaEstadoRol estadoRol = null;
+
+		try {
+			String consulta = "SELECT der.idgrupo, der.iddisciplinaestadoactual, der.iddisciplinaestadosiguiente,der.idusuariocrea, der.fechacrea, der.idusuariomod, der.fechamod, der.estado,"
+							 +"de.iddisciplinaestado, de.estadodisciplina, de.idusuariocrea as idcrea, de.fechacrea as fcrea, de.idusuariomod as idmod, de.fechamod as fmod, de.estado as est "
+							 +"FROM rrhh.disciplina_estado_rol der, rrhh.disciplina_estado de "
+							 +"WHERE der.iddisciplinaestadoactual = "+idEstadoActual+" "
+							 +"AND der.idgrupo = "+idGrupo+" "
+							 +"AND der.iddisciplinaestadosiguiente = de.iddisciplinaestado";
+										
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				estado = new DisciplinaEstado();
+				estadoRol = new DisciplinaEstadoRol();
+				
+				estado.setIddisciplinaestado(rs.getLong("iddisciplinaestado"));
+				estado.setEstadodisciplina(rs.getString("estadodisciplina"));
+				estado.setIdusuariocrea(rs.getInt("idcrea"));
+				estado.setFechacrea(rs.getTimestamp("fcrea"));
+				estado.setIdusuariomod(rs.getInt("idmod"));
+				estado.setFechamod(rs.getTimestamp("fmod"));
+				estado.setEstado(rs.getInt("est"));
+				
+				estadoRol.setIdgrupo(rs.getLong("idgrupo"));
+				estadoRol.setIddisciplinaestadoactual(rs.getLong("iddisciplinaestadoactual"));
+				estadoRol.setIddisciplinaestadosiguiente(rs.getLong("iddisciplinaestadosiguiente"));
+				estadoRol.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				estadoRol.setFechacrea(rs.getTimestamp("fechacrea"));
+				estadoRol.setIdusuariomod(rs.getInt("idusuariomod"));
+				estadoRol.setFechamod(rs.getTimestamp("fechamod"));
+				estadoRol.setEstado(rs.getInt("estado"));
+				
+				estado.setDisciplinaEstadoRol(estadoRol);
+				
+				listaEstados.add(estado);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaEstados;
+	}
+	
+	
+	 /**
+     * Método para obtener la lista de archivos asociados un disiciplinaHistorial.
+     * @param Long.iddisciplinahistorial. 
+     * @return List. DisciplinaHistorial.
+     */
+	public List<DisciplinaArchivo> obtenerListaArchivosPorIdDisciplinaHistorial(Long idDisciplinaHistorial) throws DatoException {
+
+		List<DisciplinaArchivo> listaArchivos = new ArrayList<DisciplinaArchivo>();
+		DisciplinaArchivo archivo = null;
+		DisciplinaArchivoTipo tipoArchivo = null;
+
+		try {
+			String consulta = "SELECT da.iddisciplinaarchivo, da.iddisciplinaarchivotipo, da.iddisciplinahistorial, da.nombrearchivo, da.rutaarchivo, da.tamanio,da.idusuariocrea, da.fechacrea,"
+							 +"da.idusuariomod, da.fechamod, da.estado,dat.iddisciplinaarchivotipo,dat.nombretipoarchivo "
+							 +"FROM rrhh.disciplina_archivo da,rrhh.disciplina_archivo_tipo dat "
+							 +"WHERE da.iddisciplinahistorial = "+idDisciplinaHistorial+" "
+							 +"AND da.iddisciplinaarchivotipo = dat.iddisciplinaarchivotipo "
+							 +"AND da.estado = "+EstadoEnum.ACTIVO.getIndex();
+										
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				archivo = new DisciplinaArchivo();
+				tipoArchivo = new DisciplinaArchivoTipo();
+				
+				archivo.setIddisciplinaarchivo(rs.getLong("iddisciplinaarchivo"));
+				archivo.setIddisciplinaarchivotipo(rs.getLong("iddisciplinaarchivotipo"));
+				archivo.setIddisciplinahistorial(rs.getLong("iddisciplinahistorial"));
+				archivo.setNombrearchivo(rs.getString("nombrearchivo"));
+				archivo.setRutaarchivo(rs.getString("rutaarchivo"));
+				archivo.setTamanio(rs.getLong("tamanio"));
+				archivo.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				archivo.setFechacrea(rs.getTimestamp("fechacrea"));
+				archivo.setIdusuariomod(rs.getInt("idusuariomod"));
+				archivo.setFechamod(rs.getTimestamp("fechamod"));
+				archivo.setEstado(rs.getInt("estado"));
+				
+				tipoArchivo.setIddisciplinaarchivotipo(rs.getLong("iddisciplinaarchivotipo"));
+				tipoArchivo.setNombretipoarchivo(rs.getString("nombretipoarchivo"));
+				
+				archivo.setDisciplinaArchivoTipo(tipoArchivo);
+				
+				listaArchivos.add(archivo);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaArchivos;
+	}
+	
+	
+	 /**
+     * Método para obtener la lista de archivos asociados un disiciplinaHistorial.
+     * @param Long.iddisciplinahistorial. 
+     * @return List. DisciplinaHistorial.
+     */
+	public List<Sancion> obtenerSancionesPorTiposDeFalta(String [] idtiposFalta) throws DatoException {
+
+		List<Sancion> listaSanciones = new ArrayList<Sancion>();
+		Sancion sancion = null;
+		FaltaTipo tipoFalta = null;
+		Falta falta = null;
+		
+		try {
+			String consulta = "SELECT "
+							 +"s.idsancion, s.idfalta,s.nombresancion, s.recurrencia, s.procedimiento, s.responsable, s.idusuariocrea, s.fechacrea, s.idusuariomod, s.fechamod, s.estado,"
+							 +"f.idfalta, f.idfaltatipo, f.faltanombre,f.estado as estadofalta,"
+							 +"ft.idfaltatipo, ft.nombrefaltatipo "
+							 +"FROM rrhh.sancion s "
+							 +"INNER JOIN rrhh.falta f on f.idfalta = s.idfalta "
+							 +"INNER JOIN rrhh.falta_tipo ft on ft.idfaltatipo = f.idfaltatipo "
+							 +"WHERE ft.idfaltatipo = ?";
+								
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+			
+			for(String idTipoFalta : idtiposFalta){
+				
+				ps.setLong(1, Long.valueOf(idTipoFalta));
+				rs = ps.executeQuery();
+				
+				while (rs.next()) {
+					sancion = new Sancion();
+					tipoFalta = new FaltaTipo();
+					falta = new Falta();
+					
+					sancion.setIdsancion(rs.getLong("idsancion"));
+					sancion.setIdfalta(rs.getLong("idfalta"));
+					sancion.setNombresancion(rs.getString("nombresancion"));
+					sancion.setRecurrencia(rs.getInt("recurrencia"));
+					sancion.setProcedimiento(rs.getString("procedimiento"));
+					sancion.setResponsable(rs.getString("responsable"));
+					sancion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+					sancion.setFechacrea(rs.getTimestamp("fechacrea"));
+					sancion.setIdusuariomod(rs.getInt("idusuariomod"));
+					sancion.setFechamod(rs.getTimestamp("fechamod"));
+					sancion.setEstado(rs.getInt("estado"));
+					
+					falta.setIdfalta(rs.getLong("idfalta"));
+					falta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+					falta.setFaltanombre(rs.getString("faltanombre"));
+					falta.setEstado(rs.getInt("estadofalta"));
+					
+					tipoFalta.setIdfaltatipo(rs.getLong("idfaltatipo"));
+					tipoFalta.setNombrefaltatipo(rs.getString("nombrefaltatipo"));
+					
+					sancion.setFalta(falta);
+					sancion.setFaltaTipo(tipoFalta);
+					
+					listaSanciones.add(sancion);
+					
+				}
+				
+			}
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaSanciones;
+	}
+	
+	
+	
+	
+	 /**
+     * Método para obtener la lista de formatos por id.
+     * @param Long.idFormato. 
+     * @return List. Formato.
+     */
+	public List<Formato> obtenerFormatosPorIdFormato(String [] idFormatos) throws DatoException {
+
+		Formato formato = null;
+		List<Formato> listaDeFormatos = new ArrayList<Formato>();
+		
+		try {
+			String consulta = "SELECT "
+							 +"f.idformato, f.nombreformato, f.rutaformato, f.idusuariocrea, f.fechacrea, f.idusuariomod, f.fechamod, f.estado "
+							 +"FROM rrhh.formato f "
+							+ "WHERE f.idformato =?";
+								
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+			
+			for(String idFormato : idFormatos){
+				
+				ps.setLong(1, Long.valueOf(idFormato));
+				rs = ps.executeQuery();
+				
+				while (rs.next()) {
+					formato =  new Formato();	
+					
+					formato.setIdformato(rs.getLong("idformato"));
+					formato.setNombreformato(rs.getString("nombreformato"));
+					formato.setIdusuariocrea(rs.getInt("idusuariocrea"));
+					formato.setFechacrea(rs.getTimestamp("fechacrea"));
+					formato.setIdusuariomod(rs.getInt("idusuariomod"));
+					formato.setFechamod(rs.getTimestamp("fechamod"));
+					formato.setEstado(rs.getInt("estado"));
+					
+					listaDeFormatos.add(formato);
+				}
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaDeFormatos;
+	}
+	
+	
+	/**
+	 *  Metodo para actualizar el estado la relacion Sancion.
+	 *  @param Sancion. la relacion Sancion a cambiarle el estado.
+	 *  @return Integer, Numero de filas alteradas.
+	 */
+	public Integer actualizarEstadoSancion(Sancion sancion) throws DatoException {
+		Integer filaAfectadas = 0;
+		
+		try {
+			String actualizacion = "UPDATE rrhh.sancion "
+						  		  +"SET estado=?,idusuariomod=?,fechamod=getdate() "
+						          +"WHERE idsancion=?";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setInt(1, sancion.getEstado());
+			ps.setInt(2, sancion.getIdusuariomod());
+			ps.setLong(3, sancion.getIdsancion());
+
+			filaAfectadas = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return filaAfectadas;
+	}
+	
+
+	/**
+	 *  Metodo para actualizar el estado la relacion Formato.
+	 *  @param Formato. la relacion Formato a cambiarle el estado.
+	 *  @return Integer, Numero de filas alteradas.
+	 */
+	public Integer actualizarEstadoFormato(Formato formato) throws DatoException {
+		Integer filaAfectadas = 0;
+		
+		try {
+			String actualizacion = "UPDATE rrhh.formato "
+						  		  +"SET estado=?,idusuariomod=?,fechamod=getdate() "
+						          +"WHERE idformato=?";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setInt(1, formato.getEstado());
+			ps.setInt(2, formato.getIdusuariomod());
+			ps.setLong(3, formato.getIdformato());
+
+			filaAfectadas = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return filaAfectadas;
+	}
+	
+	
+	/**
+	 *  Metodo para actualizar el estado la relacion FaltaTipo.
+	 *  @param FaltaTipo. la relacion Sancion a cambiarle el estado.
+	 *  @return Integer, Numero de filas alteradas.
+	 */
+	public Integer actualizarEstadoFaltaTipo(FaltaTipo tipoDeFalta) throws DatoException {
+		Integer filaAfectadas = 0;
+		
+		try {
+			String actualizacion = "UPDATE rrhh.falta_tipo "
+						  		  +"SET estado=?,idusuariomod=?,fechamod=getdate() "
+						          +"WHERE idfaltatipo=?";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setInt(1, tipoDeFalta.getEstado());
+			ps.setInt(2, tipoDeFalta.getIdusuariomod());
+			ps.setLong(3, tipoDeFalta.getIdfaltatipo());
+
+			filaAfectadas = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return filaAfectadas;
+	}
+	
+	/**
+	 *  Metodo para actualizar el estado la relacion Falta.
+	 *  @param Falta. la relacion Falta a cambiarle el estado.
+	 *  @return Integer, Numero de filas alteradas.
+	 */
+	public Integer actualizarEstadoFalta(Falta falta) throws DatoException {
+		Integer filaAfectadas = 0;
+		
+		try {
+			String actualizacion = "UPDATE rrhh.falta "
+						  		  +"SET estado=?,idusuariomod=?,fechamod=getdate() "
+						          +"WHERE idfalta=?";
+			
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setInt(1, falta.getEstado());
+			ps.setInt(2, falta.getIdusuariomod());
+			ps.setLong(3, falta.getIdfalta());
+
+			filaAfectadas = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return filaAfectadas;
+	}
+	
+}

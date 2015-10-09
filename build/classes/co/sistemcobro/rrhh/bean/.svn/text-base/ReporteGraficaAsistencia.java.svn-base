@@ -1,0 +1,50 @@
+package co.sistemcobro.rrhh.bean;
+
+import co.sistemcobro.asistencia.bean.Asistencia;
+
+public class ReporteGraficaAsistencia {
+
+	
+	private static final long serialVersionUID = 1L;
+	
+	private String fecha;
+	
+	private Integer tarde;
+	private Integer atiempo;
+	private Integer atiempoconflex;
+	private Integer falta;
+	
+	public String getFecha() {
+		return fecha;
+	}
+	public void setFecha(String fecha) {
+		this.fecha = fecha;
+	}
+	public Integer getTarde() {
+		return tarde;
+	}
+	public void setTarde(Integer tarde) {
+		this.tarde = tarde;
+	}
+	public Integer getAtiempo() {
+		return atiempo;
+	}
+	public void setAtiempo(Integer atiempo) {
+		this.atiempo = atiempo;
+	}
+	public Integer getAtiempoconflex() {
+		return atiempoconflex;
+	}
+	public void setAtiempoconflex(Integer atiempoconflex) {
+		this.atiempoconflex = atiempoconflex;
+	}
+	public Integer getFalta() {
+		return falta;
+	}
+	public void setFalta(Integer falta) {
+		this.falta = falta;
+	}
+	
+	
+	
+}

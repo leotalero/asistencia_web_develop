@@ -1,0 +1,65 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class AccesoTipo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idaccesotipo;
+	private String nombre;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer estado;
+
+	public Long getIdaccesotipo() {
+		return idaccesotipo;
+	}
+
+	public void setIdaccesotipo(Long idaccesotipo) {
+		this.idaccesotipo = idaccesotipo;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	@Override
+	public String toString() {
+		return "AccesoTipoBean [idaccesotipo=" + idaccesotipo + ", nombre=" + nombre + ", idusuariocrea=" + idusuariocrea + ", fechacrea=" + fechacrea + ", estado=" + estado + "]";
+	}
+
+}

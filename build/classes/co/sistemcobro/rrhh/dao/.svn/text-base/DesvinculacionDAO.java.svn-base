@@ -1,0 +1,1560 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.rrhh.bean.*;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class DesvinculacionDAO extends BaseDAO {
+
+	public DesvinculacionDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	
+	public List<Pregunta> getPreguntasporCuestionarioActivas(Long idcuestionario) throws DatoException {
+		Pregunta pregunta = null;
+		PreguntaTipo preguntatipo=null;
+		List<Pregunta> preguntas=new ArrayList<Pregunta>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select p.idpregunta,p.idcuestionario,p.idpreguntatipo,p.pregunta, p.obligatorio,");
+			q.append(" pt.idpreguntatipo,pt.nombrepreguntatipo,");
+			q.append(" p.idusuariocrea,p.fechacrea, p.idusuariomod, p.fechamod, p.estado ");
+			
+			q.append(" from rrhh.pregunta p  ");
+			q.append(" left join  rrhh.pregunta_tipo pt on pt.idpreguntatipo=p.idpreguntatipo and pt.estado=2");
+			q.append(" where p.idcuestionario =? and p.estado=? "
+					+ " order by p.idpregunta asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+			ps.setLong(1, idcuestionario);
+			ps.setLong(2, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				pregunta = new Pregunta();
+				pregunta.setIdpregunta(rs.getLong(c++));
+				pregunta.setIdcuestionario(rs.getLong(c++));
+				pregunta.setIdpreguntatipo(rs.getLong(c++));
+				pregunta.setPregunta(rs.getString(c++));
+				pregunta.setObligatorio(rs.getInt(c++));
+				preguntatipo =new PreguntaTipo();
+				preguntatipo.setIdpreguntatipo(rs.getLong(c++)); 
+				preguntatipo.setNombrepreguntatipo(rs.getString(c++)); 
+				
+				pregunta.setIdusuariocrea(rs.getInt(c++));
+				pregunta.setFechacrea(rs.getTimestamp(c++));
+				pregunta.setIdusuariomod(rs.getInt(c++));
+				pregunta.setFechamod(rs.getTimestamp(c++));
+				pregunta.setEstado(rs.getInt(c++));
+				
+				preguntas.add(pregunta);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return preguntas;
+
+	}
+	public List<Pregunta> getPreguntasporCuestionarioTodas(Long idcuestionario) throws DatoException {
+		Pregunta pregunta = null;
+		PreguntaTipo preguntatipo=null;
+		List<Pregunta> preguntas=new ArrayList<Pregunta>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select p.idpregunta,p.idcuestionario,p.idpreguntatipo,p.pregunta, p.obligatorio,");
+			q.append(" pt.idpreguntatipo,pt.nombrepreguntatipo,");
+			q.append(" p.idusuariocrea,p.fechacrea, p.idusuariomod, p.fechamod, p.estado ");
+			
+			q.append(" from rrhh.pregunta p  ");
+			q.append(" left join  rrhh.pregunta_tipo pt on pt.idpreguntatipo=p.idpreguntatipo and pt.estado=2");
+			q.append(" where p.idcuestionario =?  "
+					+ " order by p.idpregunta asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+			ps.setLong(1, idcuestionario);
+			//ps.setLong(2, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				pregunta = new Pregunta();
+				pregunta.setIdpregunta(rs.getLong(c++));
+				pregunta.setIdcuestionario(rs.getLong(c++));
+				pregunta.setIdpreguntatipo(rs.getLong(c++));
+				pregunta.setPregunta(rs.getString(c++));
+				pregunta.setObligatorio(rs.getInt(c++));
+				preguntatipo =new PreguntaTipo();
+				preguntatipo.setIdpreguntatipo(rs.getLong(c++)); 
+				preguntatipo.setNombrepreguntatipo(rs.getString(c++)); 
+				
+				pregunta.setIdusuariocrea(rs.getInt(c++));
+				pregunta.setFechacrea(rs.getTimestamp(c++));
+				pregunta.setIdusuariomod(rs.getInt(c++));
+				pregunta.setFechamod(rs.getTimestamp(c++));
+				pregunta.setEstado(rs.getInt(c++));
+				
+				preguntas.add(pregunta);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return preguntas;
+
+	}
+	public List<Opcion> getOpcionesporPreguntaActivos(Long idpregunta) throws DatoException {
+		Opcion opcion = null;
+		
+		List<Opcion> opciones=new ArrayList<Opcion>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select o.idopcion,o.idpregunta,o.opcion,");
+			//q.append(" pt.idpreguntatipo,pt.nombrepreguntatipo,");
+			q.append(" o.idusuariocrea,o.fechacrea, o.idusuariomod, o.fechamod, o.estado ");
+			
+			q.append(" from rrhh.opcion o  ");
+			
+			q.append(" where o.idpregunta =? and o.estado=? "
+					+ " order by o.idopcion asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+			ps.setLong(1, idpregunta);
+			ps.setLong(2, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				opcion = new Opcion();
+				opcion.setIdopcion(rs.getLong(c++));
+				opcion.setIdpregunta(rs.getLong(c++));
+				opcion.setOpcion(rs.getString(c++));
+				
+				
+				opcion.setIdusuariocrea(rs.getInt(c++));
+				opcion.setFechacrea(rs.getTimestamp(c++));
+				opcion.setIdusuariomod(rs.getInt(c++));
+				opcion.setFechamod(rs.getTimestamp(c++));
+				opcion.setEstado(rs.getInt(c++));
+				
+				opciones.add(opcion);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return opciones;
+
+	}
+	
+	public List<Opcion> getOpcionesporPregunta(Long idpregunta) throws DatoException {
+		Opcion opcion = null;
+		
+		List<Opcion> opciones=new ArrayList<Opcion>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select o.idopcion,o.idpregunta,o.opcion,");
+			//q.append(" pt.idpreguntatipo,pt.nombrepreguntatipo,");
+			q.append(" o.idusuariocrea,o.fechacrea, o.idusuariomod, o.fechamod, o.estado ");
+			
+			q.append(" from rrhh.opcion o  ");
+			
+			q.append(" where o.idpregunta =?  "
+					+ " order by o.idopcion asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+			ps.setLong(1, idpregunta);
+			//ps.setLong(2, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				opcion = new Opcion();
+				opcion.setIdopcion(rs.getLong(c++));
+				opcion.setIdpregunta(rs.getLong(c++));
+				opcion.setOpcion(rs.getString(c++));
+				
+				
+				opcion.setIdusuariocrea(rs.getInt(c++));
+				opcion.setFechacrea(rs.getTimestamp(c++));
+				opcion.setIdusuariomod(rs.getInt(c++));
+				opcion.setFechamod(rs.getTimestamp(c++));
+				opcion.setEstado(rs.getInt(c++));
+				
+				opciones.add(opcion);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return opciones;
+
+	}
+	
+	public List<ContratoRespuesta> getRespuestasporContratoPreguntaActiva(Long idcontrato) throws DatoException {
+		ContratoRespuesta contratorespuesta = null;
+		Pregunta pregunta = null;
+		Opcion opcion = null;
+		Respuesta respuesta = null;
+		PreguntaTipo preguntatipo=null;
+		List<ContratoRespuesta> contratorespuestas=new ArrayList<ContratoRespuesta>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select  cr.idcontrato,cr.idrespuesta,cr.idusuariocrea,cr.fechacrea, cr.idusuariomod, cr.fechamod, cr.estado,  "
+					+ "r.idrespuesta,r.idcuestionario,r.idpregunta,r.idopcion,r.texto,");
+			q.append(" p.idpregunta,p.idcuestionario,p.idpreguntatipo,p.pregunta,p.obligatorio,");
+			q.append(" p.idusuariocrea,p.fechacrea, p.idusuariomod, p.fechamod, p.estado, ");
+			q.append(" pt.idpreguntatipo,pt.nombrepreguntatipo,");
+			q.append(" o.idopcion,o.idpregunta,o.opcion,");
+				
+			q.append(" o.idusuariocrea,o.fechacrea, o.idusuariomod, o.fechamod, o.estado ");
+			
+			q.append(" from rrhh.contrato_respuesta cr  ");
+			q.append(" left join  rrhh.respuesta r on r.idrespuesta=cr.idrespuesta ");
+			q.append(" left join  rrhh.pregunta p on p.idpregunta=r.idpregunta ");
+			q.append(" left join  rrhh.pregunta_tipo pt on pt.idpreguntatipo=p.idpreguntatipo and pt.estado=2");
+			q.append(" left join  rrhh.opcion o on o.idopcion=r.idopcion and o.estado=2");
+			
+			q.append(" where cr.idcontrato =? and p.estado=?  and cr.estado=2 "
+					+ " order by cr.idrespuesta asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+			ps.setLong(1, idcontrato);
+			ps.setLong(2, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contratorespuesta = new ContratoRespuesta();
+				contratorespuesta.setIdcontrato(rs.getLong(c++));
+				contratorespuesta.setIdrespuesta(rs.getLong(c++));
+				contratorespuesta.setIdusuariocrea(rs.getInt(c++));
+				contratorespuesta.setFechacrea(rs.getTimestamp(c++));
+				contratorespuesta.setIdusuariomod(rs.getInt(c++));
+				contratorespuesta.setFechamod(rs.getTimestamp(c++));
+				contratorespuesta.setEstado(rs.getInt(c++));
+				
+				respuesta=new Respuesta();
+				respuesta.setIdrespuesta(rs.getLong(c++));
+				respuesta.setIdcuestionario(rs.getLong(c++));
+				respuesta.setIdpregunta(rs.getLong(c++));
+				respuesta.setIdopcion(rs.getLong(c++));
+				String temptexto = rs.getString(c++);
+				if(temptexto!=null ){
+					respuesta.setTexto(temptexto.toString().replace("&", "&amp;").replace("<", "&lt;").replace("\"", "'").replace(">", "&lt;"));
+				}else{
+					respuesta.setTexto(temptexto);
+				}
+				
+					
+				
+				
+				
+				pregunta = new Pregunta();
+				pregunta.setIdpregunta(rs.getLong(c++));
+				pregunta.setIdcuestionario(rs.getLong(c++));
+				pregunta.setIdpreguntatipo(rs.getLong(c++));
+				pregunta.setPregunta(rs.getString(c++));
+				pregunta.setObligatorio(rs.getInt(c++));
+				
+				
+				pregunta.setIdusuariocrea(rs.getInt(c++));
+				pregunta.setFechacrea(rs.getTimestamp(c++));
+				pregunta.setIdusuariomod(rs.getInt(c++));
+				pregunta.setFechamod(rs.getTimestamp(c++));
+				pregunta.setEstado(rs.getInt(c++));
+				
+				preguntatipo =new PreguntaTipo();
+				preguntatipo.setIdpreguntatipo(rs.getLong(c++)); 
+				preguntatipo.setNombrepreguntatipo(rs.getString(c++)); 
+				
+				opcion = new Opcion();
+				opcion.setIdopcion(rs.getLong(c++));
+				opcion.setIdpregunta(rs.getLong(c++));
+				opcion.setOpcion(rs.getString(c++));
+				
+				
+				opcion.setIdusuariocrea(rs.getInt(c++));
+				opcion.setFechacrea(rs.getTimestamp(c++));
+				opcion.setIdusuariomod(rs.getInt(c++));
+				opcion.setFechamod(rs.getTimestamp(c++));
+				opcion.setEstado(rs.getInt(c++));
+				
+				respuesta.setPregunta(pregunta);
+				respuesta.setOpcion(opcion);
+				contratorespuesta.setRespuesta(respuesta);
+				
+				contratorespuestas.add(contratorespuesta);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return contratorespuestas;
+
+	}
+	public List<ContratoRespuesta> getRespuestasporContratoTodasPreguntas(Long idcontrato) throws DatoException {
+		ContratoRespuesta contratorespuesta = null;
+		Pregunta pregunta = null;
+		Opcion opcion = null;
+		Respuesta respuesta = null;
+		PreguntaTipo preguntatipo=null;
+		List<ContratoRespuesta> contratorespuestas=new ArrayList<ContratoRespuesta>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select  cr.idcontrato,cr.idrespuesta,cr.idusuariocrea,cr.fechacrea, cr.idusuariomod, cr.fechamod, cr.estado,  "
+					+ "r.idrespuesta,r.idcuestionario,r.idpregunta,r.idopcion,r.texto,");
+			q.append(" p.idpregunta,p.idcuestionario,p.idpreguntatipo,p.pregunta,p.obligatorio,");
+			q.append(" p.idusuariocrea,p.fechacrea, p.idusuariomod, p.fechamod, p.estado, ");
+			q.append(" pt.idpreguntatipo,pt.nombrepreguntatipo,");
+			q.append(" o.idopcion,o.idpregunta,o.opcion,");
+				
+			q.append(" o.idusuariocrea,o.fechacrea, o.idusuariomod, o.fechamod, o.estado ");
+			
+			q.append(" from rrhh.contrato_respuesta cr  ");
+			q.append(" left join  rrhh.respuesta r on r.idrespuesta=cr.idrespuesta ");
+			q.append(" left join  rrhh.pregunta p on p.idpregunta=r.idpregunta ");
+			q.append(" left join  rrhh.pregunta_tipo pt on pt.idpreguntatipo=p.idpreguntatipo and pt.estado=2");
+			q.append(" left join  rrhh.opcion o on o.idopcion=r.idopcion ");
+			
+			q.append(" where cr.idcontrato =? and cr.estado=2 "
+					+ " order by cr.idrespuesta asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+			ps.setLong(1, idcontrato);
+			//ps.setLong(2, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contratorespuesta = new ContratoRespuesta();
+				contratorespuesta.setIdcontrato(rs.getLong(c++));
+				contratorespuesta.setIdrespuesta(rs.getLong(c++));
+				contratorespuesta.setIdusuariocrea(rs.getInt(c++));
+				contratorespuesta.setFechacrea(rs.getTimestamp(c++));
+				contratorespuesta.setIdusuariomod(rs.getInt(c++));
+				contratorespuesta.setFechamod(rs.getTimestamp(c++));
+				contratorespuesta.setEstado(rs.getInt(c++));
+				
+				respuesta=new Respuesta();
+				respuesta.setIdrespuesta(rs.getLong(c++));
+				respuesta.setIdcuestionario(rs.getLong(c++));
+				respuesta.setIdpregunta(rs.getLong(c++));
+				respuesta.setIdopcion(rs.getLong(c++));
+				respuesta.setTexto(rs.getString(c++));
+				
+				
+				
+				pregunta = new Pregunta();
+				pregunta.setIdpregunta(rs.getLong(c++));
+				pregunta.setIdcuestionario(rs.getLong(c++));
+				pregunta.setIdpreguntatipo(rs.getLong(c++));
+				pregunta.setPregunta(rs.getString(c++));
+				pregunta.setObligatorio(rs.getInt(c++));
+				
+				
+				pregunta.setIdusuariocrea(rs.getInt(c++));
+				pregunta.setFechacrea(rs.getTimestamp(c++));
+				pregunta.setIdusuariomod(rs.getInt(c++));
+				pregunta.setFechamod(rs.getTimestamp(c++));
+				pregunta.setEstado(rs.getInt(c++));
+				
+				preguntatipo =new PreguntaTipo();
+				preguntatipo.setIdpreguntatipo(rs.getLong(c++)); 
+				preguntatipo.setNombrepreguntatipo(rs.getString(c++)); 
+				
+				opcion = new Opcion();
+				opcion.setIdopcion(rs.getLong(c++));
+				opcion.setIdpregunta(rs.getLong(c++));
+				opcion.setOpcion(rs.getString(c++));
+				
+				
+				opcion.setIdusuariocrea(rs.getInt(c++));
+				opcion.setFechacrea(rs.getTimestamp(c++));
+				opcion.setIdusuariomod(rs.getInt(c++));
+				opcion.setFechamod(rs.getTimestamp(c++));
+				opcion.setEstado(rs.getInt(c++));
+				
+				respuesta.setPregunta(pregunta);
+				respuesta.setOpcion(opcion);
+				contratorespuesta.setRespuesta(respuesta);
+				
+				contratorespuestas.add(contratorespuesta);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return contratorespuestas;
+
+	}
+	public Integer ActualizarRespuestasDesvinculacion(List<Respuesta> respuestas) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.respuesta set idcuestionario=?, idpregunta=?, idopcion=?, texto=?,estado=?, ");
+			
+			q.append(" idusuariomod=?, fechamod=getdate() where idrespuesta=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			
+			for(Respuesta r:respuestas){
+				c = 1;
+				ps.setLong(c++, r.getIdcuestionario());
+				ps.setLong(c++, r.getIdpregunta());
+				ps.setLong(c++, r.getIdopcion());
+				ps.setString(c++, r.getTexto());
+				
+			
+				ps.setInt(c++, r.getEstado());
+				ps.setInt(c++, r.getIdusuariomod());
+				ps.setLong(c++, r.getIdrespuesta());
+
+				estatus = ps.executeUpdate();
+			}
+			
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	public Integer deshabilitarRespuestasDesvinculacion(List<ContratoRespuesta> con_respuestas) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.contrato_respuesta set estado=?, ");
+			
+			q.append(" idusuariomod=?, fechamod=getdate() where idcontrato=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			
+			for(ContratoRespuesta r:con_respuestas){
+				c = 1;
+				
+			
+				ps.setInt(c++, r.getEstado());
+				ps.setInt(c++, r.getIdusuariomod());
+				ps.setLong(c++, r.getIdcontrato());
+
+				estatus = ps.executeUpdate();
+			}
+			
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	public List<Respuesta> insertarRespuestasDesvinculacion(List<Respuesta> respuestas) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.respuesta (idcuestionario, idpregunta,idopcion,texto, ");
+			q.append("idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(), Statement.RETURN_GENERATED_KEYS);
+			
+
+			
+			
+			for(Respuesta r:respuestas){
+				c = 1;
+				ps.setLong(c++, r.getIdcuestionario());
+				ps.setLong(c++, r.getIdpregunta());
+				if(r.getIdopcion()== null){
+					ps.setNull(c++, java.sql.Types.NVARCHAR);
+				}else{
+					ps.setLong(c++, r.getIdopcion());
+				}
+				
+				if(r.getTexto()== null){
+					ps.setNull(c++, java.sql.Types.NVARCHAR);
+				}else{
+					ps.setString(c++, r.getTexto().replace("&", "&amp;").replace("<", "&lt;").replace("\"", "'").replace(">", "&lt;"));
+				}
+				
+				ps.setInt(c++, r.getIdusuariocrea());
+				ps.setInt(c++, r.getEstado());
+			
+				//ps.setLong(c++, r.getIdrespuesta());
+
+				estatus = estatus + ps.executeUpdate();
+				rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+					r.setIdrespuesta(rs.getLong(1));
+				} else {
+					throw new SQLException("Respuesta,No pudo insertar respuesta.");
+				}
+				estatus++;
+			}
+			
+			
+			
+		
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return respuestas;
+
+	}
+	
+	
+	public List<ContratoRespuesta> insertarContratoRespuestas(List<ContratoRespuesta> con_respuestas) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.contrato_respuesta (idcontrato, idrespuesta, ");
+			q.append("idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(), Statement.RETURN_GENERATED_KEYS);
+			
+
+			
+			
+			for(ContratoRespuesta r:con_respuestas){
+				c = 1;
+				ps.setLong(c++, r.getIdcontrato());
+				ps.setLong(c++, r.getIdrespuesta());
+				
+				ps.setInt(c++, r.getIdusuariocrea());
+				ps.setInt(c++, r.getEstado());
+				
+				
+
+				estatus = estatus + ps.executeUpdate();
+				rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+					r.setIdrespuesta(rs.getLong(1));
+				} else {
+					throw new SQLException("Respuesta,No pudo insertar respuesta.");
+				}
+				estatus++;
+			}
+			
+			
+			
+		
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return con_respuestas;
+
+	}
+	
+	public List<Proceso> getAllProcesos() throws DatoException {
+		Proceso proceso = null;
+		
+		List<Proceso> procesos=new ArrayList<Proceso>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select p.idproceso,p.nombreproceso,p.color,");
+			q.append(" ");
+			q.append(" p.idusuariocrea,p.fechacrea, p.idusuariomod, p.fechamod, p.estado ");
+			
+			q.append(" from rrhh.proceso p  ");
+			//q.append(" left join  rrhh.pregunta_tipo pt on pt.idpreguntatipo=p.idpreguntatipo and pt.estado=2");
+			q.append(" where p.estado=? "
+					+ " order by p.idproceso asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				proceso = new Proceso();
+				proceso.setIdproceso(rs.getLong(c++));
+				proceso.setNombreproceso(rs.getString(c++));
+				proceso.setColor(rs.getString(c++));
+				
+				proceso.setIdusuariocrea(rs.getInt(c++));
+				proceso.setFechacrea(rs.getTimestamp(c++));
+				proceso.setIdusuariomod(rs.getInt(c++));
+				proceso.setFechamod(rs.getTimestamp(c++));
+				proceso.setEstado(rs.getInt(c++));
+				
+				procesos.add(proceso);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return procesos;
+
+	}
+
+	public List<ContratoProceso> insertarContratoProceso(List<ContratoProceso> con_proceso) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.contrato_proceso (idcontrato,idproceso, idprocesoestado, ");
+			q.append("idusuariocrea, fechacrea, estado,porcentaje)  ");
+			q.append("values (?,?,?,?,getdate(),?,?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(), Statement.RETURN_GENERATED_KEYS);
+			
+
+			
+			
+			for(ContratoProceso r:con_proceso){
+				c = 1;
+				ps.setLong(c++, r.getIdcontrato());
+				ps.setLong(c++, r.getIdproceso());
+				ps.setLong(c++, r.getIdprocesoestado());
+				ps.setInt(c++, r.getIdusuariocrea());
+				ps.setInt(c++, r.getEstado());
+				ps.setInt(c++, r.getPorcentaje());
+				
+				
+
+				estatus = estatus + ps.executeUpdate();
+				rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+					r.setIdcontratoproceso(rs.getLong(1));
+				} else {
+					throw new SQLException("Contrato Proceso,No pudo insertar respuesta.");
+				}
+				estatus++;
+			}
+			
+			
+			
+		
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return con_proceso;
+
+	}
+	public List<EstadoDesvinculacion> getAllEstadosDesvinculacion() throws DatoException {
+		EstadoDesvinculacion estadodesvinculacion = null;
+		
+		List<EstadoDesvinculacion> estadosdesvinculacion=new ArrayList<EstadoDesvinculacion>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select e.idestadodesvinculacion,e.nombreestado,");
+			q.append(" ");
+			q.append(" e.idusuariocrea,e.fechacrea, e.idusuariomod, e.fechamod, e.estado ");
+			
+			q.append(" from rrhh.estadodesvinculacion e  ");
+			//q.append(" left join  rrhh.pregunta_tipo pt on pt.idpreguntatipo=p.idpreguntatipo and pt.estado=2");
+			q.append(" where e.estado=? "
+					+ " order by e.idestadodesvinculacion asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				estadodesvinculacion = new EstadoDesvinculacion();
+				estadodesvinculacion.setIdestadodesvinculacion(rs.getLong(c++));
+				estadodesvinculacion.setNombreestado(rs.getString(c++));
+				
+				
+				estadodesvinculacion.setIdusuariocrea(rs.getInt(c++));
+				estadodesvinculacion.setFechacrea(rs.getTimestamp(c++));
+				estadodesvinculacion.setIdusuariomod(rs.getInt(c++));
+				estadodesvinculacion.setFechamod(rs.getTimestamp(c++));
+				estadodesvinculacion.setEstado(rs.getInt(c++));
+				
+				estadosdesvinculacion.add(estadodesvinculacion);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return estadosdesvinculacion;
+
+	}
+	
+	
+	
+	public EstadoDesvinculacion getAllEstadosDesvinculacionbyId( Long iddesvinculacion) throws DatoException {
+		EstadoDesvinculacion estadodesvinculacion = null;
+		
+		List<EstadoDesvinculacion> estadosdesvinculacion=new ArrayList<EstadoDesvinculacion>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select e.idestadodesvinculacion,e.nombreestado,");
+			q.append(" ");
+			q.append(" e.idusuariocrea,e.fechacrea, e.idusuariomod, e.fechamod, e.estado ");
+			
+			q.append(" from rrhh.estadodesvinculacion e  ");
+			//q.append(" left join  rrhh.pregunta_tipo pt on pt.idpreguntatipo=p.idpreguntatipo and pt.estado=2");
+			q.append(" where e.estado=? and e.idestadodesvinculacion=?"
+					+ " order by e.idestadodesvinculacion asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, iddesvinculacion);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				estadodesvinculacion = new EstadoDesvinculacion();
+				estadodesvinculacion.setIdestadodesvinculacion(rs.getLong(c++));
+				estadodesvinculacion.setNombreestado(rs.getString(c++));
+				
+				
+				estadodesvinculacion.setIdusuariocrea(rs.getInt(c++));
+				estadodesvinculacion.setFechacrea(rs.getTimestamp(c++));
+				estadodesvinculacion.setIdusuariomod(rs.getInt(c++));
+				estadodesvinculacion.setFechamod(rs.getTimestamp(c++));
+				estadodesvinculacion.setEstado(rs.getInt(c++));
+				
+			//	estadosdesvinculacion.add(estadodesvinculacion);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return estadodesvinculacion;
+
+	}
+	
+	
+	
+	public List<ContratoProceso> getAllContratoProcesoporContrato(Long idcontrato) throws DatoException {
+		ContratoProceso contratoproceso = null;
+		Proceso proceso=null;
+		ProcesoEstado procesoestado=null;
+		List<ContratoProceso> contratoprocesos=new ArrayList<ContratoProceso>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select cp.idcontratoproceso,cp.idcontrato,cp.idproceso,cp.idprocesoestado,cp.porcentaje,");
+			q.append(" ");
+			q.append(" cp.idusuariocrea,cp.fechacrea, cp.idusuariomod, cp.fechamod, cp.estado, ");
+			q.append(" p.idproceso,p.nombreproceso ,p.color,");
+			q.append(" pe.idprocesoestado,pe.nombreestado ");
+			q.append(" from rrhh.contrato_proceso cp ");
+			q.append(" inner join  rrhh.proceso p on p.idproceso=cp.idproceso ");
+			q.append(" inner join  rrhh.proceso_estado pe on pe.idprocesoestado=cp.idprocesoestado ");
+			
+			q.append(" where cp.estado=? and cp.idcontrato=? "
+					+ " order by cp.idcontratoproceso asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idcontrato);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contratoproceso = new ContratoProceso();
+				contratoproceso.setIdcontratoproceso(rs.getLong(c++));
+				contratoproceso.setIdcontrato(rs.getLong(c++));
+				contratoproceso.setIdproceso(rs.getLong(c++));
+				contratoproceso.setIdprocesoestado(rs.getInt(c++));
+				contratoproceso.setPorcentaje(rs.getInt(c++));
+				
+				contratoproceso.setIdusuariocrea(rs.getInt(c++));
+				contratoproceso.setFechacrea(rs.getTimestamp(c++));
+				contratoproceso.setIdusuariomod(rs.getInt(c++));
+				contratoproceso.setFechamod(rs.getTimestamp(c++));
+				contratoproceso.setEstado(rs.getInt(c++));
+				
+				proceso = new Proceso();
+				proceso.setIdproceso(rs.getLong(c++));
+				proceso.setNombreproceso(rs.getString(c++));
+				proceso.setColor(rs.getString(c++));
+				
+				procesoestado = new ProcesoEstado();
+				procesoestado.setIdprocesoestado(rs.getLong(c++));
+				procesoestado.setNombreestado(rs.getString(c++));
+				
+				contratoproceso.setProcesoestado(procesoestado);
+				
+				contratoproceso.setProceso(proceso);
+				
+				contratoprocesos.add(contratoproceso);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return contratoprocesos;
+
+	}
+	
+	public ContratoProceso getContratoProcesoporIdContratoyIdproceso(Long idcontrato,Long idproceso ) throws DatoException {
+		ContratoProceso contratoproceso = null;
+		Proceso proceso=null;
+		ProcesoEstado procesoestado=null;
+		List<ContratoProceso> contratoprocesos=new ArrayList<ContratoProceso>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select cp.idcontratoproceso,cp.idcontrato,cp.idproceso,cp.idprocesoestado,cp.porcentaje,");
+			q.append(" ");
+			q.append(" cp.idusuariocrea,cp.fechacrea, cp.idusuariomod, cp.fechamod, cp.estado, ");
+			q.append(" p.idproceso,p.nombreproceso ,p.color,");
+			q.append(" pe.idprocesoestado,pe.nombreestado ");
+			q.append(" from rrhh.contrato_proceso cp ");
+			q.append(" inner join  rrhh.proceso p on p.idproceso=cp.idproceso ");
+			q.append(" inner join  rrhh.proceso_estado pe on pe.idprocesoestado=cp.idprocesoestado ");
+			
+			q.append(" where cp.estado=? and cp.idcontrato=? and cp.idproceso=? "
+					+ " order by cp.idcontratoproceso asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idcontrato);
+			ps.setLong(3, idproceso);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contratoproceso = new ContratoProceso();
+				contratoproceso.setIdcontratoproceso(rs.getLong(c++));
+				contratoproceso.setIdcontrato(rs.getLong(c++));
+				contratoproceso.setIdproceso(rs.getLong(c++));
+				contratoproceso.setIdprocesoestado(rs.getInt(c++));
+				contratoproceso.setPorcentaje(rs.getInt(c++));
+				
+				contratoproceso.setIdusuariocrea(rs.getInt(c++));
+				contratoproceso.setFechacrea(rs.getTimestamp(c++));
+				contratoproceso.setIdusuariomod(rs.getInt(c++));
+				contratoproceso.setFechamod(rs.getTimestamp(c++));
+				contratoproceso.setEstado(rs.getInt(c++));
+				
+				proceso = new Proceso();
+				proceso.setIdproceso(rs.getLong(c++));
+				proceso.setNombreproceso(rs.getString(c++));
+				proceso.setColor(rs.getString(c++));
+				
+				procesoestado = new ProcesoEstado();
+				procesoestado.setIdprocesoestado(rs.getLong(c++));
+				procesoestado.setNombreestado(rs.getString(c++));
+				
+				contratoproceso.setProcesoestado(procesoestado);
+				
+				contratoproceso.setProceso(proceso);
+				
+				//contratoprocesos.add(contratoproceso);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return contratoproceso;
+
+	}
+	
+	public ContratoProceso getContratoProcesoporId(Long idcontratoproceso ) throws DatoException {
+		ContratoProceso contratoproceso = null;
+		Proceso proceso=null;
+		ProcesoEstado procesoestado=null;
+		List<ContratoProceso> contratoprocesos=new ArrayList<ContratoProceso>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select cp.idcontratoproceso,cp.idcontrato,cp.idproceso,cp.idprocesoestado,cp.porcentaje,");
+			q.append(" ");
+			q.append(" cp.idusuariocrea,cp.fechacrea, cp.idusuariomod, cp.fechamod, cp.estado, ");
+			q.append(" p.idproceso,p.nombreproceso ,p.color,");
+			q.append(" pe.idprocesoestado,pe.nombreestado ");
+			q.append(" from rrhh.contrato_proceso cp ");
+			q.append(" inner join  rrhh.proceso p on p.idproceso=cp.idproceso ");
+			q.append(" inner join  rrhh.proceso_estado pe on pe.idprocesoestado=cp.idprocesoestado ");
+			
+			q.append(" where cp.estado=? and cp.idcontratoproceso=?  "
+					+ " order by cp.idcontratoproceso asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idcontratoproceso);
+		
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contratoproceso = new ContratoProceso();
+				contratoproceso.setIdcontratoproceso(rs.getLong(c++));
+				contratoproceso.setIdcontrato(rs.getLong(c++));
+				contratoproceso.setIdproceso(rs.getLong(c++));
+				contratoproceso.setIdprocesoestado(rs.getInt(c++));
+				contratoproceso.setPorcentaje(rs.getInt(c++));
+				
+				contratoproceso.setIdusuariocrea(rs.getInt(c++));
+				contratoproceso.setFechacrea(rs.getTimestamp(c++));
+				contratoproceso.setIdusuariomod(rs.getInt(c++));
+				contratoproceso.setFechamod(rs.getTimestamp(c++));
+				contratoproceso.setEstado(rs.getInt(c++));
+				
+				proceso = new Proceso();
+				proceso.setIdproceso(rs.getLong(c++));
+				proceso.setNombreproceso(rs.getString(c++));
+				proceso.setColor(rs.getString(c++));
+				
+				procesoestado = new ProcesoEstado();
+				procesoestado.setIdprocesoestado(rs.getLong(c++));
+				procesoestado.setNombreestado(rs.getString(c++));
+				
+				contratoproceso.setProcesoestado(procesoestado);
+				
+				contratoproceso.setProceso(proceso);
+				
+				//contratoprocesos.add(contratoproceso);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return contratoproceso;
+
+	}
+	public List<ContratoProcesoPropiedad> getAllPropiedadProcesoporContrato(Long idcontrato,Long idproceso) throws DatoException {
+		ContratoProcesoPropiedad contratoprocesopropiedad = null;
+		ProcesoPropiedad procesopropiedad=null;
+		Proceso proceso=null;
+		List<ContratoProcesoPropiedad> contratoprocesopropiedades=new ArrayList<ContratoProcesoPropiedad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select cpp.idcontratoprocesopropiedad,cpp.idcontrato,cpp.idprocesopropiedad,cpp.dato,cpp.datoamostrar,cpp.observacion,");
+			q.append(" ");
+			q.append(" cpp.idusuariocrea,cpp.fechacrea, cpp.idusuariomod, cpp.fechamod, cpp.estado, ");
+			q.append(" pp.idprocesopropiedad,pp.idproceso,pp.nombrepropiedad,");
+			q.append(" p.idproceso,p.nombreproceso,p.color ");
+			q.append(" from rrhh.contrato_proceso_propiedad cpp ");
+			q.append(" inner join  rrhh.proceso_propiedad pp on pp.idprocesopropiedad=cpp.idprocesopropiedad");
+			q.append(" inner join  rrhh.proceso p on p.idproceso=pp.idproceso ");
+			
+			
+			
+			q.append(" where cpp.idcontrato=? and p.idproceso=?"
+					+ " order by cpp.idcontratoprocesopropiedad asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			//ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(1, idcontrato);
+			ps.setLong(2,idproceso);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contratoprocesopropiedad = new ContratoProcesoPropiedad();
+				contratoprocesopropiedad.setIdcontratoprocesopropiedad(rs.getLong(c++));
+				contratoprocesopropiedad.setIdcontrato(rs.getLong(c++));
+				contratoprocesopropiedad.setIdprocesopropiedad(rs.getLong(c++));
+				contratoprocesopropiedad.setDato(rs.getString(c++));
+				contratoprocesopropiedad.setDatoamostrar(rs.getString(c++));
+				contratoprocesopropiedad.setObservacion(rs.getString(c++));
+				
+				contratoprocesopropiedad.setIdusuariocrea(rs.getInt(c++));
+				contratoprocesopropiedad.setFechacrea(rs.getTimestamp(c++));
+				contratoprocesopropiedad.setIdusuariomod(rs.getInt(c++));
+				contratoprocesopropiedad.setFechamod(rs.getTimestamp(c++));
+				contratoprocesopropiedad.setEstado(rs.getInt(c++));
+				
+				procesopropiedad = new ProcesoPropiedad();
+				procesopropiedad.setIdprocesopropiedad(rs.getLong(c++));
+				procesopropiedad.setIdproceso(rs.getLong(c++));
+				procesopropiedad.setNombrepropiedad(rs.getString(c++));
+				
+				proceso = new Proceso();
+				proceso.setIdproceso(rs.getLong(c++));
+				proceso.setNombreproceso(rs.getString(c++));
+				proceso.setColor(rs.getString(c++));
+				
+				procesopropiedad.setProceso(proceso);
+				
+				contratoprocesopropiedad.setProcesopropiedad(procesopropiedad);
+				
+				
+				contratoprocesopropiedades.add(contratoprocesopropiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return contratoprocesopropiedades;
+
+	}
+	public List<ProcesoEstado> getAllprocesoEstados() throws DatoException {
+		ProcesoEstado procesoestado = null;
+		
+		List<ProcesoEstado> procesoestados=new ArrayList<ProcesoEstado>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select e.idprocesoestado,e.nombreestado,");
+			q.append(" ");
+			q.append(" e.idusuariocrea,e.fechacrea, e.idusuariomod, e.fechamod, e.estado ");
+			
+			q.append(" from rrhh.proceso_estado e  ");
+			//q.append(" left join  rrhh.pregunta_tipo pt on pt.idpreguntatipo=p.idpreguntatipo and pt.estado=2");
+			q.append(" where e.estado=? "
+					+ " order by e.idprocesoestado asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				procesoestado = new ProcesoEstado();
+				procesoestado.setIdprocesoestado(rs.getLong(c++));
+				procesoestado.setNombreestado(rs.getString(c++));
+				
+				
+				procesoestado.setIdusuariocrea(rs.getInt(c++));
+				procesoestado.setFechacrea(rs.getTimestamp(c++));
+				procesoestado.setIdusuariomod(rs.getInt(c++));
+				procesoestado.setFechamod(rs.getTimestamp(c++));
+				procesoestado.setEstado(rs.getInt(c++));
+				
+				procesoestados.add(procesoestado);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return procesoestados;
+
+	}
+	
+	public List<ProcesoPropiedad> getAllProcesoPropiedadporIdproceso(Long idproceso) throws DatoException {
+		ProcesoPropiedad procesopropiedad = null;
+		
+		List<ProcesoPropiedad> procesospropiedades=new ArrayList<ProcesoPropiedad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select pp.idprocesopropiedad,pp.idproceso,pp.nombrepropiedad,");
+			q.append(" ");
+			q.append(" pp.idusuariocrea,pp.fechacrea, pp.idusuariomod, pp.fechamod, pp.estado ");
+			
+		
+			q.append(" from rrhh.proceso_propiedad pp ");
+			
+			
+			q.append(" where pp.estado=? and pp.idproceso=? "
+					+ " order by pp.idprocesopropiedad asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idproceso);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				procesopropiedad = new ProcesoPropiedad();
+				procesopropiedad.setIdprocesopropiedad(rs.getLong(c++));
+				procesopropiedad.setIdproceso(rs.getLong(c++));
+			
+				procesopropiedad.setNombrepropiedad(rs.getString(c++));
+				
+				procesopropiedad.setIdusuariocrea(rs.getInt(c++));
+				procesopropiedad.setFechacrea(rs.getTimestamp(c++));
+				procesopropiedad.setIdusuariomod(rs.getInt(c++));
+				procesopropiedad.setFechamod(rs.getTimestamp(c++));
+				procesopropiedad.setEstado(rs.getInt(c++));
+				
+			
+				
+				procesospropiedades.add(procesopropiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return procesospropiedades;
+
+	}
+	
+	
+	public ProcesoPropiedad getProcesoPropiedadporIdprocesopropiedad(Long idprocesoropiedad) throws DatoException {
+		ProcesoPropiedad procesopropiedad = null;
+		
+		//List<ProcesoPropiedad> procesospropiedades=new ArrayList<ProcesoPropiedad>();
+		try {
+			StringBuffer q = new StringBuffer();
+			q.append("select pp.idprocesopropiedad,pp.idproceso,pp.nombrepropiedad,");
+			q.append(" ");
+			q.append(" pp.idusuariocrea,pp.fechacrea, pp.idusuariomod, pp.fechamod, pp.estado ");
+			
+		
+			q.append(" from rrhh.proceso_propiedad pp ");
+			
+			
+			q.append(" where pp.estado=? and pp.idprocesopropiedad=? "
+					+ " order by pp.idprocesopropiedad asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idprocesoropiedad);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				procesopropiedad = new ProcesoPropiedad();
+				procesopropiedad.setIdprocesopropiedad(rs.getLong(c++));
+				procesopropiedad.setIdproceso(rs.getLong(c++));
+			
+				procesopropiedad.setNombrepropiedad(rs.getString(c++));
+				
+				procesopropiedad.setIdusuariocrea(rs.getInt(c++));
+				procesopropiedad.setFechacrea(rs.getTimestamp(c++));
+				procesopropiedad.setIdusuariomod(rs.getInt(c++));
+				procesopropiedad.setFechamod(rs.getTimestamp(c++));
+				procesopropiedad.setEstado(rs.getInt(c++));
+				
+			
+				
+				//procesospropiedades.add(procesopropiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return procesopropiedad;
+
+	}
+	
+	public ContratoProcesoPropiedad insertarContratoprocesopropiedad(ContratoProcesoPropiedad contratoprocesopropiedad) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.contrato_proceso_propiedad (idcontrato,idprocesopropiedad, dato,datoamostrar,observacion, ");
+			q.append("idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(), Statement.RETURN_GENERATED_KEYS);
+			
+
+			
+			
+			
+				c = 1;
+				ps.setLong(c++, contratoprocesopropiedad.getIdcontrato());
+				ps.setLong(c++, contratoprocesopropiedad.getIdprocesopropiedad());
+				if(contratoprocesopropiedad.getDato()== null){
+					ps.setNull(c++, java.sql.Types.NVARCHAR);
+				}else{
+					ps.setString(c++, contratoprocesopropiedad.getDato());
+				}
+				if(contratoprocesopropiedad.getDatoamostrar()== null){
+					ps.setNull(c++, java.sql.Types.NVARCHAR);
+				}else{
+					ps.setString(c++, contratoprocesopropiedad.getDatoamostrar());
+				}
+				
+				if(contratoprocesopropiedad.getObservacion()== null){
+					ps.setNull(c++, java.sql.Types.NVARCHAR);
+				}else{
+					ps.setString(c++, contratoprocesopropiedad.getObservacion().replace("&", "&amp;").replace("<", "&lt;").replace("\"", "'").replace(">", "&lt;"));
+				}
+				
+				ps.setInt(c++, contratoprocesopropiedad.getIdusuariocrea());
+				ps.setInt(c++, contratoprocesopropiedad.getEstado());
+			
+				//ps.setLong(c++, r.getIdrespuesta());
+
+				estatus = estatus + ps.executeUpdate();
+				rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+					contratoprocesopropiedad.setIdcontratoprocesopropiedad(rs.getLong(1));
+				} else {
+					throw new SQLException("Respuesta,No pudo insertar respuesta.");
+				}
+				estatus++;
+		
+			
+			
+			
+		
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contratoprocesopropiedad;
+
+	}
+	
+	public ContratoProcesoPropiedad ActualizarContratoprocesoPropiedadcompleto(ContratoProcesoPropiedad contratoprocesopropiedad) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("update rrhh.contrato_proceso_propiedad	 set idcontrato=?, idprocesopropiedad=?, dato=?,datoamostrar=?,observacion=?,");
+			q.append(" idusuariomod=?, fechamod=getdate(),estado=? where idcontratoprocesopropiedad =? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			
+
+			
+			
+			
+				c = 1;
+				ps.setLong(c++, contratoprocesopropiedad.getIdcontrato());
+				ps.setLong(c++, contratoprocesopropiedad.getIdprocesopropiedad());
+				ps.setString(c++, contratoprocesopropiedad.getDato());
+				
+				if(contratoprocesopropiedad.getDatoamostrar()== null){
+					ps.setNull(c++, java.sql.Types.NVARCHAR);
+				}else{
+					ps.setString(c++, contratoprocesopropiedad.getDatoamostrar());
+				}
+				ps.setString(c++, contratoprocesopropiedad.getObservacion());
+				
+				ps.setInt(c++, contratoprocesopropiedad.getIdusuariomod());
+				ps.setInt(c++, contratoprocesopropiedad.getEstado());
+				ps.setLong(c++, contratoprocesopropiedad.getIdcontratoprocesopropiedad());
+				//ps.setLong(c++, r.getIdrespuesta());
+
+				estatus = ps.executeUpdate();
+				
+		
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contratoprocesopropiedad;
+
+	}
+	
+	public ContratoProceso ActualizarContratoproceso(ContratoProceso contratoproceso) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("update rrhh.contrato_proceso set idcontrato=?, idproceso=?, idprocesoestado=?,porcentaje=?,");
+			q.append(" idusuariomod=?, fechamod=getdate(),estado=? where idcontratoproceso =? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			
+
+			
+			
+			
+				c = 1;
+				ps.setLong(c++, contratoproceso.getIdcontrato());
+				ps.setLong(c++, contratoproceso.getIdproceso());
+				ps.setLong(c++, contratoproceso.getIdprocesoestado());
+				ps.setLong(c++, contratoproceso.getPorcentaje());
+				
+				ps.setInt(c++, contratoproceso.getIdusuariomod());
+				ps.setInt(c++, contratoproceso.getEstado());
+				ps.setLong(c++, contratoproceso.getIdcontratoproceso());
+				//ps.setLong(c++, r.getIdrespuesta());
+
+				estatus = ps.executeUpdate();
+				
+		
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contratoproceso;
+
+	}
+	
+	public ContratoProcesoPropiedad getPropiedadProcesoporId(Long idcontratoprocesopropiedad) throws DatoException {
+		ContratoProcesoPropiedad contratoprocesopropiedad = null;
+		ProcesoPropiedad procesopropiedad=null;
+		Proceso proceso=null;
+		List<ContratoProcesoPropiedad> contratoprocesopropiedades=new ArrayList<ContratoProcesoPropiedad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select cpp.idcontratoprocesopropiedad,cpp.idcontrato,cpp.idprocesopropiedad,cpp.dato,cpp.datoamostrar,cpp.observacion,");
+			q.append(" ");
+			q.append(" cpp.idusuariocrea,cpp.fechacrea, cpp.idusuariomod, cpp.fechamod, cpp.estado, ");
+			q.append(" pp.idprocesopropiedad,pp.idproceso,pp.nombrepropiedad,");
+			q.append(" p.idproceso,p.nombreproceso,p.color ");
+			q.append(" from rrhh.contrato_proceso_propiedad cpp ");
+			q.append(" inner join  rrhh.proceso_propiedad pp on pp.idprocesopropiedad=cpp.idprocesopropiedad");
+			q.append(" inner join  rrhh.proceso p on p.idproceso=pp.idproceso ");
+			
+			
+			
+			q.append(" where cpp.idcontratoprocesopropiedad=? "
+					+ " order by cpp.idcontratoprocesopropiedad asc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+		//	ps.setLong(1, idcuestionario);
+			//ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(1, idcontratoprocesopropiedad);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contratoprocesopropiedad = new ContratoProcesoPropiedad();
+				contratoprocesopropiedad.setIdcontratoprocesopropiedad(rs.getLong(c++));
+				contratoprocesopropiedad.setIdcontrato(rs.getLong(c++));
+				contratoprocesopropiedad.setIdprocesopropiedad(rs.getLong(c++));
+				contratoprocesopropiedad.setDato(rs.getString(c++));
+				contratoprocesopropiedad.setDatoamostrar(rs.getString(c++));
+				contratoprocesopropiedad.setObservacion(rs.getString(c++));
+				
+				contratoprocesopropiedad.setIdusuariocrea(rs.getInt(c++));
+				contratoprocesopropiedad.setFechacrea(rs.getTimestamp(c++));
+				contratoprocesopropiedad.setIdusuariomod(rs.getInt(c++));
+				contratoprocesopropiedad.setFechamod(rs.getTimestamp(c++));
+				contratoprocesopropiedad.setEstado(rs.getInt(c++));
+				
+				procesopropiedad = new ProcesoPropiedad();
+				procesopropiedad.setIdprocesopropiedad(rs.getLong(c++));
+				procesopropiedad.setIdproceso(rs.getLong(c++));
+				procesopropiedad.setNombrepropiedad(rs.getString(c++));
+				
+				proceso = new Proceso();
+				proceso.setIdproceso(rs.getLong(c++));
+				proceso.setNombreproceso(rs.getString(c++));
+				proceso.setColor(rs.getString(c++));
+				
+				procesopropiedad.setProceso(proceso);
+				
+				contratoprocesopropiedad.setProcesopropiedad(procesopropiedad);
+				
+				
+				//contratoprocesopropiedades.add(contratoprocesopropiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+	return contratoprocesopropiedad;
+
+	}
+	
+	public ContratoProcesoPropiedad ActualizarContratoprocesopropiedad(ContratoProcesoPropiedad contratoprocesopropiedad) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("update rrhh.contrato_proceso_propiedad set dato=?,datoamostrar=?, ");
+			q.append(" idusuariomod=?, fechamod=getdate(),estado=? where idcontratoprocesopropiedad =? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			
+				c = 1;
+	
+				ps.setString(c++, contratoprocesopropiedad.getDato());
+			
+				if(contratoprocesopropiedad.getDatoamostrar()== null){
+					ps.setNull(c++, java.sql.Types.NVARCHAR);
+				}else{
+					ps.setString(c++, contratoprocesopropiedad.getDatoamostrar());
+				}
+				ps.setInt(c++, contratoprocesopropiedad.getIdusuariomod());
+				ps.setInt(c++, contratoprocesopropiedad.getEstado());
+				ps.setLong(c++, contratoprocesopropiedad.getIdcontratoprocesopropiedad());
+				//ps.setLong(c++, r.getIdrespuesta());
+
+				estatus = ps.executeUpdate();
+				
+		
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contratoprocesopropiedad;
+
+	}
+	
+}

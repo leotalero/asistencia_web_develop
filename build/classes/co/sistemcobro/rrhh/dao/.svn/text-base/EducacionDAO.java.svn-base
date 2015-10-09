@@ -1,0 +1,406 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.rrhh.bean.EducacionEstado;
+import co.sistemcobro.rrhh.bean.EducacionNivel;
+import co.sistemcobro.rrhh.bean.EmpleadoEducacion;
+
+/**
+ * Para la gestión de datos sobre la educación del empleado.
+ * @author jpuentes
+ * 
+ */
+public class EducacionDAO extends BaseDAO{
+
+	Logger log = Logger.getLogger(EducacionDAO.class);
+	
+	/**
+	 * Constructor.
+	 */
+	public EducacionDAO(DataSource ds) {
+		this.ds = ds;
+	}
+	
+	
+	/**
+	 * Este método consulta los datos de educación de un empleado.
+	 * @param idempleado. El id del empleado.
+	 * @return List<EmpleadoEducacion>. La lista de datos de educacion del empleado.
+	 */
+	public List<EmpleadoEducacion> obtenerEducacionDeEmpleadoPorIdEmpleado(Long idEmpleado) throws DatoException{
+		
+		List<EmpleadoEducacion> listaEmpleadoEducacion = new ArrayList<EmpleadoEducacion>();
+		
+		EmpleadoEducacion empleadoEducacion= null;
+		EducacionNivel nivel = null;
+		EducacionEstado estado = null;
+				
+		try {
+
+			String consulta = "select edu.idempleadoeducacion,edu.ideducacionnivel,edu.ideducacionestado, edu.idempleado, edu.institucion, edu.carrera,"
+							 +"edu.titulo, edu.fechainicio, edu.fechafin, edu.observacion, edu.idusuariocrea, edu.fechacrea, edu.idusuariomod,edu.fechamod,"
+							 +"edu.estado, niv.ideducacionnivel, niv.nombreeducacionnivel,est.ideducacionestado, est.nombreeducacionestado "
+							 +"from rrhh.empleado_educacion edu,rrhh.educacion_nivel niv,rrhh.educacion_estado est "
+							 +"where edu.idempleado = "+idEmpleado+" "
+							 +"and est.ideducacionestado = edu.ideducacionestado "
+							 +"and niv.ideducacionnivel = edu.ideducacionnivel";
+											
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				empleadoEducacion =  new EmpleadoEducacion();
+				nivel = new EducacionNivel();
+				estado = new EducacionEstado();
+								
+				empleadoEducacion.setIdEmpleadoEducacion(rs.getLong("idempleadoeducacion"));
+				empleadoEducacion.setIdEducacionNivel(rs.getLong("ideducacionnivel"));
+				empleadoEducacion.setIdEducacionEstado(rs.getLong("ideducacionestado"));
+				empleadoEducacion.setIdEmpleado(rs.getLong("idempleado"));
+				empleadoEducacion.setInstitucion(rs.getString("institucion"));
+				empleadoEducacion.setCarrera(rs.getString("carrera"));
+				empleadoEducacion.setTitulo(rs.getString("titulo"));
+				empleadoEducacion.setFechaInicio(rs.getTimestamp("fechainicio"));
+				empleadoEducacion.setFechafin(rs.getTimestamp("fechafin"));
+				empleadoEducacion.setObservacion(rs.getString("observacion"));
+				empleadoEducacion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoEducacion.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoEducacion.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoEducacion.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoEducacion.setEstado(rs.getInt("estado"));
+				
+				nivel.setIdEducacionNivel(rs.getLong("ideducacionnivel"));
+				nivel.setNombreEducacionNivel(rs.getString("nombreeducacionnivel"));
+				
+				estado.setIdEducacionEstado(rs.getLong("ideducacionestado"));
+				estado.setNombreEducacionEstado(rs.getString("nombreeducacionestado"));
+				
+				empleadoEducacion.setNivelEducacion(nivel);
+				empleadoEducacion.setEstadoEducacion(estado);
+				
+				listaEmpleadoEducacion.add(empleadoEducacion);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaEmpleadoEducacion;
+	}
+	
+	/**
+	 * Este método consulta los niveles de educación existentes.
+	 * @return List. La lista de niveles de educación.
+	 */
+	public List<EducacionNivel> obtenerNivelesDeEducacion() throws DatoException{
+		
+		List<EducacionNivel> listaNivelesEducacion = new ArrayList<EducacionNivel>();
+		EducacionNivel nivel = null;
+				
+		try {
+
+			String consulta = "select ideducacionnivel,nombreeducacionnivel,idusuariocrea,fechacrea,idusuariomod,fechamod,estado from rrhh.educacion_nivel";
+											
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				nivel = new EducacionNivel();
+				nivel.setIdEducacionNivel(rs.getLong("ideducacionnivel"));
+				nivel.setNombreEducacionNivel(rs.getString("nombreeducacionnivel"));
+				nivel.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				nivel.setFechacrea(rs.getTimestamp("fechacrea"));
+				nivel.setIdusuariomod(rs.getInt("idusuariomod"));
+				nivel.setFechamod(rs.getTimestamp("fechamod"));
+				nivel.setEstado(rs.getInt("estado"));
+				listaNivelesEducacion.add(nivel);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaNivelesEducacion;
+	}
+	
+	/**
+	 * Este método consulta los estados de educación existentes.
+	 * @return List. La lista de niveles de educación.
+	 */
+	public List<EducacionEstado> obtenerEstadosDeEducacion() throws DatoException{
+		
+		List<EducacionEstado> listaEstadosEducacion = new ArrayList<EducacionEstado>();
+		EducacionEstado estado = null;
+				
+		try {
+
+			String consulta = "select ideducacionestado,nombreeducacionestado,idusuariocrea,fechacrea,idusuariomod,fechamod,estado from rrhh.educacion_estado";
+											
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				estado = new EducacionEstado();
+				
+				estado.setIdEducacionEstado(rs.getLong("ideducacionestado"));
+				estado.setNombreEducacionEstado(rs.getString("nombreeducacionestado"));
+				estado.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				estado.setFechacrea(rs.getTimestamp("fechacrea"));
+				estado.setIdusuariomod(rs.getInt("idusuariomod"));
+				estado.setFechamod(rs.getTimestamp("fechamod"));
+				estado.setEstado(rs.getInt("estado"));
+				
+				listaEstadosEducacion.add(estado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaEstadosEducacion;
+	}
+	
+	/**
+	 * Registrar una nueva relacion EmpleadoEducacion.
+	 * @param: EmpleadoEducacion a insertar.
+	 * @return: EmpleadoEducacion. El EmpleadoEducacion insertada.
+	 */
+	public EmpleadoEducacion insertarEmpleadoEducacion(EmpleadoEducacion empleadoEducacion) throws DatoException{
+		
+		Util.registerConverters();
+		try {
+						
+			String insercion ="insert into rrhh.empleado_educacion(ideducacionnivel,ideducacionestado,idempleado,institucion,carrera,titulo,fechainicio,fechafin,observacion,idusuariocrea,fechacrea,estado)"
+                             +"values (?,?,?,?,?,?,?,?,?,?,GETDATE(),?)";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setLong(1, empleadoEducacion.getIdEducacionNivel());
+			ps.setLong(2, empleadoEducacion.getIdEducacionEstado());
+			ps.setLong(3,empleadoEducacion.getIdEmpleado());
+			ps.setString(4, empleadoEducacion.getInstitucion());
+			ps.setString(5,empleadoEducacion.getCarrera());
+			ps.setString(6,empleadoEducacion.getTitulo());
+			ps.setTimestamp(7,empleadoEducacion.getFechaInicio());
+			
+			
+			if(empleadoEducacion.getFechafin()==null){
+				ps.setNull(8,java.sql.Types.TIMESTAMP );
+			}else{
+				ps.setTimestamp(8,empleadoEducacion.getFechafin());
+			}
+			
+			if(empleadoEducacion.getObservacion()==null){
+				ps.setNull(9, java.sql.Types.NVARCHAR);
+			}else{
+				ps.setString(9, empleadoEducacion.getObservacion());
+			}
+			
+			ps.setLong(10,empleadoEducacion.getIdusuariocrea());
+			ps.setInt(11,empleadoEducacion.getEstado());
+			
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			
+			if (rs.next()) {
+				empleadoEducacion.setIdEmpleadoEducacion(rs.getLong(1));
+			} else {
+				throw new SQLException("EmpleadoEducacion, no se pudo generar su IDEmpleadoEducacion.");
+			}
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoEducacion;
+	}
+	
+
+	/**
+	 * Obtener un EmpleadoEducacion por id.
+	 * @param idEmpleadoEducacion.
+	 * @return EmpleadoEducacion.
+	 */
+	public EmpleadoEducacion obtenerEmpleadoEducacionPorId(Long idEmpleadoEducacion)throws DatoException,IOException{
+	
+		EmpleadoEducacion empleadoEducacion = null;
+		EducacionEstado estadoEducacion  = null;
+		EducacionNivel nivel =  null;
+		
+		try{
+			String consulta = "select edu.idempleadoeducacion,edu.ideducacionnivel,edu.ideducacionestado, edu.idempleado, edu.institucion, edu.carrera,"
+							 +"edu.titulo, edu.fechainicio, edu.fechafin, edu.observacion, edu.idusuariocrea, edu.fechacrea, edu.idusuariomod,edu.fechamod,"
+							 +"edu.estado, niv.ideducacionnivel, niv.nombreeducacionnivel,est.ideducacionestado, est.nombreeducacionestado "
+							 +"from rrhh.empleado_educacion edu,rrhh.educacion_nivel niv,rrhh.educacion_estado est "
+							 +"where edu.idempleadoeducacion = "+idEmpleadoEducacion+" "
+							 +"and est.ideducacionestado = edu.ideducacionestado "
+							 +"and niv.ideducacionnivel = edu.ideducacionnivel";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				empleadoEducacion= new EmpleadoEducacion();
+				estadoEducacion =  new EducacionEstado();
+				nivel =  new EducacionNivel();
+			    
+				empleadoEducacion.setIdEmpleadoEducacion(rs.getLong("idempleadoeducacion"));
+				empleadoEducacion.setIdEducacionNivel(rs.getLong("ideducacionnivel"));
+				empleadoEducacion.setIdEducacionEstado(rs.getLong("ideducacionestado"));
+				empleadoEducacion.setIdEmpleado(rs.getLong("idempleado"));
+				empleadoEducacion.setInstitucion(rs.getString("institucion"));
+				empleadoEducacion.setCarrera(rs.getString("carrera"));
+				empleadoEducacion.setTitulo(rs.getString("titulo"));
+				empleadoEducacion.setFechaInicio(rs.getTimestamp("fechainicio"));
+				
+				log.info("FECHA FIN = "+rs.getTimestamp("fechafin"));
+				
+				empleadoEducacion.setFechafin(rs.getTimestamp("fechafin"));
+				empleadoEducacion.setObservacion(rs.getString("observacion"));
+				empleadoEducacion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoEducacion.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoEducacion.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoEducacion.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoEducacion.setEstado(rs.getInt("estado"));
+				
+				estadoEducacion.setIdEducacionEstado(rs.getLong("ideducacionestado"));
+				estadoEducacion.setNombreEducacionEstado(rs.getString("nombreeducacionestado"));
+				
+				nivel.setIdEducacionNivel(rs.getLong("ideducacionnivel"));
+				nivel.setNombreEducacionNivel(rs.getString("nombreeducacionnivel"));
+				
+				empleadoEducacion.setEstadoEducacion(estadoEducacion);
+				empleadoEducacion.setNivelEducacion(nivel);
+			}
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoEducacion;
+	}
+	
+
+	/**
+	 * Editar EmpleadoEducacion.
+	 * @param EmpleadoEducacion, El EmpleadoEducacion a editar.
+	 * @return Integer. El numero de filas afectadas.
+	 */
+	public Integer editarEmpleadoEducacion(EmpleadoEducacion empleadoEducacion) throws DatoException {
+		Integer estatus = 0;
+		
+		try {
+
+			String actualizacion = "update rrhh.empleado_educacion set ideducacionnivel=?,ideducacionestado=?,idempleado=?,institucion=?,carrera=?,"
+							      +"titulo=?,fechainicio=?,fechafin=?,observacion=?,idusuariomod=?,fechamod=getdate() "
+							      +"where idempleadoeducacion = ?";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setLong(1,empleadoEducacion.getIdEducacionNivel());
+			ps.setLong(2,empleadoEducacion.getIdEducacionEstado());
+			ps.setLong(3,empleadoEducacion.getIdEmpleado());
+			ps.setString(4,empleadoEducacion.getInstitucion());
+			ps.setString(5,empleadoEducacion.getCarrera());
+			ps.setString(6,empleadoEducacion.getTitulo());
+			ps.setTimestamp(7,empleadoEducacion.getFechaInicio());
+			
+			
+			if(empleadoEducacion.getFechafin()==null){
+				ps.setNull(8, java.sql.Types.TIMESTAMP);
+			}else{
+				ps.setTimestamp(8,empleadoEducacion.getFechafin());
+			}
+			
+			if(empleadoEducacion.getObservacion()==null){
+				ps.setNull(9, java.sql.Types.NVARCHAR);
+			}else{
+				ps.setString(9,empleadoEducacion.getObservacion());
+			}
+			
+			ps.setInt(10, empleadoEducacion.getIdusuariomod());
+			ps.setLong(11, empleadoEducacion.getIdEmpleadoEducacion());
+			
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+	}
+	
+
+	/**
+	 *  Metodo para actualizar el estado de Empleado Educacion.
+	 *  @param EmpleadoEducacion. El empleado educacion a cambiarle el estado.
+	 *  @return Integer, Número de filas alteradas.
+	 */
+	public Integer actualizarEstadoEmpleadoEducacion(EmpleadoEducacion empleadoEducacion) throws DatoException {
+		Integer estatus = 0;
+		
+		try {
+
+			String actualizacion = "update rrhh.empleado_educacion set estado=?,idusuariomod=?,fechamod=getdate() where idempleadoeducacion=?";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setInt(1, empleadoEducacion.getEstado());
+			ps.setInt(2, empleadoEducacion.getIdusuariomod());
+			ps.setLong(3, empleadoEducacion.getIdEmpleadoEducacion());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	
+	
+
+
+}

@@ -1,0 +1,128 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Time;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class HorarioAsignado implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idhorarioasignado;
+	private Long idempleado;
+	private Long idcontrato;
+	private Long idhorario;
+	private Timestamp validezinicio;
+	private Timestamp validezfin;
+	private String causahorario;
+	 	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	
+	private Horario horario;
+	private FrecuenciaAsignacion frecuenciaasignacion;
+	
+	
+
+	public Long getIdhorarioasignado() {
+		return idhorarioasignado;
+	}
+	public void setIdhorarioasignado(Long idhorarioasignado) {
+		this.idhorarioasignado = idhorarioasignado;
+	}
+	public Long getIdempleado() {
+		return idempleado;
+	}
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+	public Long getIdcontrato() {
+		return idcontrato;
+	}
+	public void setIdcontrato(Long idcontrato) {
+		this.idcontrato = idcontrato;
+	}
+	public Long getIdhorario() {
+		return idhorario;
+	}
+	public void setIdhorario(Long idhorario) {
+		this.idhorario = idhorario;
+	}
+	public Timestamp getValidezinicio() {
+		return validezinicio;
+	}
+	public void setValidezinicio(Timestamp validezinicio) {
+		this.validezinicio = validezinicio;
+	}
+	public Timestamp getValidezfin() {
+		return validezfin;
+	}
+	public void setValidezfin(Timestamp validezfin) {
+		this.validezfin = validezfin;
+	}
+	public String getCausahorario() {
+		return causahorario;
+	}
+	public void setCausahorario(String causahorario) {
+		this.causahorario = causahorario;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public Horario getHorario() {
+		return horario;
+	}
+	public void setHorario(Horario horario) {
+		this.horario = horario;
+	}
+	public FrecuenciaAsignacion getFrecuenciaasignacion() {
+		return frecuenciaasignacion;
+	}
+	public void setFrecuenciaasignacion(FrecuenciaAsignacion frecuenciaasignacion) {
+		this.frecuenciaasignacion = frecuenciaasignacion;
+	}
+
+	
+	
+	
+
+	
+
+
+}

@@ -1,0 +1,146 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class ContratoProcesoPropiedad implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idcontratoprocesopropiedad;
+	private Long idcontrato;
+	private Long idprocesopropiedad;
+	private String dato ;
+	private String datoamostrar ;
+	private String observacion ;
+	
+
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	private ProcesoPropiedad procesopropiedad;
+
+	public Long getIdcontratoprocesopropiedad() {
+		return idcontratoprocesopropiedad;
+	}
+
+	public void setIdcontratoprocesopropiedad(Long idcontratoprocesopropiedad) {
+		this.idcontratoprocesopropiedad = idcontratoprocesopropiedad;
+	}
+
+	public Long getIdcontrato() {
+		return idcontrato;
+	}
+
+	public void setIdcontrato(Long idcontrato) {
+		this.idcontrato = idcontrato;
+	}
+
+	public Long getIdprocesopropiedad() {
+		return idprocesopropiedad;
+	}
+
+	public void setIdprocesopropiedad(Long idprocesopropiedad) {
+		this.idprocesopropiedad = idprocesopropiedad;
+	}
+
+	public String getDato() {
+		return dato;
+	}
+
+	public void setDato(String dato) {
+		this.dato = dato;
+	}
+
+	public String getObservacion() {
+		return observacion;
+	}
+
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public ProcesoPropiedad getProcesopropiedad() {
+		return procesopropiedad;
+	}
+
+	public void setProcesopropiedad(ProcesoPropiedad procesopropiedad) {
+		this.procesopropiedad = procesopropiedad;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public String getDatoamostrar() {
+		return datoamostrar;
+	}
+
+	public void setDatoamostrar(String datoamostrar) {
+		this.datoamostrar = datoamostrar;
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	
+
+	
+
+
+}

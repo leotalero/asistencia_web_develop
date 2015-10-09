@@ -1,0 +1,42 @@
+package co.sistemcobro.hermes.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum ClaveCambioEnum {
+	FUERZA_EL_CAMBIO_DE_CLAVE(2), NO_SOLICITAR_CAMBIO_DE_CLAVE(3);
+
+	public static final Map<Integer, ClaveCambioEnum> mapByID = new HashMap<Integer, ClaveCambioEnum>();
+	public static final Map<String, ClaveCambioEnum> mapByNAME = new HashMap<String, ClaveCambioEnum>();
+
+	static {
+		for (ClaveCambioEnum s : EnumSet.allOf(ClaveCambioEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	ClaveCambioEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static ClaveCambioEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static ClaveCambioEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

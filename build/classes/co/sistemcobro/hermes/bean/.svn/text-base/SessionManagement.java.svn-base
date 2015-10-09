@@ -1,0 +1,165 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class SessionManagement implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private String idsession;
+	private Long creationtime;
+	private Long lastaccessedtime;
+	private Integer maxinactiveinterval;
+	private String requesturl;
+	private String requesturi;
+	private String useragent;
+	private String remoteaddr;
+	private String remotehost;
+	private Integer remoteport;
+	private String remoteuser;
+	private String headertotal;
+	private String usuario;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+
+	public String getIdsession() {
+		return idsession;
+	}
+
+	public void setIdsession(String idsession) {
+		this.idsession = idsession;
+	}
+
+	public Timestamp getCreationtimedate() {
+		return new Timestamp(creationtime);
+	}
+
+	public Long getCreationtime() {
+		return creationtime;
+	}
+
+	public void setCreationtime(Long creationtime) {
+		this.creationtime = creationtime;
+	}
+
+	public Timestamp getLastaccessedtimedate() {
+		return new Timestamp(lastaccessedtime);
+	}
+
+	public Long getLastaccessedtime() {
+		return lastaccessedtime;
+	}
+
+	public void setLastaccessedtime(Long lastaccessedtime) {
+		this.lastaccessedtime = lastaccessedtime;
+	}
+
+	public Integer getMaxinactiveinterval() {
+		return maxinactiveinterval;
+	}
+
+	public void setMaxinactiveinterval(Integer maxinactiveinterval) {
+		this.maxinactiveinterval = maxinactiveinterval;
+	}
+
+	public String getRequesturl() {
+		return requesturl;
+	}
+
+	public void setRequesturl(String requesturl) {
+		this.requesturl = requesturl;
+	}
+
+	public String getRequesturi() {
+		return requesturi;
+	}
+
+	public void setRequesturi(String requesturi) {
+		this.requesturi = requesturi;
+	}
+
+	public String getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public String getUseragent() {
+		return useragent;
+	}
+
+	public void setUseragent(String useragent) {
+		this.useragent = useragent;
+	}
+
+	public String getRemoteaddr() {
+		return remoteaddr;
+	}
+
+	public void setRemoteaddr(String remoteaddr) {
+		this.remoteaddr = remoteaddr;
+	}
+
+	public String getRemotehost() {
+		return remotehost;
+	}
+
+	public void setRemotehost(String remotehost) {
+		this.remotehost = remotehost;
+	}
+
+	public String getRemoteuser() {
+		return remoteuser;
+	}
+
+	public void setRemoteuser(String remoteuser) {
+		this.remoteuser = remoteuser;
+	}
+
+	public String getHeadertotal() {
+		return headertotal;
+	}
+
+	public void setHeadertotal(String headertotal) {
+		this.headertotal = headertotal;
+	}
+
+	public Integer getRemoteport() {
+		return remoteport;
+	}
+
+	public void setRemoteport(Integer remoteport) {
+		this.remoteport = remoteport;
+	}
+
+	public Long getInactiveinterval() {
+		Date end = new Date();
+		Long diferencia = ((end.getTime() - getLastaccessedtimedate().getTime()) / 1000) + 1;
+		return diferencia;
+	}
+
+}

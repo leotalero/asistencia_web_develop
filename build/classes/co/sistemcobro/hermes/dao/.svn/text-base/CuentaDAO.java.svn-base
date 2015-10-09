@@ -1,0 +1,90 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.hermes.bean.Cuenta;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class CuentaDAO extends BaseDAO {
+
+	public CuentaDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public List<Cuenta> getCuentas(String estados) throws DatoException {
+		List<Cuenta> aplicaciones = new ArrayList<Cuenta>();
+		Cuenta aplicacion = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select c.idcuenta, c.nombre, c.estado ");
+			q.append("from hermes.cuenta c where  c.estado in (" + estados + ") ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				int t = 1;
+				aplicacion = new Cuenta();
+				aplicacion.setIdcuenta(rs.getInt(t++));
+				aplicacion.setNombre(rs.getString(t++));
+				aplicacion.setEstado(rs.getInt(t++));
+				aplicaciones.add(aplicacion);
+
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return aplicaciones;
+
+	}
+
+	public Cuenta getCuentaPorIdcuenta(Integer idcuenta) throws DatoException {
+		Cuenta cuenta = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select c.idcuenta, c.nombre, c.estado ");
+			q.append("from hermes.cuenta c where  c.idcuenta = ? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idcuenta);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				int t = 1;
+				cuenta = new Cuenta();
+				cuenta.setIdcuenta(rs.getInt(t++));
+				cuenta.setNombre(rs.getString(t++));
+				cuenta.setEstado(rs.getInt(t++));
+
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return cuenta;
+
+	}
+
+}

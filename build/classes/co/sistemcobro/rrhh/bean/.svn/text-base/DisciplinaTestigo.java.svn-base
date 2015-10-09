@@ -1,0 +1,76 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+public class DisciplinaTestigo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long iddisciplinatestigo;
+	private Long iddisciplina;
+	private Long idempleado;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	private EmpleadoBean empleado;
+	
+	public Long getIddisciplinatestigo() {
+		return iddisciplinatestigo;
+	}
+	public void setIddisciplinatestigo(Long iddisciplinatestigo) {
+		this.iddisciplinatestigo = iddisciplinatestigo;
+	}
+	public Long getIddisciplina() {
+		return iddisciplina;
+	}
+	public void setIddisciplina(Long iddisciplina) {
+		this.iddisciplina = iddisciplina;
+	}
+	
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public Long getIdempleado() {
+		return idempleado;
+	}
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+	public EmpleadoBean getEmpleado() {
+		return empleado;
+	}
+	public void setEmpleado(EmpleadoBean empleado) {
+		this.empleado = empleado;
+	}
+}

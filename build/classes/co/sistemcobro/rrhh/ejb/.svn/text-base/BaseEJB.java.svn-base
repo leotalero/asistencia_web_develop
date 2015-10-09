@@ -1,0 +1,28 @@
+package co.sistemcobro.rrhh.ejb;
+
+import javax.annotation.Resource;
+import javax.ejb.Remote;
+import javax.sql.DataSource;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+@Remote
+public class BaseEJB {
+
+//desarrollo
+	@Resource(mappedName = "dc_rrhh")
+	protected DataSource dc_rrhh;
+		
+	@Resource(mappedName = "dg_rrhh")
+	protected DataSource dg_rrhh;
+	
+	@Resource(mappedName = "dc_hermes")
+	protected DataSource dc_hermes;
+		
+	@Resource(mappedName = "dg_hermes")
+	protected DataSource dg_hermes;
+
+}

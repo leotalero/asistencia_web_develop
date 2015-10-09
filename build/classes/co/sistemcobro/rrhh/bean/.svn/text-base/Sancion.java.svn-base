@@ -1,0 +1,129 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+public class Sancion implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idsancion;
+	private Long idfalta;
+	private String nombresancion;
+	private Integer recurrencia;
+	private String procedimiento;
+	private String responsable;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	private FaltaTipo faltaTipo;
+	private Falta falta;
+	
+	public Long getIdsancion() {
+		return idsancion;
+	}
+
+	public void setIdsancion(Long idsancion) {
+		this.idsancion = idsancion;
+	}
+
+	public Long getIdfalta() {
+		return idfalta;
+	}
+
+	public void setIdfalta(Long idfalta) {
+		this.idfalta = idfalta;
+	}
+
+	public String getNombresancion() {
+		return nombresancion;
+	}
+
+	public void setNombresancion(String nombresancion) {
+		this.nombresancion = nombresancion;
+	}
+
+	public Integer getRecurrencia() {
+		return recurrencia;
+	}
+
+	public void setRecurrencia(Integer recurrencia) {
+		this.recurrencia = recurrencia;
+	}
+
+	public String getProcedimiento() {
+		return procedimiento;
+	}
+
+	public void setProcedimiento(String procedimiento) {
+		this.procedimiento = procedimiento;
+	}
+
+	public String getResponsable() {
+		return responsable;
+	}
+
+	public void setResponsable(String responsable) {
+		this.responsable = responsable;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public FaltaTipo getFaltaTipo() {
+		return faltaTipo;
+	}
+
+	public void setFaltaTipo(FaltaTipo faltaTipo) {
+		this.faltaTipo = faltaTipo;
+	}
+
+	public Falta getFalta() {
+		return falta;
+	}
+
+	public void setFalta(Falta falta) {
+		this.falta = falta;
+	}
+
+}

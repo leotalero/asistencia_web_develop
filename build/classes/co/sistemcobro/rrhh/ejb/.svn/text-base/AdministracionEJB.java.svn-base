@@ -1,0 +1,75 @@
+package co.sistemcobro.rrhh.ejb;
+
+import javax.ejb.Stateless;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.CargoAreaAsignada;
+import co.sistemcobro.rrhh.dao.AdministracionDAO;
+import co.sistemcobro.rrhh.dao.ContratoDAO;
+
+/**
+ * 
+ * @author leonardo talero
+ * 
+ */
+@Stateless
+public class AdministracionEJB extends BaseEJB {
+
+
+	public AdministracionEJB() {
+	}
+	
+	
+	public Integer deshabilitarEstadoArea(CargoAreaAsignada cargoarea) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			cargoarea.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resu=contratoDAO.actualizarEstadoAreaAsociada(cargoarea);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	
+	public Integer habilitarEstadoArea(CargoAreaAsignada cargoarea) throws DatoException, LogicaException {
+		Integer resu;
+		try {
+			ContratoDAO contratoDAO = new ContratoDAO(dg_rrhh);
+			cargoarea.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resu=contratoDAO.actualizarEstadoAreaAsociada(cargoarea);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resu;	
+	}
+	
+	
+	/**
+	 * Este método obtiene el maximo id de una tabla especifica.
+	 * @param String. El nombre de la tabla. (Ejemplo rrhh.empleado)
+	 * @param String. El nombre del id o atributo.
+	 * @throws LogicaException 
+	 * */
+	public Long obtenerIdMaximoDeTabla(String nombreTabla, String nombreId) throws LogicaException{
+		Long idMaximo;
+		try {
+			AdministracionDAO adminDAO = new AdministracionDAO(dc_rrhh);
+			idMaximo = adminDAO.obtenerIdMaximoDeTabla(nombreTabla, nombreId);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return idMaximo;	
+	}
+		
+}

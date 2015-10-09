@@ -1,0 +1,137 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+
+
+public class EmpleadoEducacion implements Serializable {
+
+	
+	private static final long serialVersionUID = 1L;
+
+	
+	Long idEmpleadoEducacion;
+	Long idEducacionNivel;
+	Long idEducacionEstado;
+	Long idEmpleado;
+	String institucion;
+	String carrera;
+	String titulo;
+	Timestamp fechaInicio;
+	Timestamp fechafin;
+	String observacion;
+	
+	Integer idusuariocrea;
+	Timestamp fechacrea;
+	Integer idusuariomod;
+	Timestamp fechamod;
+	Integer estado;
+	
+	EducacionNivel nivelEducacion;
+	EducacionEstado estadoEducacion;
+	
+	public Long getIdEmpleadoEducacion() {
+		return idEmpleadoEducacion;
+	}
+	public void setIdEmpleadoEducacion(Long idEmpleadoEducacion) {
+		this.idEmpleadoEducacion = idEmpleadoEducacion;
+	}
+	public Long getIdEducacionNivel() {
+		return idEducacionNivel;
+	}
+	public void setIdEducacionNivel(Long idEducacionNivel) {
+		this.idEducacionNivel = idEducacionNivel;
+	}
+	public Long getIdEducacionEstado() {
+		return idEducacionEstado;
+	}
+	public void setIdEducacionEstado(Long idEducacionEstado) {
+		this.idEducacionEstado = idEducacionEstado;
+	}
+	public Long getIdEmpleado() {
+		return idEmpleado;
+	}
+	public void setIdEmpleado(Long idEmpleado) {
+		this.idEmpleado = idEmpleado;
+	}
+	public String getInstitucion() {
+		return institucion;
+	}
+	public void setInstitucion(String institucion) {
+		this.institucion = institucion;
+	}
+	public String getCarrera() {
+		return carrera;
+	}
+	public void setCarrera(String carrera) {
+		this.carrera = carrera;
+	}
+	public String getTitulo() {
+		return titulo;
+	}
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+	public Timestamp getFechaInicio() {
+		return fechaInicio;
+	}
+	public void setFechaInicio(Timestamp fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+	public Timestamp getFechafin() {
+		return fechafin;
+	}
+	public void setFechafin(Timestamp fechafin) {
+		this.fechafin = fechafin;
+	}
+	public String getObservacion() {
+		return observacion;
+	}
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public EducacionNivel getNivelEducacion() {
+		return nivelEducacion;
+	}
+	public void setNivelEducacion(EducacionNivel nivelEducacion) {
+		this.nivelEducacion = nivelEducacion;
+	}
+	public EducacionEstado getEstadoEducacion() {
+		return estadoEducacion;
+	}
+	public void setEstadoEducacion(EducacionEstado estadoEducacion) {
+		this.estadoEducacion = estadoEducacion;
+	}
+	
+}

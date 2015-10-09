@@ -1,0 +1,1156 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.Disciplina;
+import co.sistemcobro.rrhh.bean.DisciplinaArchivo;
+import co.sistemcobro.rrhh.bean.DisciplinaArchivoTipo;
+import co.sistemcobro.rrhh.bean.DisciplinaEstado;
+import co.sistemcobro.rrhh.bean.DisciplinaHistorial;
+import co.sistemcobro.rrhh.bean.DisciplinaTestigo;
+import co.sistemcobro.rrhh.bean.EmpleadoBean;
+import co.sistemcobro.rrhh.bean.Falta;
+import co.sistemcobro.rrhh.bean.FaltaTipo;
+import co.sistemcobro.rrhh.bean.Formato;
+import co.sistemcobro.rrhh.bean.Sancion;
+import co.sistemcobro.rrhh.bean.SancionFormato;
+import co.sistemcobro.rrhh.dao.ProcesoDisciplinarioDAO;
+
+/**
+ * Session Bean para el manejo de los  Procesos Disciplinarios.
+ * @author jpuentes
+ */
+@Stateless
+public class ProcesoDisciplinarioEJB extends BaseEJB{
+
+	Logger log = Logger.getLogger(ProcesoDisciplinarioEJB.class);
+	
+    /**
+     * Constructor. 
+     */
+    public ProcesoDisciplinarioEJB() {
+    }
+    
+    /**
+     * Consulta el listado de procesos disciplinarios que tiene un contrato.
+     * @param Long. idcontrato.
+     * @return List. Disciplina.
+     */
+    public List<Disciplina> obtenerProcesoDisciplinarioPorIdContrato(Long idContrato) throws DatoException, LogicaException{
+  
+    	List<Disciplina> listaProcesosDisciplinarios = new ArrayList<Disciplina>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaProcesosDisciplinarios = procesoDisciplinarioDAO.obtenerDisciplinaPorIdContrato(idContrato);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaProcesosDisciplinarios;  
+    }    
+    
+    public List<Disciplina> obtenerHistoricoDisciplinarioPorArea(List<String> idAreas,String desde,String hasta) throws DatoException, LogicaException{
+    	  
+    	List<Disciplina> listaProcesosDisciplinarios = new ArrayList<Disciplina>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaProcesosDisciplinarios = procesoDisciplinarioDAO.obtenerHistoricoDisciplinaPorIdAreas(idAreas,desde,hasta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaProcesosDisciplinarios;  
+    } 
+    
+    
+    public List<Disciplina> obtenerHistoricoDisciplinarioPorArea(List<String> idAreas) throws DatoException, LogicaException{
+  	  
+    	List<Disciplina> listaProcesosDisciplinarios = new ArrayList<Disciplina>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaProcesosDisciplinarios = procesoDisciplinarioDAO.obtenerHistoricoDisciplinaPorIdAreas(idAreas);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaProcesosDisciplinarios;  
+    } 
+    
+    /**
+     * Consulta el listado de formatos posibles a asignar a una sancion o falta.
+     * @return List. Formato.
+     */
+    public List<Formato> obtenerFormatos() throws DatoException, LogicaException{
+  
+    	List<Formato> listaFormatos = new ArrayList<Formato>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaFormatos = procesoDisciplinarioDAO.obtenerTodosFormatos();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaFormatos;  
+    }  
+    
+    
+
+    /**
+     * Consulta el listado de formatos posibles a asignar a una sancion o falta.
+     * @return List. Formato.
+     */
+    public List<Formato> obtenerFormatosPorIdFormato(String[] idFormatos) throws DatoException, LogicaException{
+  
+    	List<Formato> listaFormatos = new ArrayList<Formato>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaFormatos = procesoDisciplinarioDAO.obtenerFormatosPorIdFormato(idFormatos);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaFormatos;  
+    } 
+    
+    
+    /**
+     * Consulta los tipos de faltas segun el reglamento interno y otras politicas de Sistemcobro
+     * @return List. FaltaTipo.
+     */
+    public List<FaltaTipo> obtenerTiposDeFaltas() throws DatoException, LogicaException{
+    	
+    	List<FaltaTipo> listaDeTipoDeFaltas = new ArrayList<FaltaTipo>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaDeTipoDeFaltas = procesoDisciplinarioDAO.obtenerTiposDeFaltas();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeTipoDeFaltas;  
+    }
+    
+
+    /**
+     * Consulta las faltas segun el reglamento interno y otras politicas de Sistemcobro.
+     * Estan clasificadas por el FaltaTipo.
+     * @return List. Falta.
+     */
+    public List<Falta> ObtenerTodasLasFaltas() throws DatoException, LogicaException{
+    	
+    	List<Falta> listaDeFaltas = new ArrayList<Falta>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaDeFaltas = procesoDisciplinarioDAO.obtenerListaFaltas();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeFaltas;  
+    }
+    
+    
+    /**
+     * Consulta las faltas por tipo de falta.(FaltaTipo)
+     * @return List. Falta.
+     */
+    public List<Falta> obtenerFaltasPorTipoFalta(Long idFaltaTipo) throws DatoException, LogicaException{
+    	
+    	List<Falta> listaDeFaltas = new ArrayList<Falta>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaDeFaltas = procesoDisciplinarioDAO.obtenerListaFaltasPorTipoFalta(idFaltaTipo);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeFaltas;  
+    }
+    
+
+    /**
+     * Consulta el número de veces que ha cometido una falta en un contrato.
+     * @param Long. idFalta e idContrato.
+     * @return Int
+     */
+    public Integer obtenerRecurrenciaDeFaltaPorContrato(Long idFalta, Long idContrato) throws DatoException, LogicaException{
+    	
+    	Integer recurrencia = 0;
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		recurrencia = procesoDisciplinarioDAO.obtenerRecurrenciaDeFaltaPorContrato(idFalta,idContrato);
+		} catch (DatoException e) {
+			log.info("DatoException e = "+e);
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception e = "+e);
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return recurrencia;  
+    }
+
+    /**
+     * Consulta el maximo numero de recurrencia exitentes en sancion para una falta especifica.
+     * @param Long. idFalta e idContrato.
+     * @return Int
+     */
+    public Integer obtenerSiguienteRecurrenciaDeSancion(Long idFalta) throws DatoException, LogicaException{
+    	
+    	Integer recurrencia = 0;
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		recurrencia = procesoDisciplinarioDAO.obtenerSiguienteRecurrenciaDeSancion(idFalta);
+		} catch (DatoException e) {
+			log.info("DatoException e = "+e);
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception e = "+e);
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return recurrencia;  
+    }
+    
+    /**
+     * Método para obtener una sancion y los datos asociados de otras tablas por idFalta.
+     * @param Long. idFalta.
+     * @return Sancion.
+     */
+    public Sancion obtenerSancionDeFaltaPorIdFalta(Long idFalta, Integer recurrencia) throws LogicaException{
+    	Sancion sancion = null;
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		sancion = procesoDisciplinarioDAO.obtenerSancionDeFaltaPorIdFalta(idFalta, recurrencia);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return sancion;  
+    }
+    
+    
+    /**
+     * Método para obtener una sancion y los datos asociados por idFalta, recurrencia y idGrupo.
+     * @param Long. idFalta.
+     * @param Integer. Recurrencia.
+     * @param Integer. idGrupo.
+     * @return Sancion.
+     */
+    public Sancion obtenerSancionDeFaltaPorIdFaltaRecurrenciaYIdGrupo(Long idFalta, Integer recurrencia, Integer idGrupo) throws LogicaException{
+    	Sancion sancion = null;
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		sancion = procesoDisciplinarioDAO.obtenerSancionDeFaltaPorIdFaltaRecurrenciaYIdGrupo(idFalta, recurrencia, idGrupo);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return sancion;  
+    }
+
+    /**
+     * Método para obtener una sancion y los datos asociados por idFalta, recurrencia y idGrupo.
+     * @param Long. idFalta.
+     * @param Integer. Recurrencia.
+     * @param Integer. idGrupo.
+     * @return Sancion.
+     */
+    public Sancion obtenerSancionDeFaltaPorIdFaltaRecurrenciaYIdGrupo(Long idFalta, Integer recurrencia, Integer idGrupoUno,Integer idGrupoDos) throws LogicaException{
+    	Sancion sancion = null;
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		sancion = procesoDisciplinarioDAO.obtenerSancionDeFaltaPorIdFaltaRecurrenciaYIdGrupo(idFalta, recurrencia, idGrupoUno,idGrupoDos);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return sancion;  
+    }
+    
+    /**
+     * Método para obtener la relacion FaltaTipo por idFaltaTipo.
+     * @param Long. idFaltaTipo.
+     * @return FaltaTipo.
+     */
+    public FaltaTipo obtenerFaltaTipoPorId(Long idFaltaTipo) throws LogicaException{
+    	FaltaTipo faltaTipo = null;
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		faltaTipo = procesoDisciplinarioDAO.obtenerFaltaTipoPorId(idFaltaTipo);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return faltaTipo;  
+    }
+    
+    
+    /**
+     * Método para obtener un OBJETO sancion por idFalta.
+     * @param Long. idFalta.
+     * @return Sancion.
+     */
+//    public Sancion obtenerSancionPorIdFalta(Long idFalta) throws LogicaException{
+//    	Sancion sancion = null;
+//    	
+//    	try {
+//    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+//    		sancion = procesoDisciplinarioDAO.obtenerSancionDeFaltaPorIdFalta(idFalta);
+//		} catch (DatoException e) {
+//			throw new LogicaException(e.toString(), e.getCause());
+//		} catch (Exception e) {
+//			throw new LogicaException(e.toString(), e.getCause());
+//		}
+//		return sancion;  
+//    }
+    
+
+    /**
+     * Consulta los formatos (Sancion_Formato - Formato) por idFalta.
+     * @return List. SancionFormato.
+     */
+    public List<SancionFormato> obtenerListaDeFormatosPorIdFalta(Long idFalta) throws DatoException, LogicaException{
+    	
+    	List<SancionFormato> listaDeSancionFormato = new ArrayList<SancionFormato>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaDeSancionFormato = procesoDisciplinarioDAO.obtenerListaDeSancionFormato(idFalta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeSancionFormato;  
+    }
+    
+    
+    /**
+     * Consulta los formatos (Sancion_Formato - Formato) por idFalta y por recurrencia.
+     * @return List. SancionFormato.
+     */
+    public List<SancionFormato> obtenerListaDeFormatosPorIdFaltaYRecurrencia(Long idFalta,Integer recurrencia) throws DatoException, LogicaException{
+    	
+    	List<SancionFormato> listaDeSancionFormato = new ArrayList<SancionFormato>();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+//    		listaDeSancionFormato = procesoDisciplinarioDAO.obtenerListaDeSancionFormato(idFalta);
+    		listaDeSancionFormato = procesoDisciplinarioDAO.obtenerListaDeSancioFormatoPorIdFaltaYRecurrencia(idFalta,recurrencia);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeSancionFormato;  
+    }
+    
+    
+    /**
+     * Método para obtener una instancia de Formato por su idFormato.
+     * @param Long. idFormato.
+     * @return Formato.
+     */
+    public Formato obtenerFormatoId(Long idFormato) throws LogicaException{
+    	Formato formato = null;
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		formato = procesoDisciplinarioDAO.obtenerFormatoPorId(idFormato);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return formato;  
+    }
+    
+    /**
+     * Método para obtener una instancia de Formato por su idFormato.
+     * @param Long. idFormato.
+     * @return Formato.
+     */
+    public DisciplinaArchivo obtenerDisciplinaArchivoPorId(Long idDisciplinaArchivo) throws LogicaException{
+    	DisciplinaArchivo archivo = null;
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		archivo = procesoDisciplinarioDAO.obtenerDisciplinaArchivoPorId(idDisciplinaArchivo);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return archivo;  
+    }
+    
+    /**
+     * Método para obtener la lista de los tipos de archivos a cargar al crear un proceso disciplinario.
+     * @return List. DisciplinaArchivoTipo.
+     */
+    public List<DisciplinaArchivoTipo> obtenerListaDisciplinaArchivoTipo() throws LogicaException{
+    	List<DisciplinaArchivoTipo> tiposDeArchivos = new ArrayList<DisciplinaArchivoTipo>();
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		tiposDeArchivos = procesoDisciplinarioDAO.obtenerListaDeDisciplinaArchivoTipo();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return tiposDeArchivos;  
+    }
+    
+    
+    /**
+     * Método para insertar un nuevo proceso disciplinario
+     * @param Disciplina. La relación a insertar.
+     * @return Disciplina. La relación insertada.
+     */
+    public Disciplina insertarNuevaDisciplina(Disciplina disciplina) throws DatoException, LogicaException{
+    	Disciplina resultado = null;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarDisciplina(disciplina);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    /**
+     * Método para insertar un nuevo proceso disciplinario
+     * @param Disciplina. La relación a insertar.
+     * @return Disciplina. La relación insertada.
+     */
+    public boolean insertarTipoDeFalta(FaltaTipo tipoFalta) throws DatoException, LogicaException{
+    	boolean resultado;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarTipoDeFalta(tipoFalta);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    
+    /**
+     * Método para insertar una nueva Falta.
+     * @param Falta. La relación a insertar.
+     * @return boolean. true si la relación fué insertada.
+     */
+    public boolean insertarNuevaFalta(Falta falta) throws DatoException, LogicaException{
+    	boolean resultado = false;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarFalta(falta);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+   
+    /**
+     * Método para insertar una nueva sanción.
+     * @param Sancion. La relación a insertar.
+     * @return boolean. true si la relación fué insertada.
+     */
+    public Sancion insertarNuevaSancion(Sancion sancion) throws DatoException, LogicaException{
+    	Sancion resultado = null;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarSancion(sancion);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+
+    /**
+     * Método para insertar la relación Formato.
+     * @param Formato. La relación a insertar.
+     * @return Formato. La relación insertada.
+     */
+    public boolean insertarNuevoFormato(Formato formato) throws DatoException, LogicaException{
+    	boolean resultado = false;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarFormato(formato);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    /**
+     * Método para insertar una nueva relacion sancion_formato.
+     * @param SancionFormato. La relación a insertar.
+     * @return boolean. true si la relación fué insertada.
+     */
+    public boolean insertarSancionFormato(SancionFormato sancionFormato) throws DatoException, LogicaException{
+    	boolean resultado = false;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarSancionFormato(sancionFormato);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    /**
+     * Método para insertar un nuevo disciplina historial.
+     * @param Disciplina. La relación a insertar.
+     * @return Disciplina. La relación insertada.
+     */
+    public DisciplinaHistorial insertarNuevoDisciplinaHistorial(DisciplinaHistorial disciplinaHistorial) throws DatoException, LogicaException{
+    	DisciplinaHistorial resultado = null;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarDisciplinaHistorial(disciplinaHistorial);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    /**
+     * Método para insertar un nuevo proceso disciplinario
+     * @param Disciplina. La relación a insertar.
+     * @return Disciplina. La relación insertada.
+     */
+    public DisciplinaTestigo insertarDisciplinaTestigo(DisciplinaTestigo disciplinaTestigo) throws DatoException, LogicaException{
+    	DisciplinaTestigo resultado = null;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarDisciplinaTestigo(disciplinaTestigo);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    /**
+     * Método para obtener disciplinaTestigo por idEmpleado.
+     * @return Disciplina. La relación insertada.
+     */
+    public boolean empleadoEsTestigo(Long idEmpleado, Long idDisciplina) throws DatoException, LogicaException{
+    	boolean resultado = false;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.empleadoEsTestigo(idEmpleado,idDisciplina);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    /**
+     * Método para insertar la relación disciplina_historial.
+     * @param DisciplinaHistorial. La relación a insertar.
+     * @return DisciplinaHistorial. La relación insertada.
+     */
+    public DisciplinaHistorial insertarDisciplinaHistorial(DisciplinaHistorial disciplinaHistorial) throws DatoException, LogicaException{
+    	DisciplinaHistorial resultado = null;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarDisciplinaHistorial(disciplinaHistorial);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    
+
+    /**
+     * Método para insertar la relación disciplina_archivo
+     * @param DisciplinaArchivo. La relación a insertar.
+     * @return DisciplinaArchivo. La relación insertada.
+     */
+    public DisciplinaArchivo insertarDisciplinaArchivo(DisciplinaArchivo archivo) throws DatoException, LogicaException{
+    	DisciplinaArchivo resultado = null;
+    	try{
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+    		resultado = procesoDisciplinarioDAO.insertarDisciplinaArchivo(archivo);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    
+    /**
+     * Este método permite actualizar la información de la relación EmpleadoDocumentoPersonal.
+     * @param EmpleadoDocumentoPersonal. La relación a actualizar.
+     * @return EmpleadoDocumentoPersonal. La relación actualizada.
+     */
+    public DisciplinaArchivo actualizarRutaArchivoCargado(DisciplinaArchivo archivo) throws DatoException, LogicaException {
+    	DisciplinaArchivo resultado = null;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			resultado = procesoDisciplinarioDAO.actualizarRutaArchivoCargado(archivo);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+   
+    
+    /**
+     * Consulta el detalle de un proceso disciplinario especifico.
+     * @param Long. idDisciplina.
+     * @return Disciplina. Disciplina.
+     */
+    public Disciplina obtenerDetalleProcesoDisciplinario(Long idDisciplina) throws DatoException, LogicaException{
+  
+    	Disciplina procesoDisciplinario = new Disciplina();
+    	
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		procesoDisciplinario = procesoDisciplinarioDAO.obtenerDetalleProcesoDisciplinario(idDisciplina);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return procesoDisciplinario;  
+    }
+    
+
+    /**
+     * Método para obtener la lista de formatos asociados a una sancion
+     * @return List. Formato.
+     */
+    public List<Formato> obtenerFormatosPorIdSancion(Long idSancion) throws LogicaException{
+    	List<Formato> listaFormatos = new ArrayList<Formato>();
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaFormatos = procesoDisciplinarioDAO.obtenerListaDeFormatosPorIdSancion(idSancion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaFormatos;  
+    }
+    
+    /**
+     * Método para obtener la lista de testigos asociados a un proceso disciplinario.
+     * @return List. Formato.
+     */
+    public List<DisciplinaTestigo> obtenerListaDisciplinaTestigo(Long idDiciplina) throws LogicaException{
+    	List<DisciplinaTestigo> listaTestigos = new ArrayList<DisciplinaTestigo>();
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaTestigos = procesoDisciplinarioDAO.obtenerListaDeTestigosPorIdDisciplina(idDiciplina);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaTestigos;  
+    }
+    
+    /**
+     * Método para obtener la lista de DisciplinaHistorial.
+     * @return List. DisciplinaHistorial.
+     */
+    public List<DisciplinaHistorial> obtenerDisciplinaHistorialPorIdDisciplina(Long idDiciplina) throws LogicaException{
+    	List<DisciplinaHistorial> listaDisciplinaHistorial = new ArrayList<DisciplinaHistorial>();
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaDisciplinaHistorial = procesoDisciplinarioDAO.obtenerListaDisicplinaHistorialPorIdDisciplina(idDiciplina);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDisciplinaHistorial;  
+    }
+    
+
+    /**
+     * Método para setear el objeto Empleado a la lista de los testigos.
+     * @return List. DisciplinaTestigo.
+     */
+    public List<DisciplinaTestigo> setearEmpleadosComoTestigos(List<DisciplinaTestigo> listaTestigos) throws LogicaException{
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		EmpleadoBean  empleado = null;
+    		
+    		for(DisciplinaTestigo testigo : listaTestigos){
+    			empleado = new EmpleadoBean();
+    			empleado = procesoDisciplinarioDAO.buscarEmpleadosporId(testigo.getIdempleado());
+    			testigo.setEmpleado(empleado);
+    		}
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaTestigos;  
+    }
+    
+
+    /**
+     * Método para obtener los archivos asociados a un proceso disciplinario.
+     * @return List. DisciplinaArchivo.
+     */
+    public List<DisciplinaArchivo> obtenerListaArchivosPorIdDisciplina(Long idDisciplina) throws LogicaException{
+    	List<DisciplinaArchivo> listaArchivos = new ArrayList<DisciplinaArchivo>();
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaArchivos = procesoDisciplinarioDAO.obtenerListaDisciplinaArchivoPorIdDisciplina(idDisciplina);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaArchivos;  
+    }
+ 
+    
+    /**
+     *  Deshabilitar la relación Sancion.
+     *  @param Long. idsancion.
+     *  @return Integer. El número de filas afectadas.
+     * */
+    public Integer deshabilitarSancion(Sancion sancion) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			resultado = procesoDisciplinarioDAO.actualizarEstadoSancion(sancion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+
+    /**
+     *  Deshabilitar la relación Formato.
+     *  @param Long. idFormato.
+     *  @return Integer. El número de filas afectadas.
+     * */
+    public Integer deshabilitarFormato(Formato formato) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			resultado = procesoDisciplinarioDAO.actualizarEstadoFormato(formato);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    
+    /**
+     *  Habilitar la relación Formato.
+     *  @param Long. idFormato.
+     *  @return Integer. El número de filas afectadas.
+     * */
+    public Integer habilitarFormato(Formato formato) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			resultado = procesoDisciplinarioDAO.actualizarEstadoFormato(formato);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    /**
+     *  Deshabilitar la relación Falta.
+     *  @param Long. idFalta.
+     *  @return Integer. El número de filas afectadas.
+     * */
+    public Integer deshabilitarFalta(Falta falta) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			resultado = procesoDisciplinarioDAO.actualizarEstadoFalta(falta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    /**
+     *  Deshabilitar la relación Sancion.
+     *  @param Long. idsancion.
+     *  @return Integer. El número de filas afectadas.
+     * */
+    public Integer habilitarSancion(Sancion sancion) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			resultado = procesoDisciplinarioDAO.actualizarEstadoSancion(sancion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    
+    /**
+     *  Actualizar la relación FaltaTipo.
+     *  @param Long. idFaltaTipo.
+     *  @return Integer. El número de filas afectadas.
+     * */
+    public Integer actualizarEstadoFaltaTipo(FaltaTipo tipoFalta) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			resultado = procesoDisciplinarioDAO.actualizarEstadoFaltaTipo(tipoFalta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    /**
+     *  Deshabilitar la relación Falta.
+     *  @param Long. idFalta.
+     *  @return Integer. El número de filas afectadas.
+     * */
+    public Integer habilitarFalta(Falta falta) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			resultado = procesoDisciplinarioDAO.actualizarEstadoFalta(falta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    
+    /**
+     * Este método permite actualizar la información de la relación rrhh.formato.
+     * @param Formato. La relación a actualizar.
+     */
+    public Formato activarFormato(Formato formato) throws DatoException, LogicaException {
+    	Formato resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			resultado = procesoDisciplinarioDAO.activarYActualizarFormato(formato);
+			} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;
+	}
+    
+    /**
+     * Deshabilitar la relacion Disciplina.
+     * @param Disciplina. la relacion Disciplina.
+     * @return Integer. El número de filas afectadas.
+     */
+    public Integer desactivarDisciplina(Disciplina disciplina) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			disciplina.setEstado(EstadoEnum.ELIMINADO.getIndex());
+			resultado = procesoDisciplinarioDAO.actualizarEstadoDisciplina(disciplina);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    /**
+     * habilitar la relacion Disciplina.
+     * @param Disciplina. la relacion Disciplina.
+     */
+    public Integer activarDisciplina(Disciplina disciplina) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dg_rrhh);
+			disciplina.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resultado = procesoDisciplinarioDAO.actualizarEstadoDisciplina(disciplina);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    
+
+    /**
+     * Obtener ultimo estado de disciplina
+     * @param Disciplina. la relacion Disciplina.
+     */
+    public DisciplinaEstado obtenerUltimoEstadoDisciplinaHistorial(Long iddisciplina) throws DatoException, LogicaException {
+    	DisciplinaEstado ultimoEstado;
+    	
+		try {
+			ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+			ultimoEstado = procesoDisciplinarioDAO.obtenerUltimoEstadoDisciplinaHistorial(iddisciplina);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return ultimoEstado;	
+	}
+    
+    
+    /**
+     * @param Integer. El idGrupo.
+     * @param Long. El idEstadoActual.
+     * @throws LogicaException 
+     * 
+     * */
+    public List<DisciplinaEstado> obtenerListaEstadosPorGrupoYEstadoActual(Integer idDeGrupo,Long idEstadoActual) throws LogicaException{
+    	List<DisciplinaEstado> listaEstados = new ArrayList<DisciplinaEstado>();
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaEstados = procesoDisciplinarioDAO.obtenerListaEstadosPorGrupoYEstadoActual(idDeGrupo,idEstadoActual);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaEstados;  
+    }
+    
+
+    /**
+     * Obtiene y setea el ultimo estado (Creado, revisado, Sentencia a favor, Sentencia en contra, eliminado) de un proceso disciplinario.
+     * @param Integer. El idGrupo.
+     * @param Long. El idEstadoActual.
+     * @throws LogicaException 
+     * 
+     * */
+    public List<Disciplina> setearUltimoEstadoDeLProceso(List<Disciplina> listaDisciplina) throws LogicaException{
+    	
+    	try {    		
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		
+    		for(Disciplina disciplina : listaDisciplina){
+    			DisciplinaEstado disciplinaEstado = new DisciplinaEstado();
+    			disciplinaEstado = procesoDisciplinarioDAO.obtenerUltimoEstadoDisciplinaHistorial(disciplina.getIddisciplina());
+    			disciplina.setUltimoDisciplinaEstado(disciplinaEstado);
+    		}
+    		
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDisciplina;  
+    }
+    
+    
+    /**
+     * Consulta el numero de veces que se ha cometido una falta por proceso.
+     * @param Integer. El idGrupo.
+     * @param Long. El idEstadoActual.
+     * @throws LogicaException 
+     * 
+     * */
+    public List<Disciplina> setearRecurrenciaDeLProceso(List<Disciplina> listaDisciplina) throws LogicaException{
+    	
+    	try {    		
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		
+    		for(Disciplina disciplina : listaDisciplina){
+    			Integer recurrencia = procesoDisciplinarioDAO.obtenerRecurrenciaDeFaltaPorContrato(disciplina.getFalta().getIdfalta(), disciplina.getIdcontrato());
+    			disciplina.setRecurrenciaPorFalta(getRecurrenciaPalabras(recurrencia));
+    		}
+    		
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDisciplina;  
+    }
+    
+    /**
+     * Configura o setea los archivos asociados a cada historial disciplinario.
+     * @param List. Listado de DisciplinaHistorial.
+     * @return List<DisciplinaHistorial>
+     * @throws LogicaException 
+     * 
+     * */
+    public List<DisciplinaHistorial> setearArchivosAsociadosACadaHhistorial(List<DisciplinaHistorial>  listaDisciplinaHistorial) throws LogicaException{
+    	int contradorDeArchivos = 0;
+    	try {    		
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		for(DisciplinaHistorial disciplinaHistorial :listaDisciplinaHistorial ){
+    			List<DisciplinaArchivo> listaArchivosDeHistorial = procesoDisciplinarioDAO.obtenerListaArchivosPorIdDisciplinaHistorial(disciplinaHistorial.getIddisciplinahistorial());
+    			if(listaArchivosDeHistorial!=null){
+    				disciplinaHistorial.setListaArchivos(listaArchivosDeHistorial);
+    				contradorDeArchivos = contradorDeArchivos + listaArchivosDeHistorial.size();
+    			}
+    		}
+    		
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDisciplinaHistorial;  
+    }
+    
+    /**
+     * Consulta la lista de sanciones de faltas por los idFalta seleccionados desde web.
+     * @param String[]. La lista de id de las faltas a consultar.
+     * @throws LogicaException 
+     * 
+     * */
+    public List<Sancion> obtenerSancionesPorTiposDeFalta(String [] idtiposFalta) throws LogicaException{
+    	List<Sancion> listaSanciones = new ArrayList<Sancion>();
+    	try {
+    		ProcesoDisciplinarioDAO procesoDisciplinarioDAO = new ProcesoDisciplinarioDAO(dc_rrhh);
+    		listaSanciones = procesoDisciplinarioDAO.obtenerSancionesPorTiposDeFalta(idtiposFalta);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaSanciones;  
+    }
+    
+    
+    /**
+	 * Método para reemplazar y convertir el numero de veces que se ha cometido
+	 * una falta en letras. Unicamente es valido al momento de crear el proceso.
+	 * 
+	 * @param Integer
+	 *            . numeroVeces
+	 * @return String. el numero de veces en palabras.
+	 * */
+	private String getRecurrenciaPalabras(Integer numeroVeces) {
+		String respuesta = "";
+
+		switch (numeroVeces) {
+		case 1:
+			respuesta = "Primera vez";
+			break;
+		case 2:
+			respuesta = "Segunda vez";
+			break;
+		case 3:
+			respuesta = "Tercera vez";
+			break;
+		case 4:
+			respuesta = "Cuarta vez";
+			break;
+		case 5:
+			respuesta = "Quinta vez";
+			break;
+		case 6:
+			respuesta = "Sexta vez";
+			break;
+		case 7:
+			respuesta = "Septima vez";
+			break;
+		case 8:
+			respuesta = "Octava  vez";
+			break;
+		case 9:
+			respuesta = "Novena  vez";
+			break;
+		case 10:
+			respuesta = "Decima  vez";
+			break;
+		case 11:
+			respuesta = "Onceava  vez";
+			break;
+		default:
+			respuesta = "";
+			break;
+		}
+		return respuesta;
+	}
+
+}
+
+
+
+
+
+
+
+
+

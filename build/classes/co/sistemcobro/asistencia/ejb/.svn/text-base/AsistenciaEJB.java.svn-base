@@ -1,0 +1,99 @@
+package co.sistemcobro.asistencia.ejb;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import org.apache.commons.net.ntp.TimeStamp;
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.asistencia.bean.Asistencia;
+import co.sistemcobro.asistencia.bean.AsistenciaClasificacion;
+import co.sistemcobro.asistencia.dao.AsistenciaDAO;
+
+
+/**
+ * 
+ * @author Leonardo  talero
+ * 
+ */
+@Stateless
+public class AsistenciaEJB extends BaseEJB {
+
+	private Logger logger = Logger.getLogger(AsistenciaEJB.class);
+
+	public AsistenciaEJB() {
+	}
+	
+	public List<Asistencia> getAsistenciaHistorico(Long idcontrato) throws LogicaException {
+		List<Asistencia> identificaciontipo = new ArrayList<Asistencia>();
+		try {
+			AsistenciaDAO asistenciaDAO = new AsistenciaDAO(dc_asistencia);
+			identificaciontipo = asistenciaDAO.getAsistenciaHistorico(idcontrato);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return identificaciontipo;
+		
+	}
+	public Timestamp Obtenerhora_servidor() throws LogicaException {
+		
+		Timestamp dateservidor;
+		try {
+			AsistenciaDAO asistenciaDAO = new AsistenciaDAO(dc_asistencia);
+			dateservidor = asistenciaDAO.getHoraServidor();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return dateservidor;
+		
+	}
+	public Integer insertaMaracionentrada(Asistencia asistencia) throws DatoException, LogicaException {
+		//Timestamp dateservidor;
+		Integer rsu = null;
+		try {
+			AsistenciaDAO asistenciaDAO = new AsistenciaDAO(dg_asistencia);
+			 rsu = asistenciaDAO.insertaMaracionentrada(asistencia);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return rsu;
+	}
+	public Integer editarMaracionentradaconmarcacionSalida(Asistencia asistencia) throws DatoException, LogicaException {
+		//Timestamp dateservidor;
+		Integer rsu = null;
+		try {
+			AsistenciaDAO asistenciaDAO = new AsistenciaDAO(dg_asistencia);
+			 rsu = asistenciaDAO.editarMaracionentradaconmarcacionSalida(asistencia);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return rsu;
+	}
+			
+	
+	public List<AsistenciaClasificacion> getAllClasificacion() throws DatoException, LogicaException {
+		List<AsistenciaClasificacion> clasificaciones = new ArrayList<AsistenciaClasificacion>();
+		try {
+			AsistenciaDAO asistenciaDAO = new AsistenciaDAO(dc_asistencia);
+			clasificaciones = asistenciaDAO.getAllClasificacion();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return clasificaciones;
+	}
+}

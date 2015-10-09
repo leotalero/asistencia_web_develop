@@ -1,0 +1,100 @@
+package co.sistemcobro.all.util;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
+import org.apache.log4j.Logger;
+
+public class Validar {
+	private static Logger logger = Logger.getLogger(Validar.class);
+
+	public static final int DIA = 1;
+	public static final int MENSUAL = 2;
+	public static final int ANUAL = 3;
+
+	public static boolean validarPeriodo(String idperiodo, int frecuencia) {
+
+		boolean resultado = false;
+		SimpleDateFormat formatoDelTexto = null;
+		try {
+			if (null != idperiodo) {
+
+				int log = idperiodo.length();
+				if (frecuencia == DIA) {// diario
+					formatoDelTexto = new SimpleDateFormat("yyyyMMdd");
+					if (log == 8) {
+						formatoDelTexto.setLenient(false);
+						formatoDelTexto.parse(idperiodo);
+						resultado = true;
+					}
+				} else if (frecuencia == MENSUAL) { // mensual
+					formatoDelTexto = new SimpleDateFormat("yyyyMM");
+					if (log == 6) {
+						formatoDelTexto.setLenient(false);
+						formatoDelTexto.parse(idperiodo);
+						resultado = true;
+
+					}
+				} else if (frecuencia == ANUAL) { // anual
+					formatoDelTexto = new SimpleDateFormat("yyyy");
+					if (log == 4) {
+						formatoDelTexto.setLenient(false);
+						formatoDelTexto.parse(idperiodo);
+						resultado = true;
+					}
+				}
+			}
+
+		} catch (NumberFormatException e) {
+			logger.error(e);
+		} catch (ParseException e) {
+			logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+
+		return resultado;
+	}
+
+	public static boolean isDouble(String numero) {
+		boolean resultado = false;
+		try {
+			if (null != numero) {
+				Double.parseDouble(numero);
+				resultado = true;
+			}
+
+		} catch (NumberFormatException e) {
+			logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return resultado;
+	}
+	
+	public static String removetildes(String input) {
+	    // Cadena de caracteres original a sustituir.
+	    String original = "·‡‰ÈËÎÌÏÔÛÚˆ˙˘uÒ¡¿ƒ…»ÀÕÃœ”“÷⁄Ÿ‹—Á«";
+	    // Cadena de caracteres ASCII que reemplazar·n los originales.
+	    String ascii = "aaaeeeiiiooouuunAAAEEEIIIOOOUUUNcC";
+	    String output = input;
+	    for (int i=0; i<original.length(); i++) {
+	        // Reemplazamos los caracteres especiales.
+	        output = output.replace(original.charAt(i), ascii.charAt(i));
+	    }//for i
+	    return output;
+	}//remove1
+	public static boolean isValidEmailAddress(String email) {
+		   boolean result = true;
+		   try {
+		      InternetAddress emailAddr = new InternetAddress(email);
+		      emailAddr.validate();
+		   } catch (AddressException ex) {
+		      result = false;
+		   }
+		   return result;
+		}
+}

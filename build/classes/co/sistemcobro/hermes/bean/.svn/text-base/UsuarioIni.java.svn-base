@@ -1,0 +1,37 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class UsuarioIni implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Integer idusuario;
+	private Integer diasrestacambiarcontrasena;
+
+	public Integer getIdusuario() {
+		return idusuario;
+	}
+
+	public void setIdusuario(Integer idusuario) {
+		this.idusuario = idusuario;
+	}
+
+	public Integer getDiasrestacambiarcontrasena() {
+		return diasrestacambiarcontrasena;
+	}
+
+	public void setDiasrestacambiarcontrasena(Integer diasrestacambiarcontrasena) {
+		this.diasrestacambiarcontrasena = diasrestacambiarcontrasena;
+	}
+
+	@Override
+	public String toString() {
+		return "UsuarioIni [idusuario=" + idusuario + ", diarestacambiarcontrasena=" + diasrestacambiarcontrasena + "]";
+	}
+
+}

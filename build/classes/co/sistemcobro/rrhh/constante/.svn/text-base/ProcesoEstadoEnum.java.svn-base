@@ -1,0 +1,43 @@
+package co.sistemcobro.rrhh.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum ProcesoEstadoEnum {
+	EN_PROCESO(1),COMPLETADO(2);
+
+	public static final Map<Integer, ProcesoEstadoEnum> mapByID = new HashMap<Integer, ProcesoEstadoEnum>();
+	public static final Map<String, ProcesoEstadoEnum> mapByNAME = new HashMap<String, ProcesoEstadoEnum>();
+
+	static {
+		for (ProcesoEstadoEnum s : EnumSet
+				.allOf(ProcesoEstadoEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	ProcesoEstadoEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static ProcesoEstadoEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static ProcesoEstadoEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

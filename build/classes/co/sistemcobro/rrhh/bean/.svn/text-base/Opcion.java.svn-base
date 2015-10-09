@@ -1,0 +1,83 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class Opcion implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idopcion;
+	
+	private Long idpregunta;
+	private String opcion;
+
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	public Long getIdopcion() {
+		return idopcion;
+	}
+	public void setIdopcion(Long idopcion) {
+		this.idopcion = idopcion;
+	}
+	public Long getIdpregunta() {
+		return idpregunta;
+	}
+	public void setIdpregunta(Long idpregunta) {
+		this.idpregunta = idpregunta;
+	}
+	public String getOpcion() {
+		return opcion;
+	}
+	public void setOpcion(String opcion) {
+		this.opcion = opcion;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	
+	
+
+	
+	
+	
+
+	
+
+
+}

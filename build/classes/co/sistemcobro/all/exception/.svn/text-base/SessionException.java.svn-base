@@ -1,0 +1,34 @@
+package co.sistemcobro.all.exception;
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class SessionException extends Exception{
+	
+	private static final long serialVersionUID = -7393514908352290012L;
+
+	private String title = "Session invalida";
+	private String mensaje = "Su sesión caduco, por favor vuelva a loguearse";
+
+	public SessionException() {
+	}
+
+	public SessionException(String mensaje) {
+		this.mensaje = mensaje;
+	}
+
+	@Override
+	public String toString() {
+		return mensaje;
+	}
+
+	@Override
+	public String getMessage() {
+		return mensaje;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+}

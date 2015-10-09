@@ -1,0 +1,181 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class AccesoHistorial implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idaccesohistorial;
+	private Integer idusuario;
+	private Integer idaplicacion;
+	private Integer idaccesotipo;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	private UsuarioBean usuario;
+	private AplicacionBean aplicacion;
+	private AccesoTipo accesotipo;
+	private UsuarioBean usuariocrea;
+	
+	private byte[] sessionserializada;
+	private Integer estadosession;
+	private String codigosessiondb;
+	
+
+	/* Adicionales de lógica */
+	private Long tiempotrascurrido;
+
+	public Long getIdaccesohistorial() {
+		return idaccesohistorial;
+	}
+
+	public void setIdaccesohistorial(Long idaccesohistorial) {
+		this.idaccesohistorial = idaccesohistorial;
+	}
+
+	public Integer getIdusuario() {
+		return idusuario;
+	}
+
+	public void setIdusuario(Integer idusuario) {
+		this.idusuario = idusuario;
+	}
+
+	public Integer getIdaplicacion() {
+		return idaplicacion;
+	}
+
+	public void setIdaplicacion(Integer idaplicacion) {
+		this.idaplicacion = idaplicacion;
+	}
+
+	public Integer getIdaccesotipo() {
+		return idaccesotipo;
+	}
+
+	public void setIdaccesotipo(Integer idaccesotipo) {
+		this.idaccesotipo = idaccesotipo;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public UsuarioBean getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(UsuarioBean usuario) {
+		this.usuario = usuario;
+	}
+
+	public AplicacionBean getAplicacion() {
+		return aplicacion;
+	}
+
+	public void setAplicacion(AplicacionBean aplicacion) {
+		this.aplicacion = aplicacion;
+	}
+
+	public AccesoTipo getAccesotipo() {
+		return accesotipo;
+	}
+
+	public void setAccesotipo(AccesoTipo accesotipo) {
+		this.accesotipo = accesotipo;
+	}
+
+	public UsuarioBean getUsuariocrea() {
+		return usuariocrea;
+	}
+
+	public void setUsuariocrea(UsuarioBean usuariocrea) {
+		this.usuariocrea = usuariocrea;
+	}
+
+	public Long getTiempotrascurrido() {
+		return tiempotrascurrido;
+	}
+
+	public void setTiempotrascurrido(Long tiempotrascurrido) {
+		this.tiempotrascurrido = tiempotrascurrido;
+	}
+
+	public byte[] getSessionserializada() {
+		return sessionserializada;
+	}
+
+	public void setSessionserializada(byte[] sessionserializada) {
+		this.sessionserializada = sessionserializada;
+	}
+
+	public Integer getEstadosession() {
+		return estadosession;
+	}
+
+	public void setEstadosession(Integer estadosession) {
+		this.estadosession = estadosession;
+	}
+
+	public String getCodigosessiondb() {
+		return codigosessiondb;
+	}
+
+	public void setCodigosessiondb(String codigosessiondb) {
+		this.codigosessiondb = codigosessiondb;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	
+	
+	
+}

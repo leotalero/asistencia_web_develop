@@ -1,0 +1,111 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class AplicacionBean implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Integer idaplicacion;
+	private String nombre;
+	private String nombreexterno;
+	private Integer estado;
+	private String linkproduccion;
+	private String icono;
+	private String favicon;
+	private String linkpublico;
+	private Estado estadob;
+
+	private DirectivaAcceso directivaacceso;
+
+	public Integer getIdaplicacion() {
+		return idaplicacion;
+	}
+
+	public void setIdaplicacion(Integer idaplicacion) {
+		this.idaplicacion = idaplicacion;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getNombreexterno() {
+		return nombreexterno;
+	}
+
+	public void setNombreexterno(String nombreexterno) {
+		this.nombreexterno = nombreexterno;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public Estado getEstadob() {
+		return estadob;
+	}
+
+	public void setEstadob(Estado estadob) {
+		this.estadob = estadob;
+	}
+
+	public DirectivaAcceso getDirectivaacceso() {
+		return directivaacceso;
+	}
+
+	public void setDirectivaacceso(DirectivaAcceso directivaacceso) {
+		this.directivaacceso = directivaacceso;
+	}
+
+	@Override
+	public String toString() {
+		return "AplicacionBean [idaplicacion=" + idaplicacion + ", nombre=" + nombre + ", estado=" + estado + "]";
+	}
+
+	public String getLinkproduccion() {
+		return linkproduccion;
+	}
+
+	public void setLinkproduccion(String linkproduccion) {
+		this.linkproduccion = linkproduccion;
+	}
+
+	public String getIcono() {
+		return icono;
+	}
+
+	public void setIcono(String icono) {
+		this.icono = icono;
+	}
+
+	public String getFavicon() {
+		return favicon;
+	}
+
+	public void setFavicon(String favicon) {
+		this.favicon = favicon;
+	}
+
+	public String getLinkpublico() {
+		return linkpublico;
+	}
+
+	public void setLinkpublico(String linkpublico) {
+		this.linkpublico = linkpublico;
+	}
+
+	
+}

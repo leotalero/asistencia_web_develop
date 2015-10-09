@@ -1,0 +1,141 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.hermes.bean.DirectivaAcceso;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class DirectivaAccesoDAO extends BaseDAO {
+
+	@SuppressWarnings("unused")
+	private Logger logger = Logger.getLogger(DirectivaAccesoDAO.class);
+
+	public DirectivaAccesoDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public DirectivaAcceso getDirectivaAccesoAccesoPorIdaplicacion(Integer idaplicacion) throws DatoException {
+
+		DirectivaAcceso directivaacceso = null;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("select da.iddirectivaacceso, da.nombre, da.numintentosbloqueo, da.tiempomaximobloqueo, da.validarcaptchaenlogin, da.validarcaptchenintentosfallidos,  ");
+			q.append("da.verdirectivaaccesologin, da.verintentosfallidos, da.verbloqueotiempotrascurrido, da.idusuariocrea, da.fechacrea, da.idusuariomod, da.fechamod, da.estado ");
+			q.append("from hermes.sco_aplicacion a   ");
+			q.append("inner join hermes.directiva_acceso da on da.iddirectivaacceso = a.iddirectivaacceso  ");
+			q.append("where a.idaplicacion = ? ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idaplicacion);
+			rs = ps.executeQuery();
+
+			int c = 1;
+			if (rs.next()) {
+				c = 1;
+
+				directivaacceso = new DirectivaAcceso();
+				directivaacceso.setIddirectivaacceso(rs.getLong(c++));
+				directivaacceso.setNombre(rs.getString(c++));
+				directivaacceso.setNumintentosbloqueo(rs.getInt(c++));
+				directivaacceso.setTiempomaximobloqueo(rs.getInt(c++));
+				directivaacceso.setValidarcaptchaenlogin(rs.getInt(c++));
+				directivaacceso.setValidarcaptchenintentosfallidos(rs.getInt(c++));
+				directivaacceso.setVerdirectivaaccesologin(rs.getInt(c++));
+				directivaacceso.setVerintentosfallidos(rs.getInt(c++));
+				directivaacceso.setVerbloqueotiempotrascurrido(rs.getInt(c++));
+
+				directivaacceso.setIdusuariocrea(rs.getInt(c++));
+				directivaacceso.setFechacrea(rs.getTimestamp(c++));
+				directivaacceso.setIdusuariomod(rs.getInt(c++));
+				directivaacceso.setFechamod(rs.getTimestamp(c++));
+				directivaacceso.setEstado(rs.getInt(c++));
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return directivaacceso;
+
+	}
+
+	public List<DirectivaAcceso> getDirectivaAccesos(Integer[] estados) throws DatoException {
+		List<DirectivaAcceso> directivaaccesos = new ArrayList<DirectivaAcceso>();
+		DirectivaAcceso directivaacceso = null;
+
+		try {
+
+			/* Verificamos y formateamos los estados */
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (Integer e : estados) {
+					estados_final += String.valueOf(e) + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			} else {
+				throw new DatoException("Formato inválido de estados.");
+			}
+
+			/* Preparamos la query */
+			StringBuilder q = new StringBuilder();
+			q.append("select da.iddirectivaacceso, da.nombre, da.numintentosbloqueo, da.tiempomaximobloqueo, da.validarcaptchaenlogin, da.validarcaptchenintentosfallidos, ");
+			q.append("da.verdirectivaaccesologin, da.verintentosfallidos, da.verbloqueotiempotrascurrido, da.idusuariocrea, da.fechacrea, da.idusuariomod, da.fechamod, da.estado ");
+			q.append("from hermes.sco_aplicacion a   ");
+			q.append("inner join hermes.directiva_acceso da on da.iddirectivaacceso = a.iddirectivaacceso  ");
+			q.append("where da.estado in  (" + estados_final + ") order by da.nombre ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			rs = ps.executeQuery();
+
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				directivaacceso = new DirectivaAcceso();
+				directivaacceso.setIddirectivaacceso(rs.getLong(c++));
+				directivaacceso.setNombre(rs.getString(c++));
+				directivaacceso.setNumintentosbloqueo(rs.getInt(c++));
+				directivaacceso.setTiempomaximobloqueo(rs.getInt(c++));
+				directivaacceso.setValidarcaptchaenlogin(rs.getInt(c++));
+				directivaacceso.setValidarcaptchenintentosfallidos(rs.getInt(c++));
+				directivaacceso.setVerdirectivaaccesologin(rs.getInt(c++));
+				directivaacceso.setVerintentosfallidos(rs.getInt(c++));
+				directivaacceso.setVerbloqueotiempotrascurrido(rs.getInt(c++));
+
+				directivaacceso.setIdusuariocrea(rs.getInt(c++));
+				directivaacceso.setFechacrea(rs.getTimestamp(c++));
+				directivaacceso.setIdusuariomod(rs.getInt(c++));
+				directivaacceso.setFechamod(rs.getTimestamp(c++));
+				directivaacceso.setEstado(rs.getInt(c++));
+
+				directivaaccesos.add(directivaacceso);
+
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return directivaaccesos;
+	}
+
+}

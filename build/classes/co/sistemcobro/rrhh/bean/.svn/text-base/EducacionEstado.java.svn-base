@@ -1,0 +1,67 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+public class EducacionEstado implements Serializable {
+
+	
+	private static final long serialVersionUID = 1L;
+
+	Long idEducacionEstado;
+	String nombreEducacionEstado;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	
+	public Long getIdEducacionEstado() {
+		return idEducacionEstado;
+	}
+	public void setIdEducacionEstado(Long idEducacionEstado) {
+		this.idEducacionEstado = idEducacionEstado;
+	}
+	public String getNombreEducacionEstado() {
+		return nombreEducacionEstado;
+	}
+	public void setNombreEducacionEstado(String nombreEducacionEstado) {
+		this.nombreEducacionEstado = nombreEducacionEstado;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+}

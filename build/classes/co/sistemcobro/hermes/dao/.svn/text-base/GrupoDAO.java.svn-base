@@ -1,0 +1,122 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.hermes.bean.GrupoBean;
+import co.sistemcobro.hermes.bean.GrupoTipoBean;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class GrupoDAO extends BaseDAO {
+
+	private Logger logger = Logger.getLogger(GrupoDAO.class);
+
+	public GrupoDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public List<GrupoBean> getGrupos(String estados) throws DatoException {
+		List<GrupoBean> grupos = new ArrayList<GrupoBean>();
+		GrupoBean grupo = null;
+		GrupoTipoBean grupotipo = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select g.idgrupo, g.idgrupotipo, g.codgrupo, g.nombre, g.estado, ");
+			q.append("gt.idgrupotipo, gt.nombre, gt.estado ");
+			q.append("from hermes.sco_grupo g ");
+			q.append("inner join hermes.sco_grupo_tipo gt on g.idgrupotipo=gt.idgrupotipo ");
+			q.append("where g.estado in (" + estados + ") ");
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				int t = 1;
+				grupo = new GrupoBean();
+				grupo.setIdgrupo(rs.getInt(t++));
+				grupo.setIdgrupotipo(rs.getInt(t++));
+				grupo.setCodgrupo(rs.getInt(t++));
+				grupo.setNombre(rs.getString(t++));
+				grupo.setEstado(rs.getInt(t++));
+
+				grupotipo = new GrupoTipoBean();
+				grupotipo.setIdgrupotipo(rs.getInt(t++));
+				grupotipo.setNombre(rs.getString(t++));
+				grupotipo.setEstado(rs.getInt(t++));
+
+				grupo.setGrupotipo(grupotipo);
+
+				grupos.add(grupo);
+
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return grupos;
+
+	}
+
+	private static String SQL_GRUPOS_POR_APLICACION = "select g.idgrupo, g.idgrupotipo, g.codgrupo, g.nombre, g.estado, " + "gt.idgrupotipo, gt.nombre, gt.estado " + "from hermes.sco_grupo g " + "inner join hermes.sco_grupo_tipo gt on g.idgrupotipo=gt.idgrupotipo "
+			+ "inner join hermes.sco_aplicacion_grupo ag on ag.idgrupo = g.idgrupo " + "where ag.idaplicacion = ? ";
+
+	public List<GrupoBean> getGruposPorAplicacion(Integer idaplicacion) {
+		List<GrupoBean> grupos = new ArrayList<GrupoBean>();
+		GrupoBean grupo = null;
+		GrupoTipoBean grupotipo = null;
+
+		try {
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(SQL_GRUPOS_POR_APLICACION);
+			ps.setInt(1, idaplicacion);
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				int t = 1;
+				grupo = new GrupoBean();
+				grupo.setIdgrupo(rs.getInt(t++));
+				grupo.setIdgrupotipo(rs.getInt(t++));
+				grupo.setCodgrupo(rs.getInt(t++));
+				grupo.setNombre(rs.getString(t++));
+				grupo.setEstado(rs.getInt(t++));
+
+				grupotipo = new GrupoTipoBean();
+				grupotipo.setIdgrupotipo(rs.getInt(t++));
+				grupotipo.setNombre(rs.getString(t++));
+				grupotipo.setEstado(rs.getInt(t++));
+
+				grupo.setGrupotipo(grupotipo);
+
+				grupos.add(grupo);
+
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return grupos;
+
+	}
+
+}

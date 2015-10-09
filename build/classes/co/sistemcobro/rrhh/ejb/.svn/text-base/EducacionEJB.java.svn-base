@@ -1,0 +1,200 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.EducacionEstado;
+import co.sistemcobro.rrhh.bean.EducacionNivel;
+import co.sistemcobro.rrhh.bean.EmpleadoEducacion;
+import co.sistemcobro.rrhh.dao.EducacionDAO;
+
+/**
+ * Session Bean implementation class EducacionEJB
+ * @author jpuentes
+ */
+@Stateless
+public class EducacionEJB extends BaseEJB{
+
+    /**
+     * Default constructor. 
+     */
+    public EducacionEJB() {
+       
+    }
+    
+
+    /**
+     * Consulta el listado de datos de educación de un empleado.
+     * @param Long. idempleado.
+     * @return List. EmpleadoEducacion.
+     */
+    public List<EmpleadoEducacion> obtenerEducacionDeEmpleadoPorIdEmpleado(Long idEmpleado) throws LogicaException{
+    	
+    	List<EmpleadoEducacion> listaDeEmpleadoEducacion = new ArrayList<EmpleadoEducacion>();
+    	
+    	try {
+    		
+    		EducacionDAO educacionDAO = new EducacionDAO(dc_rrhh);
+    		listaDeEmpleadoEducacion = educacionDAO.obtenerEducacionDeEmpleadoPorIdEmpleado(idEmpleado);
+    		
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeEmpleadoEducacion;  
+    }
+
+    
+    /**
+     * Consulta el listado de niveles de educación existentes.
+     * @param Long. idempleado.
+     * @return List. EducacionNivel.
+     */
+    public List<EducacionNivel> obtenerNivelesDeEducacion() throws LogicaException{
+    	
+    	List<EducacionNivel> listaDeNivelesDeEducacion = new ArrayList<EducacionNivel>();
+    	
+    	try {
+    		
+    		EducacionDAO educacionDAO = new EducacionDAO(dc_rrhh);
+    		listaDeNivelesDeEducacion = educacionDAO.obtenerNivelesDeEducacion();
+    		
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeNivelesDeEducacion;  
+    }
+    
+
+    
+    /**
+     * Consulta el listado de estados de educación.
+     * @return List. EducacionNivel.
+     */
+    public List<EducacionEstado> obtenerEstadosDeEducacion() throws LogicaException{
+    	
+    	List<EducacionEstado> listaDeEstadosDeEducacion = new ArrayList<EducacionEstado>();
+    	
+    	try {
+    		EducacionDAO educacionDAO = new EducacionDAO(dc_rrhh);
+    		listaDeEstadosDeEducacion = educacionDAO.obtenerEstadosDeEducacion();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeEstadosDeEducacion;  
+    }
+    
+
+    /**
+     * Método para insertar una nueva afiliación.
+     * @param EmpleadoEducacion. La relación a insertar.
+     * @return EmpleadoEducacion. La relación insertada.
+     * @throws LogicaException.
+     */
+    public EmpleadoEducacion insertarNuevaEducacion(EmpleadoEducacion empleadoEducacion) throws LogicaException{
+    	EmpleadoEducacion resultado = null;
+    	try{
+    		EducacionDAO educacionDAO = new EducacionDAO(dg_rrhh); 
+    		resultado = educacionDAO.insertarEmpleadoEducacion(empleadoEducacion);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+
+    /**
+     * Obtener un EmpleadoEducacion por IdEmpleadoEducacion
+     * @param idempleadoeducacion. el id de la relación.
+     * @return EmpleadoEducacion.
+     */
+    public EmpleadoEducacion obtenerEmpleadoEducacionPorId(Long idEmpleadoEducacion) throws DatoException, LogicaException {
+    	EmpleadoEducacion empleadoEducacion = null;
+    	try{
+    		EducacionDAO educacionDAO = new EducacionDAO(dc_rrhh);
+    		empleadoEducacion = educacionDAO.obtenerEmpleadoEducacionPorId(idEmpleadoEducacion);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return empleadoEducacion;
+    }
+    
+    
+    /**
+     * Editar un EmpleadoEducacion.
+     * @param EmpleadoEducacion. El EmpleadoEducacion a editar.
+     * @return Integer. El numero de filas afectadas.
+     */
+	public Integer editarEmpleadoEducacion(EmpleadoEducacion empleadoEducacion) throws DatoException, LogicaException {
+		
+			Integer resultado=null;
+			
+			try {
+				EducacionDAO educacionDAO = new EducacionDAO(dg_rrhh);
+				resultado = educacionDAO.editarEmpleadoEducacion(empleadoEducacion);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return resultado;
+	}
+    
+
+	 /**
+     * Deshabilitar un Empleado Educacion
+     * @param EmpleadoEducacion. la relacion EmpleadoEducacion.
+     * @return Integer. El número de filas afectadas.
+     */
+    public Integer deshabilitarEmpleadoEducacion(EmpleadoEducacion empleadoEducacion) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			EducacionDAO educacionDAO = new EducacionDAO(dg_rrhh);
+			empleadoEducacion.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resultado = educacionDAO.actualizarEstadoEmpleadoEducacion(empleadoEducacion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+	
+    
+    /**
+     * Habilitar un Empleado Educacion
+     * @param EmpleadoEducacion. la relacion EmpleadoEducacion.
+     * @return Integer. El número de filas afectadas.
+     */
+    public Integer habilitarEmpleadoEducacion(EmpleadoEducacion empleadoEducacion) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			EducacionDAO educacionDAO = new EducacionDAO(dg_rrhh);
+			empleadoEducacion.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resultado = educacionDAO.actualizarEstadoEmpleadoEducacion(empleadoEducacion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+}
+
+
+

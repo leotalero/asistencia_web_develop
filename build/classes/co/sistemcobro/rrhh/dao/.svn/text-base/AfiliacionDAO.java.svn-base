@@ -1,0 +1,471 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.rrhh.bean.AfiliacionEntidad;
+import co.sistemcobro.rrhh.bean.AfiliacionTipo;
+import co.sistemcobro.rrhh.bean.EmpleadoAfiliacion;
+
+/**
+ * Para la gestión de Afiliaciones a prestaciones sociales(Salud,Pensión,Cesantias,Caja de Compensación) de los empleados.
+ * 
+ * @author jpuentes
+ */
+
+public class AfiliacionDAO extends BaseDAO {
+
+	private final static Logger log = Logger.getLogger(AfiliacionDAO.class);
+	
+	/**
+	 * Constructor.
+	 */
+	public AfiliacionDAO(DataSource ds) {
+		this.ds = ds;
+	}
+	
+	/**
+	 * Este método consulta las afilaciones de un empleado.
+	 * @param idempleado. El id del empleado.
+	 * @return List<EmpleadoAfiliacion>. La lista de datos de afiliacionesd el empleado.
+	 */
+	public List<EmpleadoAfiliacion> obtenerAfiliacionesDeEmpleadoPorIdEmpleado(Long idEmpleado) throws DatoException{
+		
+		List<EmpleadoAfiliacion> listaEmpleadoAfiliacion = new ArrayList<EmpleadoAfiliacion>();
+		EmpleadoAfiliacion empleadoAfiliacion= null;
+		AfiliacionTipo tipoAfiliacion = null;
+		AfiliacionEntidad entidad = null;
+		try {
+
+			String consulta = "SELECT ea.idempleadoafiliacion,ea.idempleado,ea.idafiliaciontipo,ea.idafiliacionentidad,ea.fechainicio, ea.fechafin, ea.observacion,"
+							 +"ea.idusuariocrea,ea.fechacrea,ea.idusuariomod,ea.fechamod, ea.estado,at.idafiliaciontipo, at.tipoafiliacion,ae.idafiliacionentidad,"
+							 +"ae.nombreentidad "
+							 +"FROM rrhh.empleado_afiliacion ea,rrhh.afiliacion_tipo at,rrhh.afiliacion_entidad ae "
+							 +"WHERE ea.idempleado= "+idEmpleado+" "
+							 +"AND at.idafiliaciontipo = ea.idafiliaciontipo "
+							 +"AND ae.idafiliacionentidad = ea.idafiliacionentidad";
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+			while (rs.next()) {
+				empleadoAfiliacion =  new EmpleadoAfiliacion();
+				tipoAfiliacion = new AfiliacionTipo();
+				entidad = new AfiliacionEntidad();
+				
+				empleadoAfiliacion.setIdempleadoafiliacion(rs.getLong("idempleadoafiliacion"));
+				empleadoAfiliacion.setIdempleado(rs.getLong("idempleado"));
+				empleadoAfiliacion.setIdafiliaciontipo(rs.getLong("idafiliaciontipo"));
+				empleadoAfiliacion.setIdafiliacionentidad(rs.getLong("idafiliacionentidad"));
+				empleadoAfiliacion.setFechainicio(rs.getTimestamp("fechainicio"));
+				empleadoAfiliacion.setFechafin(rs.getTimestamp("fechafin"));
+				empleadoAfiliacion.setObservacion(rs.getString("observacion"));
+				empleadoAfiliacion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoAfiliacion.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoAfiliacion.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoAfiliacion.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoAfiliacion.setEstado(rs.getInt("estado"));
+				
+				tipoAfiliacion.setIdafiliaciontipo(rs.getLong("idafiliaciontipo"));
+				tipoAfiliacion.setTipoafiliacion(rs.getString("tipoafiliacion"));
+				
+				entidad.setIdafiliacionentidad(rs.getLong("idafiliacionentidad"));
+				entidad.setNombreentidad(rs.getString("nombreentidad"));
+				
+				empleadoAfiliacion.setAfiliacionTipo(tipoAfiliacion);
+				empleadoAfiliacion.setAfiliacionEntidad(entidad);
+				listaEmpleadoAfiliacion.add(empleadoAfiliacion);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaEmpleadoAfiliacion;
+	}
+
+	
+	/**
+	 * Obtener todos los tipos de afiliación.
+	 * @return List. La lista de AfiliacionTipo.
+	 */
+	public List<AfiliacionTipo> obtenerTiposDeAfiliacion() throws DatoException {
+
+		List<AfiliacionTipo> listaTiposDeAfiliacion = new ArrayList<AfiliacionTipo>();
+		AfiliacionTipo tipoDeAfiliacion = null;
+
+		try {
+
+			String consulta = "SELECT idafiliaciontipo as id,tipoafiliacion as tipo,observacion,idusuariocrea as idcrea,fechacrea,idusuariomod as idmod,fechamod,estado "
+							 +"FROM rrhh.afiliacion_tipo "
+							 +"WHERE estado = 2";
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				tipoDeAfiliacion = new AfiliacionTipo();
+
+				tipoDeAfiliacion.setIdafiliaciontipo(rs.getLong("id"));
+				tipoDeAfiliacion.setTipoafiliacion(rs.getString("tipo"));
+				tipoDeAfiliacion.setObservacion(rs.getString("observacion"));
+				tipoDeAfiliacion.setIdusuariocrea(rs.getInt("idcrea"));
+				tipoDeAfiliacion.setFechacrea(rs.getTimestamp("fechacrea"));
+				tipoDeAfiliacion.setIdusuariomod(rs.getInt("idmod"));
+				tipoDeAfiliacion.setFechamod(rs.getTimestamp("fechamod"));
+				tipoDeAfiliacion.setEstado(rs.getInt("estado"));
+
+				listaTiposDeAfiliacion.add(tipoDeAfiliacion);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaTiposDeAfiliacion;
+	}
+	
+	
+	/**
+	 * Obtener las entidades dependiendo del tipo de afiliación.
+	 * 
+	 * @param idafiliaciontipo
+	 */
+	public List<AfiliacionEntidad> obtenerEntidadesDeAfiliacion() throws DatoException {
+
+		List<AfiliacionEntidad> listaDeEntidades = new ArrayList<AfiliacionEntidad>();
+		AfiliacionEntidad entidad = null;
+
+		try {
+
+			String consulta = "SELECT ae.idafiliacionentidad,ae.nombreentidad,ae.observacion,ae.idusuariocrea,ae.fechacrea,ae.idusuariomod,ae.fechamod, ae.estado "
+							 +"FROM rrhh.afiliacion_entidad ae "
+							 +"WHERE ae.estado = 2";
+
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				entidad = new AfiliacionEntidad();
+
+				entidad.setIdafiliacionentidad(rs.getLong("idafiliacionentidad"));
+				entidad.setNombreentidad(rs.getString("nombreentidad"));
+				entidad.setObservacion(rs.getString("observacion"));
+				entidad.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				entidad.setFechacrea(rs.getTimestamp("fechacrea"));
+				entidad.setIdusuariomod(rs.getInt("idusuariomod"));
+				entidad.setFechamod(rs.getTimestamp("fechamod"));
+				entidad.setEstado(rs.getInt("estado"));
+
+				listaDeEntidades.add(entidad);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaDeEntidades;
+	}
+	
+	
+	
+	/**
+	 * Registrar una ueva afiliación a un empleado.
+	 * @param: EmpleadoAfiliacion a insertar.
+	 * @return: EmpleadoAfiliacion. El empleadoAfiliacion registrada.
+	 */
+	public EmpleadoAfiliacion insertarEmpleadoAfiliacion(EmpleadoAfiliacion empleadoAfiliacion) throws DatoException{
+		
+		Util.registerConverters();
+		try {
+						
+			String insercion ="INSERT INTO rrhh.empleado_afiliacion(idempleado,idafiliaciontipo,idafiliacionentidad,fechainicio,fechafin,observacion,idusuariocrea,fechacrea,estado)"
+                             +"VALUES(?,?,?,?,?,?,?,GETDATE(),?)";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setLong(1,empleadoAfiliacion.getIdempleado());
+			ps.setLong(2,empleadoAfiliacion.getIdafiliaciontipo());
+			ps.setLong(3,empleadoAfiliacion.getIdafiliacionentidad());
+			ps.setTimestamp(4, empleadoAfiliacion.getFechainicio());
+			
+			if(empleadoAfiliacion.getFechafin()==null){
+				ps.setNull(5,java.sql.Types.TIMESTAMP );
+			}else{
+				ps.setTimestamp(5,empleadoAfiliacion.getFechafin());
+			}
+			
+			if(empleadoAfiliacion.getObservacion()==null){
+				ps.setNull(6, java.sql.Types.NVARCHAR);
+			}else{
+				ps.setString(6, empleadoAfiliacion.getObservacion());
+			}
+			
+			ps.setLong(7,empleadoAfiliacion.getIdusuariocrea());
+			ps.setInt(8,empleadoAfiliacion.getEstado());
+			
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			
+			if (rs.next()) {
+				empleadoAfiliacion.setIdempleadoafiliacion(rs.getLong(1));
+			} else {
+				throw new SQLException("EmpleadoAfiliacion, no se pudo generar su IDEmpleadoAfiliacion.");
+			}
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoAfiliacion;
+	}
+	
+	
+	/**
+	 *  Metodo para actualizar el estado de EmpleadoAfiliacion.
+	 *  @param EmpleadoAfiliacion. El empleado afiliacion a cambiarle el estado.
+	 *  @return Integer, Numero de filas alteradas.
+	 */
+	public Integer actualizarEstadoEmpleadoAfiliacion(EmpleadoAfiliacion empleadoAfiliacion) throws DatoException {
+		Integer estatus = 0;
+		
+		try {
+
+			String query = "UPDATE rrhh.empleado_afiliacion set estado=?,idusuariomod=?,fechamod=getdate() WHERE idempleadoafiliacion=?";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(query);
+
+			ps.setInt(1, empleadoAfiliacion.getEstado());
+			ps.setInt(2, empleadoAfiliacion.getIdusuariomod());
+			ps.setLong(3, empleadoAfiliacion.getIdempleadoafiliacion());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	
+	
+
+	/**
+	 * Obtener un empleadoAfiliacion por id.
+	 * @param idEmpladoAfiliacion.
+	 * @return EmpleadoAfiliacion.
+	 */
+	public EmpleadoAfiliacion obtenerEmpleadoAfiliacionPorId(Long idEmpleadoAfiliacion)throws DatoException{
+	
+		EmpleadoAfiliacion empleadoAfiliacion = null; 
+		
+		log.info("IDEMPLEADOAFILIACION QUE LLEGA : "+idEmpleadoAfiliacion);
+		
+		try{
+			String consulta = "SELECT ea.idempleadoafiliacion,ea.idempleado,ea.idafiliaciontipo,ea.idafiliacionentidad,ea.fechainicio, ea.fechafin, ea.observacion,"
+							 +"ea.idusuariocrea,ea.fechacrea,ea.idusuariomod,ea.fechamod, ea.estado,at.idafiliaciontipo, at.tipoafiliacion,ae.idafiliacionentidad,ae.nombreentidad "
+							 +"FROM rrhh.empleado_afiliacion ea,rrhh.afiliacion_tipo at,rrhh.afiliacion_entidad ae "
+							 +"WHERE at.idafiliaciontipo = ea.idafiliaciontipo and ae.idafiliacionentidad = ea.idafiliacionentidad "
+							 +"AND ea.idempleadoafiliacion = "+idEmpleadoAfiliacion;
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				empleadoAfiliacion= new EmpleadoAfiliacion();
+			    
+				empleadoAfiliacion.setIdempleadoafiliacion(rs.getLong("idempleadoafiliacion"));
+				empleadoAfiliacion.setIdempleado(rs.getLong("idempleado"));
+				empleadoAfiliacion.setIdafiliaciontipo(rs.getLong("idafiliaciontipo"));
+				empleadoAfiliacion.setIdafiliacionentidad(rs.getLong("idafiliacionentidad"));
+				empleadoAfiliacion.setFechainicio(rs.getTimestamp("fechainicio"));
+				empleadoAfiliacion.setFechafin(rs.getTimestamp("fechafin"));
+				empleadoAfiliacion.setObservacion(rs.getString("observacion"));
+				empleadoAfiliacion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoAfiliacion.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoAfiliacion.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoAfiliacion.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoAfiliacion.setEstado(rs.getInt("estado"));
+				
+				AfiliacionTipo afiliacionTipo = new AfiliacionTipo();
+				afiliacionTipo.setIdafiliaciontipo(rs.getLong("idafiliaciontipo"));
+				afiliacionTipo.setTipoafiliacion(rs.getString("tipoafiliacion"));
+				
+				AfiliacionEntidad entidad = new AfiliacionEntidad();
+				entidad.setIdafiliacionentidad(rs.getLong("idafiliacionentidad"));
+				entidad.setNombreentidad(rs.getString("nombreentidad"));
+				
+				empleadoAfiliacion.setAfiliacionTipo(afiliacionTipo);
+				empleadoAfiliacion.setAfiliacionEntidad(entidad);
+				
+			}
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoAfiliacion;
+	}
+	
+	
+
+	/**
+	 * Editar EmpleadoAfiliacion.
+	 * @param EmpleadoAfiliacion, El EmpleadoAfiliacion a editar.
+	 * @return Integer. El numero de filas afectadas.
+	 */
+	public Integer editarEmpleadoAfiliacion(EmpleadoAfiliacion empleadoafiliacion) throws DatoException {
+		Integer estatus = 0;
+		
+		try {
+
+			String actualizacion = "UPDATE rrhh.empleado_afiliacion set idafiliaciontipo = ?,idafiliacionentidad = ?,fechainicio = ?,"
+								 + "fechafin = ?,observacion = ?,idusuariomod = ?,fechamod = getdate() WHERE idempleadoafiliacion = ?";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setLong(1, empleadoafiliacion.getIdafiliaciontipo());
+			ps.setLong(2, empleadoafiliacion.getIdafiliacionentidad());
+			ps.setTimestamp(3,empleadoafiliacion.getFechainicio());
+			
+			if(empleadoafiliacion.getFechafin()==null){
+				ps.setNull(4, java.sql.Types.TIMESTAMP);
+			}else{
+				ps.setTimestamp(4,empleadoafiliacion.getFechafin());
+			}
+			
+			if(empleadoafiliacion.getObservacion()==null){
+				ps.setNull(5, java.sql.Types.TIMESTAMP);
+			}else{
+				ps.setString(5,empleadoafiliacion.getObservacion());
+			}
+			
+			ps.setInt(6, empleadoafiliacion.getIdusuariomod());
+			ps.setLong(7, empleadoafiliacion.getIdempleadoafiliacion());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+	}
+	
+
+	/**
+	 * Consulta de entidades de afiliación por el tipo de afiliacion.
+	 * @param idafiliaciontipo.
+	 * @return List. La lista de AfiliacionEntidad. 
+	 */
+	public List<AfiliacionEntidad> getEntidadesPorAfiliacionTipo(Long idafiliaciontipo) throws DatoException {
+		AfiliacionEntidad entidad = null;
+		List<AfiliacionEntidad> listaEntidades = new ArrayList<AfiliacionEntidad>();
+		
+		try {
+
+			String consulta = "SELECT enti.idafiliacionentidad,enti.nombreentidad from rrhh.afiliacion_entidad enti,rrhh.afiliacion_entidad_tipo tipo "
+							 +"WHERE tipo.idafiliaciontipo=? "
+							 +"AND tipo.idafiliacionentidad = enti.idafiliacionentidad "
+							 +"AND enti.estado= ?";
+			    
+				con = ds.getConnection();
+				ps = con.prepareStatement(consulta);
+				ps.setLong(1,idafiliaciontipo);
+				ps.setLong(2, EstadoEnum.ACTIVO.getIndex());
+				
+				rs = ps.executeQuery();
+				
+				while (rs.next()) {
+					entidad = new AfiliacionEntidad();
+					
+					entidad.setIdafiliacionentidad(rs.getLong("idafiliacionentidad"));
+					entidad.setNombreentidad(rs.getString("nombreentidad"));
+					
+					listaEntidades.add(entidad);
+				}
+			
+		
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaEntidades;
+
+	}
+	
+	/**
+	 * Consulta el id del tipo de afiliacion que tiene un empleado_afiliacion.
+	 * @param idempleadoafiliacion.
+	 * @return Long. El id del tipo de afiliacion.
+	 */
+	public Long getIdAfiliacionTipoPorEmpleadoAfiliacion(Long idempleadoafiliacion) throws DatoException {
+		Long idAfiliacionTipo = null;
+		try {
+
+			String consulta = "SELECT idafiliaciontipo FROM rrhh.empleado_afiliacion WHERE idempleadoafiliacion=?";
+			
+				con = ds.getConnection();
+				ps = con.prepareStatement(consulta);
+				ps.setLong(1,idempleadoafiliacion);
+				rs = ps.executeQuery();
+				
+				if(rs.next()) {
+					idAfiliacionTipo = rs.getLong("idafiliaciontipo");
+				}
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return idAfiliacionTipo;
+
+	}
+	
+}
+

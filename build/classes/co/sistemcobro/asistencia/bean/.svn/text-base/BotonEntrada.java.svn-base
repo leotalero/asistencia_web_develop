@@ -1,0 +1,30 @@
+package co.sistemcobro.asistencia.bean;
+
+import java.io.Serializable;
+import java.sql.Time;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class BotonEntrada implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private String valor ;
+
+	public String getValor() {
+		return valor;
+	}
+
+	public void setValor(String valor) {
+		this.valor = valor;
+	}
+	
+	
+	
+
+
+}

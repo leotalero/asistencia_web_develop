@@ -1,0 +1,89 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class Proceso implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idproceso;
+
+	private String nombreproceso;
+	private String color;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	
+	
+	
+	
+	
+	
+	public Long getIdproceso() {
+		return idproceso;
+	}
+	public void setIdproceso(Long idproceso) {
+		this.idproceso = idproceso;
+	}
+	public String getNombreproceso() {
+		return nombreproceso;
+	}
+	public void setNombreproceso(String nombreproceso) {
+		this.nombreproceso = nombreproceso;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public String getColor() {
+		return color;
+	}
+	public void setColor(String color) {
+		this.color = color;
+	}
+	
+	
+	
+
+	
+
+
+}

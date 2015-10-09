@@ -1,0 +1,282 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.hermes.bean.AplicacionBean;
+import co.sistemcobro.hermes.bean.Estado;
+import co.sistemcobro.hermes.bean.GrupoBean;
+import co.sistemcobro.hermes.bean.GrupoTipoBean;
+import co.sistemcobro.hermes.bean.UsuarioAplicacionBean;
+
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class UsuarioAplicacionDAO extends BaseDAO {
+
+	private Logger logger = Logger.getLogger(UsuarioAplicacionDAO.class);
+
+	public UsuarioAplicacionDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	private static StringBuilder SQL_USUARIO_APLICACION_ESTADO_UPDATE = new StringBuilder().append("update hermes.sco_usuario_aplicacion set estado=?, idusuariomod=?, fechamod=getdate() where idusuario=? and idaplicacion=? ");
+
+	public List<UsuarioAplicacionBean> getUsuarioAplicacionPorIdusuario(Integer idusuario, Integer[] estados) throws DatoException {
+		List<UsuarioAplicacionBean> uas = new ArrayList<UsuarioAplicacionBean>();
+		UsuarioAplicacionBean ua = null;
+		AplicacionBean aplicacion = null;
+		GrupoBean grupo = null;
+		GrupoTipoBean grupotipo = null;
+		Estado usuarioaplicacionestado = null;
+		
+		try {
+			
+			/* Procesa estados */
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (Integer e : estados) {
+					estados_final += String.valueOf(e) + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+
+			StringBuffer q = new StringBuffer();
+			q.append("select ua.idusuario, ua.idaplicacion, ua.idgrupo, ua.idusuariocrea, ua.fechacrea, ua.idusuariomod, ua.fechamod, ua.estado,  ");
+			q.append("a.idaplicacion, a.nombre, a.estado, a.linkproduccion,a.icono, ");
+			q.append("g.idgrupo, g.idgrupotipo, g.codgrupo, g.nombre, g.estado, ");
+			q.append("gt.idgrupotipo, gt.nombre, gt.estado,  ");
+			q.append("uae.idestado, uae.nombre, uae.nombrecorto, uae.simbolo, uae.orden ");
+			q.append("from hermes.sco_usuario_aplicacion ua ");
+			q.append("left join hermes.sco_aplicacion a on ua.idaplicacion = a.idaplicacion ");
+			q.append("left join hermes.sco_grupo g on ua.idgrupo=g.idgrupo ");
+			q.append("left join hermes.sco_grupo_tipo gt on gt.idgrupotipo=g.idgrupotipo ");
+			q.append("left join hermes.estado uae on uae.idestado = ua.estado   ");
+			q.append("where ua.idusuario = ? and ua.estado in (" + estados_final + ")  order by a.idaplicacion  ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+
+			rs = ps.executeQuery();
+			int t = 1;
+			while (rs.next()) {
+				t = 1;
+				ua = new UsuarioAplicacionBean();
+				ua.setIdusuario(rs.getInt(t++));
+				ua.setIdaplicacion(rs.getInt(t++));
+				ua.setIdgrupo(rs.getInt(t++));
+				ua.setIdusuariocrea(rs.getInt(t++));
+				ua.setFechacrea(rs.getTimestamp(t++));
+				ua.setIdusuariomod(rs.getInt(t++));
+				ua.setFechamod(rs.getTimestamp(t++));
+				ua.setEstado(rs.getInt(t++));
+
+				aplicacion = new AplicacionBean();
+				aplicacion.setIdaplicacion(rs.getInt(t++));
+				aplicacion.setNombre(rs.getString(t++));
+				aplicacion.setEstado(rs.getInt(t++));
+				aplicacion.setLinkproduccion(rs.getString(t++));
+				aplicacion.setIcono(rs.getString(t++));
+				
+				grupo = new GrupoBean();
+				grupo.setIdgrupo(rs.getInt(t++));
+				grupo.setIdgrupotipo(rs.getInt(t++));
+				grupo.setCodgrupo(rs.getInt(t++));
+				grupo.setNombre(rs.getString(t++));
+				grupo.setEstado(rs.getInt(t++));
+
+				grupotipo = new GrupoTipoBean();
+				grupotipo.setIdgrupotipo(rs.getInt(t++));
+				grupotipo.setNombre(rs.getString(t++));
+				grupotipo.setEstado(rs.getInt(t++));
+				
+				usuarioaplicacionestado = new Estado();
+				usuarioaplicacionestado.setIdestado(rs.getInt(t++));
+				usuarioaplicacionestado.setNombre(rs.getString(t++));
+				usuarioaplicacionestado.setNombrecorto(rs.getString(t++));
+				usuarioaplicacionestado.setSimbolo(rs.getString(t++));
+				usuarioaplicacionestado.setOrden(rs.getInt(t++));		
+
+				grupo.setGrupotipo(grupotipo);
+
+				ua.setGrupo(grupo);
+				ua.setAplicacion(aplicacion);
+				ua.setEstadob(usuarioaplicacionestado);
+				
+				uas.add(ua);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return uas;
+	}
+
+	
+	public List<UsuarioAplicacionBean> getUsuarioAplicacionPorIdusuarioconLink(Integer idusuario, Integer[] estados) throws DatoException {
+		List<UsuarioAplicacionBean> uas = new ArrayList<UsuarioAplicacionBean>();
+		UsuarioAplicacionBean ua = null;
+		AplicacionBean aplicacion = null;
+		GrupoBean grupo = null;
+		GrupoTipoBean grupotipo = null;
+		Estado usuarioaplicacionestado = null;
+		
+		try {
+			
+			/* Procesa estados */
+			String estados_final = "";
+			if (null != estados && estados.length > 0) {
+				for (Integer e : estados) {
+					estados_final += String.valueOf(e) + ",";
+				}
+				estados_final = estados_final.substring(0, estados_final.length() - 1);
+			}
+
+			StringBuffer q = new StringBuffer();
+			q.append("select ua.idusuario, ua.idaplicacion, ua.idgrupo, ua.idusuariocrea, ua.fechacrea, ua.idusuariomod, ua.fechamod, ua.estado,  ");
+			q.append("a.idaplicacion, a.nombre, a.estado, a.linkproduccion,a.icono, ");
+			q.append("g.idgrupo, g.idgrupotipo, g.codgrupo, g.nombre, g.estado, ");
+			q.append("gt.idgrupotipo, gt.nombre, gt.estado,  ");
+			q.append("uae.idestado, uae.nombre, uae.nombrecorto, uae.simbolo, uae.orden ");
+			q.append("from hermes.sco_usuario_aplicacion ua ");
+			q.append("left join hermes.sco_aplicacion a on ua.idaplicacion = a.idaplicacion ");
+			q.append("left join hermes.sco_grupo g on ua.idgrupo=g.idgrupo ");
+			q.append("left join hermes.sco_grupo_tipo gt on gt.idgrupotipo=g.idgrupotipo ");
+			q.append("left join hermes.estado uae on uae.idestado = ua.estado   ");
+			q.append("where ua.idusuario = ? and ua.estado in (" + estados_final + ") and  a.linkproduccion is not NULL   order by a.idaplicacion  ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, idusuario);
+
+			rs = ps.executeQuery();
+			int t = 1;
+			while (rs.next()) {
+				t = 1;
+				ua = new UsuarioAplicacionBean();
+				ua.setIdusuario(rs.getInt(t++));
+				ua.setIdaplicacion(rs.getInt(t++));
+				ua.setIdgrupo(rs.getInt(t++));
+				ua.setIdusuariocrea(rs.getInt(t++));
+				ua.setFechacrea(rs.getTimestamp(t++));
+				ua.setIdusuariomod(rs.getInt(t++));
+				ua.setFechamod(rs.getTimestamp(t++));
+				ua.setEstado(rs.getInt(t++));
+
+				aplicacion = new AplicacionBean();
+				aplicacion.setIdaplicacion(rs.getInt(t++));
+				aplicacion.setNombre(rs.getString(t++));
+				aplicacion.setEstado(rs.getInt(t++));
+				aplicacion.setLinkproduccion(rs.getString(t++));
+				aplicacion.setIcono(rs.getString(t++));
+				
+				grupo = new GrupoBean();
+				grupo.setIdgrupo(rs.getInt(t++));
+				grupo.setIdgrupotipo(rs.getInt(t++));
+				grupo.setCodgrupo(rs.getInt(t++));
+				grupo.setNombre(rs.getString(t++));
+				grupo.setEstado(rs.getInt(t++));
+
+				grupotipo = new GrupoTipoBean();
+				grupotipo.setIdgrupotipo(rs.getInt(t++));
+				grupotipo.setNombre(rs.getString(t++));
+				grupotipo.setEstado(rs.getInt(t++));
+				
+				usuarioaplicacionestado = new Estado();
+				usuarioaplicacionestado.setIdestado(rs.getInt(t++));
+				usuarioaplicacionestado.setNombre(rs.getString(t++));
+				usuarioaplicacionestado.setNombrecorto(rs.getString(t++));
+				usuarioaplicacionestado.setSimbolo(rs.getString(t++));
+				usuarioaplicacionestado.setOrden(rs.getInt(t++));		
+
+				grupo.setGrupotipo(grupotipo);
+
+				ua.setGrupo(grupo);
+				ua.setAplicacion(aplicacion);
+				ua.setEstadob(usuarioaplicacionestado);
+				
+				uas.add(ua);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return uas;
+	}
+	public Integer actualizarEstadoUsuarioAplicacion(UsuarioAplicacionBean usuarioaplicacion) {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+			con = ds.getConnection();
+			ps = con.prepareStatement(SQL_USUARIO_APLICACION_ESTADO_UPDATE.toString());
+			c = 1;
+
+			ps.setInt(c++, usuarioaplicacion.getEstado());
+			ps.setInt(c++, usuarioaplicacion.getIdusuariomod());
+			ps.setInt(c++, usuarioaplicacion.getIdusuario());
+			ps.setInt(c++, usuarioaplicacion.getIdaplicacion());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			logger.error(e.toString(), e.fillInStackTrace());
+		} catch (Exception e) {
+			logger.error(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	private static String SQL_USUARIOAPLICACION_INSERT = "insert hermes.sco_usuario_aplicacion (idusuario, " + "idaplicacion, idgrupo, idusuariocrea, fechacrea, estado)  " + "values (?,?,?,?,getdate(),?)";
+
+	public Integer insertarUsuarioAplicacion(UsuarioAplicacionBean usuarioaplicacion) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+			con = ds.getConnection();
+			ps = con.prepareStatement(SQL_USUARIOAPLICACION_INSERT.toString());
+			c = 1;
+
+			ps.setInt(c++, usuarioaplicacion.getIdusuario());
+			ps.setInt(c++, usuarioaplicacion.getIdaplicacion());
+			ps.setInt(c++, usuarioaplicacion.getIdgrupo());
+			ps.setInt(c++, usuarioaplicacion.getIdusuariocrea());
+			ps.setInt(c++, usuarioaplicacion.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.fillInStackTrace());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+}

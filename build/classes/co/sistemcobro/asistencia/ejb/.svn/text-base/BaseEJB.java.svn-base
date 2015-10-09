@@ -1,0 +1,35 @@
+package co.sistemcobro.asistencia.ejb;
+
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+
+public class BaseEJB {
+
+//desarrollo
+	@Resource(mappedName = "dc_rrhh")
+	protected DataSource dc_rrhh;
+		
+	@Resource(mappedName = "dg_rrhh")
+	protected DataSource dg_rrhh;
+	
+	@Resource(mappedName = "dc_hermes")
+	protected DataSource dc_hermes;
+		
+	@Resource(mappedName = "dg_hermes")
+	protected DataSource dg_hermes;
+
+	
+	
+	@Resource(mappedName = "dc_asistencia")
+	protected DataSource dc_asistencia;
+		
+	@Resource(mappedName = "dg_asistencia")
+	protected DataSource dg_asistencia;
+
+}

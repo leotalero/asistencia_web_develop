@@ -1,0 +1,85 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @autho Leonardo talero
+ * 
+ */
+public class ContratoTipo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idcontratotipo;
+	private String nombrecontratotipo;
+	private String observacion;
+
+	
+	
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	public Long getIdcontratotipo() {
+		return idcontratotipo;
+	}
+	public void setIdcontratotipo(Long idcontratotipo) {
+		this.idcontratotipo = idcontratotipo;
+	}
+	public String getNombrecontratotipo() {
+		return nombrecontratotipo;
+	}
+	public void setNombrecontratotipo(String nombrecontratotipo) {
+		this.nombrecontratotipo = nombrecontratotipo;
+	}
+	public String getObservacion() {
+		return observacion;
+	}
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+
+		
+	
+	
+	
+	
+
+}

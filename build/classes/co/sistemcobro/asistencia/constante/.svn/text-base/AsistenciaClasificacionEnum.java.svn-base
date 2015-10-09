@@ -1,0 +1,43 @@
+package co.sistemcobro.asistencia.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum AsistenciaClasificacionEnum {
+	TARDE(1),A_TIEMPO(2),FALTA(3),A_TIEMPO_TOLERANCIA(4);
+
+	public static final Map<Integer, AsistenciaClasificacionEnum> mapByID = new HashMap<Integer, AsistenciaClasificacionEnum>();
+	public static final Map<String, AsistenciaClasificacionEnum> mapByNAME = new HashMap<String, AsistenciaClasificacionEnum>();
+
+	static {
+		for (AsistenciaClasificacionEnum s : EnumSet
+				.allOf(AsistenciaClasificacionEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	AsistenciaClasificacionEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static AsistenciaClasificacionEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static AsistenciaClasificacionEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

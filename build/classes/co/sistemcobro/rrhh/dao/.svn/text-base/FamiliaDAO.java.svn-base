@@ -1,0 +1,444 @@
+package co.sistemcobro.rrhh.dao;
+
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.rrhh.bean.EmpleadoFamilia;
+import co.sistemcobro.rrhh.bean.Genero;
+import co.sistemcobro.rrhh.bean.IdentificacionTipo;
+import co.sistemcobro.rrhh.bean.Parentesco;
+
+/**
+ * Para la gestion de Afiliaciones a prestaciones sociales de los empleados.
+ * 
+ * @author jpuentes
+ */
+
+public class FamiliaDAO extends BaseDAO {
+
+	private final static Logger log = Logger.getLogger(FamiliaDAO.class);
+	
+	public FamiliaDAO() {
+		log.info("Constructor -> FamiliaDAO()");
+	}
+	
+	/**
+	 * Constructor.
+	 */
+	public FamiliaDAO(DataSource ds) {
+		log.info("Constructor -> FamiliaDAO(DataSource ds)");
+		this.ds = ds;
+	}
+	
+	/**
+	 *  Obtener los datos de la relacion entre empleado y familia.
+	 *  @param idempleado. El id del empleadio.
+	 *  @return List. La lista de EmpleadoFamilia asociados a un empleado.
+	 */
+	public List<EmpleadoFamilia> obtenerFamiliaDeEmpleadoPorIdEmpleado(Long idEmpleado) throws DatoException{
+		
+		List<EmpleadoFamilia> listaEmpleadoFamilia = new ArrayList<EmpleadoFamilia>();
+		
+		EmpleadoFamilia empleadoFamilia = null;
+		Parentesco parentesco = null;
+		Genero genero = null;
+		IdentificacionTipo tipoIdentificacion = null;
+		
+		try {
+
+			String consulta = "SELECT e.idempleadofamilia,e.idparentesco,e.idgenero,e.ididentificaciontipo,e.idempleado,e.nombrefamilia,e.apellidofamilia,e.fechanacimiento,e.numeroidentificacion,"
+							 +"e.observacion,e.idusuariocrea,e.fechacrea,e.idusuariomod,e.fechamod,e.estado,p.idparentesco,p.nombreparentesco,g.idgenero,g.nombregenero,"
+					         +"i.ididentificaciontipo,i.tipo "
+					         +"FROM rrhh.empleado_familia e, rrhh.parentesco p, rrhh.genero g, rrhh.identificaciontipo i "
+					         +"WHERE p.idparentesco = e.idparentesco "
+					         +"AND g.idgenero = e.idgenero "
+					         +"AND i.ididentificaciontipo = e.ididentificaciontipo "
+					         +"AND e.idempleado = "+idEmpleado;
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				empleadoFamilia =  new EmpleadoFamilia();
+				parentesco = new Parentesco();
+				genero = new Genero();
+				tipoIdentificacion = new IdentificacionTipo();
+
+				empleadoFamilia.setIdEmpleadoFamilia(rs.getLong("idempleadofamilia"));
+				empleadoFamilia.setIdParentesco(rs.getLong("idparentesco"));
+				empleadoFamilia.setIdGenero(rs.getLong("idgenero"));
+				empleadoFamilia.setIdidentificaciontipo(rs.getLong("ididentificaciontipo"));
+				empleadoFamilia.setIdempleado(rs.getLong("idempleado"));
+				empleadoFamilia.setNombrefamilia(rs.getString("nombrefamilia"));
+				empleadoFamilia.setApellidoFamilia(rs.getString("apellidofamilia"));
+				empleadoFamilia.setFechaNacimiento(rs.getTimestamp("fechanacimiento"));
+				empleadoFamilia.setNumeroIdentificacion(rs.getString("numeroidentificacion"));
+				empleadoFamilia.setObservacion(rs.getString("observacion"));
+				empleadoFamilia.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoFamilia.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoFamilia.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoFamilia.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoFamilia.setEstado(rs.getInt("estado"));
+				
+				parentesco.setIdparentesco(rs.getLong("idparentesco"));
+				parentesco.setNombreparentesco(rs.getString("nombreparentesco"));
+				
+				genero.setIdgenero(rs.getLong("idgenero"));
+				genero.setNombregenero(rs.getString("nombregenero"));
+			
+				tipoIdentificacion.setIdidentificaciontipo(rs.getLong("ididentificaciontipo"));
+				tipoIdentificacion.setTipo(rs.getString("tipo"));
+				
+				empleadoFamilia.setParentesco(parentesco);
+				empleadoFamilia.setGenero(genero);
+				empleadoFamilia.setTipoIdentificacion(tipoIdentificacion);
+				
+				listaEmpleadoFamilia.add(empleadoFamilia);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaEmpleadoFamilia;
+	}
+	
+	/**
+	 * Obtener la lista de parentescos existentes.
+	 * @return List. List<Parentesco>.
+	 */
+	public List<Parentesco> obtenerListaDeParentescos() throws DatoException {
+		List<Parentesco> listaDeParentescos = new ArrayList<Parentesco>();
+		Parentesco parentesco = null;
+
+		try {
+
+			String consulta = "SELECT idparentesco,nombreparentesco,idusuariocrea,fechacrea,idusuariomod,fechamod,estado FROM rrhh.parentesco order by(nombreparentesco) asc";
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				parentesco = new Parentesco();
+
+				parentesco.setIdparentesco(rs.getLong("idparentesco"));
+				parentesco.setNombreparentesco(rs.getString("nombreparentesco"));
+				
+				log.info(" - "+rs.getString("nombreparentesco"));
+				
+				parentesco.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				parentesco.setFechacrea(rs.getTimestamp("fechacrea"));
+				parentesco.setIdusuariomod(rs.getInt("idusuariomod"));
+				parentesco.setFechamod(rs.getTimestamp("fechamod"));
+				parentesco.setEstado(rs.getInt("estado"));
+
+				listaDeParentescos.add(parentesco);
+			}
+
+		} catch (SQLException e) {
+			log.info("Error 1 en :"+getClass()+" E= "+e +" Metodo: obtenerListaDeParentescos()");
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Error 2 en :"+getClass()+" E= "+e +" Metodo: obtenerListaDeParentescos()");
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaDeParentescos;
+	}
+	
+	
+	/**
+	 * Obtener los generos.
+	 * @return List. Genero.
+	 */
+	public List<Genero> obtenerListaDeGeneros() throws DatoException {
+		List<Genero> listaDeGeneros = new ArrayList<Genero>();
+		Genero genero = null;
+
+		try {
+
+			String consulta = "SELECT idgenero,nombregenero,idusuariocrea,fechacrea,idusuariomod,fechamod,estado FROM rrhh.genero";
+
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				genero = new Genero();
+
+				genero.setIdgenero(rs.getLong("idgenero"));
+				genero.setNombregenero(rs.getString("nombregenero"));
+				genero.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				genero.setFechacrea(rs.getTimestamp("fechacrea"));
+				genero.setIdusuariomod(rs.getInt("idusuariomod"));
+				genero.setFechamod(rs.getTimestamp("fechamod"));
+				genero.setEstado(rs.getInt("estado"));
+
+				listaDeGeneros.add(genero);
+			}
+
+		} catch (SQLException e) {
+			log.info("Error 1 en :"+getClass()+" E= "+e +" Metodo: obtenerListaDeGeneros()");
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Error 2 en :"+getClass()+" E= "+e +" Metodo: obtenerListaDeGeneros()");
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaDeGeneros;
+	}
+	
+	/**
+	 * Obtener los tipos de identificación.
+	 * @return List. lista de IdentificacionTipo.
+	 */
+	public List<IdentificacionTipo> obtenerListaTipoDeIdentificacion() throws DatoException {
+		
+		List<IdentificacionTipo> listaDeTiposDeIdentificacion = new ArrayList<IdentificacionTipo>();
+		IdentificacionTipo tipoDeIdentificacion = null;
+
+		try {
+
+			String consulta = "SELECT ididentificaciontipo,tipo,abreviatura,idusuariocrea,fechacrea, idusuariomod,fechamod,estado FROM rrhh.identificaciontipo";
+
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				tipoDeIdentificacion = new IdentificacionTipo();
+
+				tipoDeIdentificacion.setIdidentificaciontipo(rs.getLong("ididentificaciontipo"));
+				tipoDeIdentificacion.setTipo(rs.getString("tipo"));
+				tipoDeIdentificacion.setAbreviatura(rs.getString("abreviatura"));
+				tipoDeIdentificacion.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				tipoDeIdentificacion.setFechacrea(rs.getTimestamp("fechacrea"));
+				tipoDeIdentificacion.setIdusuariomod(rs.getInt("idusuariomod"));
+				tipoDeIdentificacion.setFechamod(rs.getTimestamp("fechamod"));
+				tipoDeIdentificacion.setEstado(rs.getInt("estado"));
+
+				listaDeTiposDeIdentificacion.add(tipoDeIdentificacion);
+			}
+
+		} catch (SQLException e) {
+			log.info("Error 1 en :"+getClass()+" E= "+e +" Metodo: obtenerListaTipoDeIdentificacion()");
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Error 2 en :"+getClass()+" E= "+e +" Metodo: obtenerListaTipoDeIdentificacion()");
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+
+		return listaDeTiposDeIdentificacion;
+	}
+	
+	
+	/**
+	 * Registrar una nueva relacion EmpleadoFamilia.
+	 * @param: EmpleadoFamilia a insertar.
+	 * @return: EmpleadoFamilia. El EmpleadoFamilia insertada.
+	 */
+	public EmpleadoFamilia insertarEmpleadoFamilia(EmpleadoFamilia empleadoFamilia) throws DatoException{
+		
+		Util.registerConverters();
+		try {
+						
+			String insercion ="INSERT INTO rrhh.empleado_familia(idparentesco,idgenero,ididentificaciontipo,idempleado,nombrefamilia,apellidofamilia,fechanacimiento,numeroidentificacion,observacion,idusuariocrea,fechacrea,idusuariomod,fechamod,estado)"
+						     +"VALUES (?,?,?,?,?,?,?,?,?,?,GETDATE(),NULL,NULL,?);";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion,Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setLong(1,empleadoFamilia.getIdParentesco());
+			ps.setLong(2, empleadoFamilia.getIdGenero());
+			ps.setLong(3,empleadoFamilia.getIdidentificaciontipo());
+			ps.setLong(4, empleadoFamilia.getIdempleado());
+			ps.setString(5, empleadoFamilia.getNombrefamilia());
+			ps.setString(6, empleadoFamilia.getApellidoFamilia());
+			ps.setTimestamp(7,empleadoFamilia.getFechaNacimiento());
+			ps.setString(8, empleadoFamilia.getNumeroIdentificacion());
+			
+			if(empleadoFamilia.getObservacion()==null){
+				ps.setNull(9, java.sql.Types.NVARCHAR);
+			}else{
+				ps.setString(9, empleadoFamilia.getObservacion());
+			}
+			
+			ps.setLong(10,empleadoFamilia.getIdusuariocrea());
+			ps.setInt(11,empleadoFamilia.getEstado());
+			
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			
+			if (rs.next()) {
+				empleadoFamilia.setIdEmpleadoFamilia(rs.getLong(1));
+			} else {
+				throw new SQLException("EmpleadoFamilia, no se pudo generar su IDEmpleadoFamilia.");
+			}
+			
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoFamilia;
+	}
+	
+	
+	/**
+	 * Obtener un empleado_familia por id.
+	 * @param idempleado.  El id del empleado a consultarle el familiar.
+	 */
+	public EmpleadoFamilia obtenerFamiliarPorId(Long idEmpleadoFamilia) throws DatoException{
+		
+		EmpleadoFamilia familiar = null;
+		
+		try {
+
+			String consulta = "SELECT idempleadofamilia,idparentesco,idgenero, ididentificaciontipo,idempleado,nombrefamilia,apellidofamilia,fechanacimiento,numeroidentificacion,observacion,idusuariocrea,fechacrea,idusuariomod,fechamod,estado "
+						     +"FROM rrhh.empleado_familia ef where ef.idempleadofamilia= "+idEmpleadoFamilia;
+			
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				familiar = new EmpleadoFamilia();
+
+				familiar.setIdEmpleadoFamilia(rs.getLong("idempleadofamilia"));
+				familiar.setIdParentesco(rs.getLong("idparentesco"));
+				familiar.setIdGenero(rs.getLong("idgenero"));
+				familiar.setIdidentificaciontipo(rs.getLong("ididentificaciontipo"));
+				familiar.setIdempleado(rs.getLong("idempleado"));
+				familiar.setNombrefamilia(rs.getString("nombrefamilia"));
+				familiar.setApellidoFamilia(rs.getString("apellidofamilia"));
+				familiar.setFechaNacimiento(rs.getTimestamp("fechanacimiento"));
+				familiar.setNumeroIdentificacion(rs.getString("numeroidentificacion"));
+				familiar.setObservacion(rs.getString("observacion"));
+				familiar.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				familiar.setFechacrea(rs.getTimestamp("fechacrea"));
+				familiar.setIdusuariomod(rs.getInt("idusuariomod"));
+				familiar.setFechamod(rs.getTimestamp("fechamod"));
+				familiar.setEstado(rs.getInt("estado"));
+				
+			}
+
+		} catch (SQLException e) {
+			log.info("SQLException "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}		
+		return familiar;
+	}
+	
+
+	/**
+	 * Editar EmpleadoFamilia.
+	 * @param EmpleadoFamilia, El EmpleadoFamilia a editar. 
+	 * @return Integer. El numero de filas afectadas.
+	 */
+	public Integer editarEmpleadoFamilia(EmpleadoFamilia empleadoFamilia) throws DatoException {
+		Integer estatus = 0;
+		
+		try {
+
+			String actualizacion = "UPDATE rrhh.empleado_familia SET idparentesco=?,idgenero=?,ididentificaciontipo=?,idempleado=?,nombrefamilia=?,apellidofamilia=?,"
+					              +"fechanacimiento=?,numeroidentificacion=?,observacion=?,idusuariomod=?,fechamod=GETDATE(),estado=? "
+                                  +"WHERE idempleadofamilia= ?";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setLong(1,empleadoFamilia.getIdParentesco());
+			ps.setLong(2,empleadoFamilia.getIdGenero());
+			ps.setLong(3,empleadoFamilia.getIdidentificaciontipo());
+			ps.setLong(4,empleadoFamilia.getIdempleado());
+			ps.setString(5,empleadoFamilia.getNombrefamilia());
+			ps.setString(6,empleadoFamilia.getApellidoFamilia());
+			ps.setTimestamp(7,empleadoFamilia.getFechaNacimiento());
+			ps.setString(8,empleadoFamilia.getNumeroIdentificacion());
+						
+			if(empleadoFamilia.getObservacion()==null){
+				ps.setNull(9, java.sql.Types.NVARCHAR);
+			}else{
+				ps.setString(9,empleadoFamilia.getObservacion());
+			}
+			
+			ps.setInt(10, empleadoFamilia.getIdusuariomod());
+			ps.setInt(11, empleadoFamilia.getEstado());
+			ps.setLong(12, empleadoFamilia.getIdEmpleadoFamilia());
+			
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+	}
+	
+
+	/**
+	 *  Metodo para actualizar el estado de EmpleadoFamilia.
+	 *  @param EmpleadoFamilia. El empleado familiar a cambiarle el estado.
+	 *  @return Integer, Número de filas alteradas.
+	 */
+	public Integer actualizarEstadoEmpleadoFamilia(EmpleadoFamilia empleadoFamilia) throws DatoException {
+		Integer estatus = 0;
+		
+		try {
+
+			String actualizacion = "UPDATE rrhh.empleado_familia set estado=?,idusuariomod=?,fechamod=getdate() WHERE idempleadofamilia=?";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+
+			ps.setInt(1, empleadoFamilia.getEstado());
+			ps.setInt(2, empleadoFamilia.getIdusuariomod());
+			ps.setLong(3, empleadoFamilia.getIdEmpleadoFamilia());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	
+}
+

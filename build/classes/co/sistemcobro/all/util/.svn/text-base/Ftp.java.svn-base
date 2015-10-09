@@ -1,0 +1,31 @@
+package co.sistemcobro.all.util;
+
+import java.io.IOException;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.log4j.Logger;
+
+public class Ftp {
+	
+	private Logger logger = Logger.getLogger(Ftp.class);
+
+	public FTPClient getFTPConnect(String server, String user, String password) {
+		FTPClient ftp = new FTPClient();
+		try {
+			// Coneccion
+			logger.info("Intentado conectarse al FTP ["+user+":"+server+"]");
+			ftp.connect(server);
+			ftp.login(user, password);
+
+		} catch (Exception e) {
+			try {
+				ftp.disconnect();
+			} catch (IOException e1) {
+				logger.error(e.toString());
+			}
+
+		}
+		return ftp;
+	}
+
+}

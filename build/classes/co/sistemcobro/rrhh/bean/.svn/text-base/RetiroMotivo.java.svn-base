@@ -1,0 +1,79 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class RetiroMotivo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idretiromotivo;
+	private String nombremotivo;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	
+	
+	
+	
+	
+
+	
+	public Long getIdretiromotivo() {
+		return idretiromotivo;
+	}
+	public void setIdretiromotivo(Long idretiromotivo) {
+		this.idretiromotivo = idretiromotivo;
+	}
+	public String getNombremotivo() {
+		return nombremotivo;
+	}
+	public void setNombremotivo(String nombremotivo) {
+		this.nombremotivo = nombremotivo;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	
+	
+	
+
+	
+
+
+}

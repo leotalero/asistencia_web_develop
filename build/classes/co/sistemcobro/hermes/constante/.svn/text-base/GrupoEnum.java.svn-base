@@ -1,0 +1,42 @@
+package co.sistemcobro.hermes.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum GrupoEnum {
+	ADMINISTRADOR(1);
+
+	public static final Map<Integer, GrupoEnum> mapByID = new HashMap<Integer, GrupoEnum>();
+	public static final Map<String, GrupoEnum> mapByNAME = new HashMap<String, GrupoEnum>();
+
+	static {
+		for (GrupoEnum s : EnumSet.allOf(GrupoEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	GrupoEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static GrupoEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static GrupoEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

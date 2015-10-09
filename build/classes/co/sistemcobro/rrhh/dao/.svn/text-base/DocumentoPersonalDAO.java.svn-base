@@ -1,0 +1,313 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.rrhh.bean.EmpleadoDocumentoPersonal;
+import co.sistemcobro.rrhh.bean.EmpleadoDocumentoTipo;
+
+/**
+ * Clase para consulta de datos sobre los documentos personales de los
+ * empleados.
+ * 
+ * @author jpuentes
+ */
+public class DocumentoPersonalDAO extends BaseDAO {
+
+	Logger log = Logger.getLogger(DocumentoPersonalDAO.class);
+
+	public DocumentoPersonalDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	/**
+	 * Este método consulta los documentos de un empleado.
+	 * 
+	 * @param idempleado
+	 *            . El id del empleado.
+	 * @return List. EmpleadoDocumentoPersonal La lista de datos de documentos
+	 *         del empleado.
+	 */
+	public List<EmpleadoDocumentoPersonal> obtenerDocumentoDeEmpleadoPorIdEmpleado(
+			Long idEmpleado) throws DatoException {
+
+		List<EmpleadoDocumentoPersonal> listaEmpleadoDocumento = new ArrayList<EmpleadoDocumentoPersonal>();
+		EmpleadoDocumentoPersonal empleadoDocumento = null;
+		EmpleadoDocumentoTipo documentoTipo = null;
+
+		try {
+
+			String consulta = "SELECT dp.idempleadodocumento,dp.idempleado,dp.iddocumentotipo,dp.nombredocumento,dp.rutadocumento,dp.tamaniodocumento,"
+					+ "dp.observaciondocumento,dp.idusuariocrea,dp.fechacrea,dp.idusuariomod,dp.fechamod,dp.estado,dt.idempleadodocumentotipo,"
+					+ "dt.nombretipodocumento "
+					+ "FROM rrhh.empleado_documento_personal dp,rrhh.empleado_documento_tipo dt "
+					+ "WHERE dp.idempleado = "
+					+ idEmpleado
+					+ " AND dp.iddocumentotipo = dt.idempleadodocumentotipo";
+
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				empleadoDocumento = new EmpleadoDocumentoPersonal();
+				documentoTipo = new EmpleadoDocumentoTipo();
+
+				empleadoDocumento.setIdempleadodocumento(rs.getLong("idempleadodocumento"));
+				empleadoDocumento.setIdempleado(rs.getLong("idempleado"));
+				empleadoDocumento.setIddocumentotipo(rs.getLong("iddocumentotipo"));
+				empleadoDocumento.setNombredocumento(rs.getString("nombredocumento"));
+				empleadoDocumento.setRutadocumento(rs.getString("rutadocumento"));
+				empleadoDocumento.setTamaniodocumento(rs.getLong("tamaniodocumento"));
+				empleadoDocumento.setObservaciondocumento(rs.getString("observaciondocumento"));
+				empleadoDocumento.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoDocumento.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoDocumento.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoDocumento.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoDocumento.setEstado(rs.getInt("estado"));
+
+				documentoTipo.setIdempleadodocumentotipo(rs.getLong("idempleadodocumentotipo"));
+				documentoTipo.setNombretipodocumento(rs.getString("nombretipodocumento"));
+
+				empleadoDocumento.setTipodocumento(documentoTipo);
+
+				listaEmpleadoDocumento.add(empleadoDocumento);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaEmpleadoDocumento;
+	}
+
+	/**
+	 * Metodo para actualizar el estado de EmpleadoDocumentoPersonal.
+	 * 
+	 * @param EmpleadoDocumentoPersonal
+	 *            . El empleado documento a cambiarle el estado.
+	 * @return Integer, Numero de filas alteradas.
+	 */
+	public Integer actualizarEstadoEmpleadoDocumentoPersonal(
+			EmpleadoDocumentoPersonal empleadoDocumentoPersonal)
+			throws DatoException {
+		Integer filasAfectadas = 0;
+
+		try {
+			String actualizacion = "UPDATE rrhh.empleado_documento_personal SET estado=?,idusuariomod=?,fechamod=getdate() where idempleadodocumento=?";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion);
+			ps.setInt(1, empleadoDocumentoPersonal.getEstado());
+			ps.setInt(2, empleadoDocumentoPersonal.getIdusuariomod());
+			ps.setLong(3, empleadoDocumentoPersonal.getIdempleadodocumento());
+
+			filasAfectadas = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return filasAfectadas;
+	}
+
+	/**
+	 * Este método devuelve la lista de tipo de documentos personales.
+	 * 
+	 * @return List. La lista de EmpleadoDocumentoTpo.
+	 * @throws DatoException
+	 */
+	public List<EmpleadoDocumentoTipo> obtenerTiposDeDocumentosPersonales()
+			throws DatoException {
+
+		List<EmpleadoDocumentoTipo> listaEmpleadoDocumentoTipo = new ArrayList<EmpleadoDocumentoTipo>();
+		EmpleadoDocumentoTipo tipoDocumento = null;
+
+		try {
+
+			String consulta = "SELECT idempleadodocumentotipo,nombretipodocumento FROM rrhh.empleado_documento_tipo WHERE estado=2";
+
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			while (rs.next()) {
+				tipoDocumento = new EmpleadoDocumentoTipo();
+				tipoDocumento.setIdempleadodocumentotipo(rs.getLong("idempleadodocumentotipo"));
+				tipoDocumento.setNombretipodocumento(rs.getString("nombretipodocumento"));
+				listaEmpleadoDocumentoTipo.add(tipoDocumento);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaEmpleadoDocumentoTipo;
+	}
+
+	/**
+	 * Insertar la relación EmpleadoDocumentoPersonal.
+	 * 
+	 * @param EmpleadoDocumentoPersonal
+	 *            . la relacion a insertar.
+	 * @return EmpleadoDocumentoPersonal. la relacion insertada.
+	 */
+	public EmpleadoDocumentoPersonal insertarEmpleadoDocumentoPersonal(
+			EmpleadoDocumentoPersonal documentoPersonal) throws DatoException {
+		// Integer estatus = 0;
+
+		log.info("Estamos en insertarEmpleadoDocumentoPersonal");
+
+		Util.registerConverters();
+		try {
+
+			String insercion = "INSERT INTO rrhh.empleado_documento_personal(idempleado,iddocumentotipo,nombredocumento,rutadocumento,observaciondocumento,tamaniodocumento,idusuariocrea,fechacrea,estado) "
+					+ "VALUES(?,?,?,?,?,?,?,getdate(),?)";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(insercion.toString(),Statement.RETURN_GENERATED_KEYS);
+
+			ps.setLong(1, documentoPersonal.getIdempleado());
+			ps.setLong(2, documentoPersonal.getIddocumentotipo());
+			ps.setString(3, documentoPersonal.getNombredocumento());
+			ps.setString(4, documentoPersonal.getRutadocumento());
+
+			if (documentoPersonal.getObservaciondocumento() == null) {
+				ps.setNull(5, java.sql.Types.NVARCHAR);
+			} else {
+				ps.setString(
+						5,
+						documentoPersonal.getObservaciondocumento()
+								.replace("&", "&amp;").replace("<", "&lt;")
+								.replace("\"", "'").replace(">", "&lt;"));
+			}
+			ps.setInt(6, 50);
+			ps.setInt(7, documentoPersonal.getIdusuariocrea());
+			ps.setInt(8, documentoPersonal.getEstado());
+
+			// estatus =
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+
+			if (rs.next()) {
+				documentoPersonal.setIdempleadodocumento(rs.getLong(1));
+			} else {
+				throw new SQLException(
+						"No se pudo generar el id a empleadoDocumentoPersonal.");
+			}
+		} catch (SQLException e) {
+			log.info("SQLException e = " + e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception e = " + e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return documentoPersonal;
+	}
+
+	/**
+	 *  Actualiza los datos de la relación EmpleadoDocumentoPersonal.
+	 *  @param EmpleadoDocumentoPersonal. La relación a actualizar.
+	 *  @return EmpleadoDocumentoPersonal. La relación actualizada.
+	 */
+	public EmpleadoDocumentoPersonal ActualizarEmpleadoDocumentoPersonal(
+			EmpleadoDocumentoPersonal empleadoDocumentoPersonal)
+			throws DatoException {
+
+		Util.registerConverters();
+		try {
+
+			String actualizacion = "UPDATE rrhh.empleado_documento_personal set nombredocumento=?,rutadocumento=?,tamaniodocumento=?,idusuariomod=?, fechamod=getdate(),estado=? "
+					+ "WHERE idempleadodocumento=?";
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(actualizacion.toString());
+
+			ps.setString(1, empleadoDocumentoPersonal.getNombredocumento());
+			ps.setString(2, empleadoDocumentoPersonal.getRutadocumento());
+			ps.setLong(3, empleadoDocumentoPersonal.getTamaniodocumento());
+			ps.setInt(4, empleadoDocumentoPersonal.getIdusuariomod());
+			ps.setInt(5, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(6, empleadoDocumentoPersonal.getIdempleadodocumento());
+
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoDocumentoPersonal;
+
+	}
+
+
+	/**
+	 * Este método consulta y retorna la relacion EmpleadoDocumentoPersonal, la consulta se efectua por id.
+	 * 
+	 * @param idempleadodocumentopersonal. El id de la relacion.
+	 * @return EmpleadoDocumentoPersonal. La relación consultada.
+	 */
+	public EmpleadoDocumentoPersonal obtenerEmpleadoDocumentoPersonalPorId(Long idEmpleadoDocumento) throws DatoException {
+
+		EmpleadoDocumentoPersonal empleadoDocumento = null;
+
+		try {
+
+			String consulta = "SELECT idempleadodocumento,idempleado,iddocumentotipo,nombredocumento,rutadocumento,tamaniodocumento,"
+							+ "observaciondocumento,idusuariocrea,fechacrea,idusuariomod,fechamod,estado "
+							+ "FROM rrhh.empleado_documento_personal WHERE idempleadodocumento = "+idEmpleadoDocumento;
+
+			con = ds.getConnection();
+			Statement sentencia = con.createStatement();
+			rs = sentencia.executeQuery(consulta);
+
+			if (rs.next()) {
+				empleadoDocumento = new EmpleadoDocumentoPersonal();
+				empleadoDocumento.setIdempleadodocumento(rs.getLong("idempleadodocumento"));
+				empleadoDocumento.setIdempleado(rs.getLong("idempleado"));
+				empleadoDocumento.setIddocumentotipo(rs.getLong("iddocumentotipo"));
+				empleadoDocumento.setNombredocumento(rs.getString("nombredocumento"));
+				empleadoDocumento.setRutadocumento(rs.getString("rutadocumento"));
+				empleadoDocumento.setTamaniodocumento(rs.getLong("tamaniodocumento"));
+				empleadoDocumento.setObservaciondocumento(rs.getString("observaciondocumento"));
+				empleadoDocumento.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoDocumento.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoDocumento.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoDocumento.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoDocumento.setEstado(rs.getInt("estado"));
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoDocumento;
+	}
+
+}

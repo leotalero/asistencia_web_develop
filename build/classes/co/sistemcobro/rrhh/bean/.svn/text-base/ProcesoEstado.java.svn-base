@@ -1,0 +1,82 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class ProcesoEstado implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idprocesoestado;
+
+	private String nombreestado;
+	
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	
+	
+	
+	
+	
+	public Long getIdprocesoestado() {
+		return idprocesoestado;
+	}
+	public void setIdprocesoestado(Long idprocesoestado) {
+		this.idprocesoestado = idprocesoestado;
+	}
+	public String getNombreestado() {
+		return nombreestado;
+	}
+	public void setNombreestado(String nombreestado) {
+		this.nombreestado = nombreestado;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	
+	
+	
+
+	
+
+
+}

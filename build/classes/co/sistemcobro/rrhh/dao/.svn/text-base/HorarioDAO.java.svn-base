@@ -1,0 +1,1250 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.asistencia.bean.Asistencia;
+import co.sistemcobro.asistencia.bean.AsistenciaClasificacion;
+import co.sistemcobro.rrhh.bean.*;
+//import co.sistemcobro.hermes.bean.IdentificacionTipo;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class HorarioDAO extends BaseDAO {
+
+	public HorarioDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	
+	public List<Horario> getHorarios() throws DatoException {
+		Horario horario = null;
+		List<Horario> horarios=new ArrayList<Horario>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select h.idhorario,h.nombrehorario,h.horaentrada,h.horasalidat,h.horaentradat,");
+			q.append("h.horasalida,h.idfrecuenciaasignacion,h.minutosflexibilidad,h.minutospermitidos,");
+			q.append(" h.idusuariocrea,h.fechacrea, h.idusuariomod, h.fechamod, h.estado, ");
+			q.append(" fa.idfrecuenciaasignacion,fa.nombrefrecuencia,fa.nocturno ");
+			q.append(" from rrhh.horario h  ");
+			q.append(" left join  rrhh.frecuenciaasignacion fa on fa.idfrecuenciaasignacion=h.idfrecuenciaasignacion  ");
+			q.append(" where h.estado =? order by fa.idfrecuenciaasignacion asc,h.nombrehorario,h.horaentrada ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			//ps.setLong(2, idpreguntasegura);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				horario = new Horario();
+				horario.setIdhorario(rs.getLong(c++));
+				horario.setNombrehorario(rs.getString(c++));
+				horario.setHoraentrada(rs.getTime(c++));
+				horario.setHorasalidat(rs.getTime(c++));
+				horario.setHoraentradat(rs.getTime(c++));
+				horario.setHorasalida(rs.getTime(c++));
+				horario.setIdfrecuenciaasignacion(rs.getLong(c++));
+				horario.setMinutosflex(rs.getInt(c++));
+				horario.setMinutospermitidos(rs.getInt(c++));
+				
+				horario.setIdusuariocrea(rs.getInt(c++));
+				horario.setFechacrea(rs.getTimestamp(c++));
+				horario.setIdusuariomod(rs.getInt(c++));
+				horario.setFechamod(rs.getTimestamp(c++));
+				horario.setEstado(rs.getInt(c++));
+				FrecuenciaAsignacion frec=new FrecuenciaAsignacion();
+				frec.setIdfrecuenciaasignacion(rs.getLong(c++));
+				frec.setNombrefrecuencia(rs.getString(c++));
+				frec.setNocturno(rs.getInt(c++));
+				horario.setFrecuenciaasignacion(frec);
+				horarios.add(horario);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return horarios;
+
+	}
+	public Horario getHorariosporId(Long idhorario) throws DatoException {
+		Horario horario = null;
+		//List<Empresa> empresas=new ArrayList<Empresa>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select h.idhorario,h.nombrehorario,h.horaentrada,h.horasalidat,h.horaentradat,");
+			q.append("h.horasalida,h.idfrecuenciaasignacion,h.minutosflexibilidad,h.minutospermitidos,");
+			q.append(" h.idusuariocrea,h.fechacrea, h.idusuariomod, h.fechamod, h.estado ");
+			q.append("from rrhh.horario h where h.estado =?  and h.idhorario=?");
+			//q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idhorario);
+			//ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				horario = new Horario();
+				horario.setIdhorario(rs.getLong(c++));
+				horario.setNombrehorario(rs.getString(c++));
+				horario.setHoraentrada(rs.getTime(c++));
+				horario.setHorasalidat(rs.getTime(c++));
+				horario.setHoraentradat(rs.getTime(c++));
+				horario.setHorasalida(rs.getTime(c++));
+				horario.setIdfrecuenciaasignacion(rs.getLong(c++));
+				horario.setMinutosflex(rs.getInt(c++));
+				horario.setMinutospermitidos(rs.getInt(c++));
+				
+				horario.setIdusuariocrea(rs.getInt(c++));
+				horario.setFechacrea(rs.getTimestamp(c++));
+				horario.setIdusuariomod(rs.getInt(c++));
+				horario.setFechamod(rs.getTimestamp(c++));
+				horario.setEstado(rs.getInt(c++));
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return horario;
+
+	}
+	
+	
+	public HorarioAsignado insertarHorarioAsignado(HorarioAsignado horarioasig) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.horarioasignado (idempleado, idcontrato,idhorario,validezinicio, validezfin,causahorario,");
+			q.append(" idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(), Statement.RETURN_GENERATED_KEYS);
+			c = 1;
+
+			
+			
+			ps.setLong(c++, horarioasig.getIdempleado());
+			ps.setLong(c++, horarioasig.getIdcontrato());
+			ps.setLong(c++, horarioasig.getIdhorario());
+			ps.setTimestamp(c++, horarioasig.getValidezinicio());
+			if (null == horarioasig.getValidezfin() ) {
+				ps.setNull(c++, java.sql.Types.TIMESTAMP);
+			} else {
+				ps.setTimestamp(c++, horarioasig.getValidezfin());
+			}
+			
+			if (null == horarioasig.getCausahorario() ) {
+				ps.setNull(c++, java.sql.Types.NVARCHAR);
+			} else {
+				ps.setString(c++, horarioasig.getCausahorario());
+			}
+			
+			
+		
+
+
+			
+			ps.setInt(c++, horarioasig.getIdusuariocrea());
+			ps.setInt(c++, horarioasig.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				horarioasig.setIdhorarioasignado(rs.getLong(1));
+			} else {
+				throw new SQLException("Empleado, no se pudo generar su IDEmpleado.");
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return horarioasig;
+
+	}
+	
+	
+	public List<HorarioAsignado> insertarHorariosAsignados(List<HorarioAsignado> horariosasig) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		
+	
+		try {
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.horarioasignado (idempleado, idcontrato,idhorario,validezinicio, validezfin,causahorario,");
+			q.append(" idusuariocrea,idusuariomod, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(), Statement.RETURN_GENERATED_KEYS);
+		
+
+			for(HorarioAsignado horarioasig:horariosasig){
+				c = 1;
+				ps.setLong(c++, horarioasig.getIdempleado());
+				ps.setLong(c++, horarioasig.getIdcontrato());
+				ps.setLong(c++, horarioasig.getIdhorario());
+				ps.setTimestamp(c++, horarioasig.getValidezinicio());
+				if (null == horarioasig.getValidezfin() ) {
+					ps.setNull(c++, java.sql.Types.TIMESTAMP);
+				} else {
+					ps.setTimestamp(c++, horarioasig.getValidezfin());
+				}
+				
+				if (null == horarioasig.getCausahorario() ) {
+					ps.setNull(c++, java.sql.Types.NVARCHAR);
+				} else {
+					ps.setString(c++, horarioasig.getCausahorario());
+				}
+				
+				
+			
+
+
+			
+				ps.setInt(c++, horarioasig.getIdusuariocrea());
+				ps.setInt(c++, horarioasig.getIdusuariomod());
+				ps.setInt(c++, horarioasig.getEstado());
+
+				estatus = estatus + ps.executeUpdate();
+
+				rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+					horarioasig.setIdhorarioasignado(rs.getLong(1));
+				} else {
+					throw new SQLException("Empleado, no se pudo generar su IDEmpleado.");
+				}
+			}
+			
+			
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return horariosasig;
+
+	}
+	
+	public List<HorarioAsignado> getHorariosAsignadosporContrato(Long idcontrato) throws DatoException {
+		HorarioAsignado horario = null;
+		List<HorarioAsignado> horarios=new ArrayList<HorarioAsignado>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select h.idhorarioasignado,h.idempleado,h.idcontrato,h.idhorario,h.validezinicio,");
+			q.append("h.validezfin,h.causahorario,");
+			q.append(" h.idusuariocrea,h.fechacrea, h.idusuariomod, h.fechamod, h.estado, ");
+			q.append("ho.idhorario,ho.nombrehorario,ho.horaentrada,ho.horasalida,ho.idfrecuenciaasignacion,ho.minutosflexibilidad,ho.minutospermitidos, ");
+			q.append("fa.idfrecuenciaasignacion,fa.nombrefrecuencia,fa.nocturno ");
+			
+			q.append(" from rrhh.horarioasignado h ");
+			q.append(" left join  rrhh.horario ho on h.idhorario=ho.idhorario  ");
+			q.append(" left join  rrhh.frecuenciaasignacion fa on ho.idfrecuenciaasignacion=fa.idfrecuenciaasignacion  ");
+			q.append(" where  h.idcontrato=? order  by idhorarioasignado desc");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			//ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(1, idcontrato);
+			//ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				horario = new HorarioAsignado();
+				horario.setIdhorarioasignado(rs.getLong(c++));
+				horario.setIdempleado(rs.getLong(c++));
+				horario.setIdcontrato(rs.getLong(c++));
+				horario.setIdhorario(rs.getLong(c++));
+				horario.setValidezinicio(rs.getTimestamp(c++));
+				horario.setValidezfin(rs.getTimestamp(c++));
+				horario.setCausahorario(rs.getString(c++));
+			
+				
+				horario.setIdusuariocrea(rs.getInt(c++));
+				horario.setFechacrea(rs.getTimestamp(c++));
+				horario.setIdusuariomod(rs.getInt(c++));
+				horario.setFechamod(rs.getTimestamp(c++));
+				horario.setEstado(rs.getInt(c++));
+				
+				
+				Horario hora=new Horario();
+				hora.setIdhorario(rs.getLong(c++));
+				hora.setNombrehorario(rs.getString(c++));
+				hora.setHoraentrada(rs.getTime(c++));
+				hora.setHorasalida(rs.getTime(c++));
+				hora.setIdfrecuenciaasignacion(rs.getLong(c++));
+				hora.setMinutosflex(rs.getInt(c++));
+				hora.setMinutospermitidos(rs.getInt(c++));
+				horario.setHorario(hora);
+				FrecuenciaAsignacion frecasig=new FrecuenciaAsignacion();
+				frecasig.setIdfrecuenciaasignacion(rs.getLong(c++));
+				frecasig.setNombrefrecuencia(rs.getString(c++));
+				frecasig.setNocturno(rs.getInt(c++));
+				horario.setFrecuenciaasignacion(frecasig);
+				horarios.add(horario);
+				
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return horarios;
+
+	}
+	
+	
+	public List<HorarioAsignado> getHorariosAsignadosporContratoActivos(Long idcontrato) throws DatoException {
+		HorarioAsignado horario = null;
+		List<HorarioAsignado> horarios=new ArrayList<HorarioAsignado>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select h.idhorarioasignado,h.idempleado,h.idcontrato,h.idhorario,h.validezinicio,");
+			q.append("h.validezfin,h.causahorario,");
+			q.append(" h.idusuariocrea,h.fechacrea, h.idusuariomod, h.fechamod, h.estado, ");
+			q.append("ho.idhorario,ho.nombrehorario,ho.horaentrada,ho.horasalida,ho.idfrecuenciaasignacion,ho.minutosflexibilidad,ho.minutospermitidos, ");
+			q.append("fa.idfrecuenciaasignacion,fa.nombrefrecuencia,fa.nocturno ");
+			
+			q.append(" from rrhh.horarioasignado h ");
+			q.append(" left join  rrhh.horario ho on h.idhorario=ho.idhorario  ");
+			q.append(" left join  rrhh.frecuenciaasignacion fa on ho.idfrecuenciaasignacion=fa.idfrecuenciaasignacion  ");
+			q.append(" where h.estado=? and h.idcontrato=? order  by h.idhorarioasignado desc");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idcontrato);
+			//ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				horario = new HorarioAsignado();
+				horario.setIdhorarioasignado(rs.getLong(c++));
+				horario.setIdempleado(rs.getLong(c++));
+				horario.setIdcontrato(rs.getLong(c++));
+				horario.setIdhorario(rs.getLong(c++));
+				horario.setValidezinicio(rs.getTimestamp(c++));
+				horario.setValidezfin(rs.getTimestamp(c++));
+				horario.setCausahorario(rs.getString(c++));
+			
+				
+				horario.setIdusuariocrea(rs.getInt(c++));
+				horario.setFechacrea(rs.getTimestamp(c++));
+				horario.setIdusuariomod(rs.getInt(c++));
+				horario.setFechamod(rs.getTimestamp(c++));
+				horario.setEstado(rs.getInt(c++));
+				
+				
+				Horario hora=new Horario();
+				hora.setIdhorario(rs.getLong(c++));
+				hora.setNombrehorario(rs.getString(c++));
+				hora.setHoraentrada(rs.getTime(c++));
+				hora.setHorasalida(rs.getTime(c++));
+				hora.setIdfrecuenciaasignacion(rs.getLong(c++));
+				hora.setMinutosflex(rs.getInt(c++));
+				hora.setMinutospermitidos(rs.getInt(c++));
+				horario.setHorario(hora);
+				FrecuenciaAsignacion frecasig=new FrecuenciaAsignacion();
+				frecasig.setIdfrecuenciaasignacion(rs.getLong(c++));
+				frecasig.setNombrefrecuencia(rs.getString(c++));
+				frecasig.setNocturno(rs.getInt(c++));
+				horario.setFrecuenciaasignacion(frecasig);
+				horarios.add(horario);
+				
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return horarios;
+
+	}
+	
+	public HorarioAsignado getHorariosAsignadosporId(Long idhorarioasignado) throws DatoException {
+		HorarioAsignado horario = null;
+		//List<HorarioAsignado> horarios=new ArrayList<HorarioAsignado>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select h.idhorarioasignado,h.idempleado,h.idcontrato,h.idhorario,h.validezinicio,");
+			q.append("h.validezfin,h.causahorario,");
+			q.append(" h.idusuariocrea,h.fechacrea, h.idusuariomod, h.fechamod, h.estado, ");
+			q.append("ho.idhorario,ho.nombrehorario,ho.horaentrada,ho.horasalida,ho.idfrecuenciaasignacion,ho.minutosflexibilidad,ho.minutospermitidos, ");
+			q.append("fa.idfrecuenciaasignacion,fa.nombrefrecuencia,fa.nocturno ");
+			
+			q.append(" from rrhh.horarioasignado h ");
+			q.append(" left join  rrhh.horario ho on h.idhorario=ho.idhorario  ");
+			q.append(" left join  rrhh.frecuenciaasignacion fa on ho.idfrecuenciaasignacion=fa.idfrecuenciaasignacion  ");
+			q.append(" where  h.idhorarioasignado=?");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			//ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(1, idhorarioasignado);
+			//ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				horario = new HorarioAsignado();
+				horario.setIdhorarioasignado(rs.getLong(c++));
+				horario.setIdempleado(rs.getLong(c++));
+				horario.setIdcontrato(rs.getLong(c++));
+				horario.setIdhorario(rs.getLong(c++));
+				horario.setValidezinicio(rs.getTimestamp(c++));
+				horario.setValidezfin(rs.getTimestamp(c++));
+				horario.setCausahorario(rs.getString(c++));
+			
+				
+				horario.setIdusuariocrea(rs.getInt(c++));
+				horario.setFechacrea(rs.getTimestamp(c++));
+				horario.setIdusuariomod(rs.getInt(c++));
+				horario.setFechamod(rs.getTimestamp(c++));
+				horario.setEstado(rs.getInt(c++));
+				
+				
+				Horario hora=new Horario();
+				hora.setIdhorario(rs.getLong(c++));
+				hora.setNombrehorario(rs.getString(c++));
+				hora.setHoraentrada(rs.getTime(c++));
+				hora.setHorasalida(rs.getTime(c++));
+				hora.setIdfrecuenciaasignacion(rs.getLong(c++));
+				hora.setMinutosflex(rs.getInt(c++));
+				hora.setMinutospermitidos(rs.getInt(c++));
+				horario.setHorario(hora);
+				FrecuenciaAsignacion frecasig=new FrecuenciaAsignacion();
+				frecasig.setIdfrecuenciaasignacion(rs.getLong(c++));
+				frecasig.setNombrefrecuencia(rs.getString(c++));
+				frecasig.setNocturno(rs.getInt(c++));
+				horario.setFrecuenciaasignacion(frecasig);
+				//horarios.add(horario);
+				
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return horario;
+
+	}
+	
+	public Integer actualizarEstadoHorarioAsignado(HorarioAsignado horarioasig) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.horarioasignado set estado=?, idusuariomod=?, fechamod=getdate() where idhorarioasignado=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+
+			ps.setInt(c++, horarioasig.getEstado());
+			ps.setInt(c++, horarioasig.getIdusuariomod());
+			ps.setLong(c++, horarioasig.getIdhorarioasignado());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	public List<FrecuenciaAsignacion> getFrecuenciasignacion() throws DatoException {
+		FrecuenciaAsignacion frecuencia = null;
+		List<FrecuenciaAsignacion> frecuencias=new ArrayList<FrecuenciaAsignacion>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select f.idfrecuenciaasignacion,f.nombrefrecuencia,f.nocturno,");
+			//q.append("h.horasalida,h.idfrecuenciaasignacion,h.minutosflexibilidad,h.minutospermitidos,");
+			q.append(" f.idusuariocrea,f.fechacrea, f.idusuariomod, f.fechamod, f.estado ");
+			q.append("from rrhh.frecuenciaasignacion f where f.estado =? ");
+			//q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			//ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				frecuencia = new FrecuenciaAsignacion();
+				frecuencia.setIdfrecuenciaasignacion(rs.getLong(c++));
+				frecuencia.setNombrefrecuencia(rs.getString(c++));
+				frecuencia.setNocturno(rs.getInt(c++));
+				
+				frecuencia.setIdusuariocrea(rs.getInt(c++));
+				frecuencia.setFechacrea(rs.getTimestamp(c++));
+				frecuencia.setIdusuariomod(rs.getInt(c++));
+				frecuencia.setFechamod(rs.getTimestamp(c++));
+				frecuencia.setEstado(rs.getInt(c++));
+				frecuencias.add(frecuencia);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return frecuencias;
+
+	}
+	public Integer EditarHorarioAsignado(HorarioAsignado horarioasig) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.horarioasignado set idempleado=?,idhorario=?,validezinicio=?,validezfin=?,causahorario=? ,idusuariomod=?, fechamod=getdate() where idhorarioasignado=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+
+			
+			ps.setLong(c++, horarioasig.getIdempleado());
+			ps.setLong(c++, horarioasig.getIdhorario());
+			ps.setTimestamp(c++, horarioasig.getValidezinicio());
+			ps.setTimestamp(c++, horarioasig.getValidezfin());
+			ps.setString(c++, horarioasig.getCausahorario());
+			//ps.setInt(c++, horarioasig.getEstado());
+			ps.setInt(c++, horarioasig.getIdusuariomod());
+			ps.setLong(c++, horarioasig.getIdhorarioasignado());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	
+	public Integer deshabilitarHorarioAsignadoMasivo(List<HorarioAsignado> horariosasignados) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.horarioasignado set  estado=?,idusuariomod=?, fechamod=getdate() where idhorarioasignado=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			
+			for(HorarioAsignado horarioasig:horariosasignados){
+				c = 1;
+
+				
+			
+				ps.setInt(c++, EstadoEnum.DESHABILITADO.getIndex());
+				//ps.setInt(c++, horarioasig.getEstado());
+				ps.setInt(c++, horarioasig.getIdusuariomod());
+				ps.setLong(c++, horarioasig.getIdhorarioasignado());
+
+				estatus = ps.executeUpdate();
+			}
+			
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	
+	public List<ReporteAsistencia> Reporteasistencia(String fechadesde,String fechahasta,String basedatosasistencia,List<String> idareas) throws DatoException {
+		ReporteAsistencia reporteasistencia=new ReporteAsistencia();
+		IdentificacionTipo identificaciontipo=new IdentificacionTipo();
+		EmpleadoIdentificacion empleadoIdentificacion=new EmpleadoIdentificacion();
+		Empresa empresa=new Empresa();
+		Cargo cargo=new Cargo();
+		Area area=new Area();
+		Area areaasignada=new Area();
+		EmpleadoBean empleado=new EmpleadoBean();
+		 Asistencia asistencia=new Asistencia();
+		
+		List<ReporteAsistencia> reporteasistencias=new ArrayList<ReporteAsistencia>();
+		
+		try {
+			StringBuffer q = new StringBuffer();
+			q.append("select it.ididentificaciontipo,it.abreviatura,it.tipo,ei.numeroidentificacion,ei.actual,ei.codigoidentificacion, "
+					+ "emp.idempleado,emp.nombres ,emp.apellidos,are.idarea, are.nombrearea ,car.idcargo, car.cargo,"+ 
+			"asi.idasistencia,asi.fechainicioprogramado,asi.fechafinprogramado,asi.fechainiciomarcado ,asi.fechafinmarcado,"+ 
+			"asi.calculoentrada"+ 
+			", asi.calculosalida"+
+			", asi.calculomintrabajados"+
+			", asi.minutosflexibilidad"+
+			", asi.ip"+
+			", asi.publicip"+
+			" ,asi.idclasificacion, "+
+			"  cl.abreviatura,cl.nombre,cl.color,"+
+			" case  when (asi.idclasificacion)=1 then 'Tarde' when (asi.idclasificacion)=2 then 'A Tiempo' when (asi.idclasificacion)=3 then 'Falta' when (asi.idclasificacion)=4 then 'A tiempo con flexibilidad'   else 'Error'  end as 'Estado_asistencia'  "+ 
+			
+			" from "+basedatosasistencia+".asistencia.asistencia  asi "+ 
+			" inner join rrhh.contrato con on asi.idcontrato=con.idcontrato "+ 
+			" inner join rrhh.empleado emp on con.idempleado=emp.idempleado "+ 
+			" inner join rrhh.empleado_identificacion  ei on ei.idempleado=emp.idempleado and ei.actual = 1 "+ 
+			" inner join rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo "+  
+			" left join rrhh.cargo car on car.idcargo=con.idcargo "+  
+			" left join rrhh.area are on are.idarea=con.idareaasignada "+ 
+	
+			" inner join "+basedatosasistencia+".asistencia.clasificacion cl on cl.idclasificacion=asi.idclasificacion "+
+		
+			
+			"  ");
+
+			q.append(" 	where asi.fechainicioprogramado >= convert(datetime,'"+fechadesde+"',103) "); 
+			
+			 String txtTo = Util.stringToString(fechahasta.trim(), "dd/MM/yyyy", "yyyyMMdd");
+			q.append(" and asi.fechainicioprogramado < convert(datetime,'" + Util.addDays("yyyyMMdd", txtTo, 1) + "',112) ");
+			q.append("  and asi.estado=2   ");
+			String stringconcatenado = "";
+			 if (idareas!= null  && idareas.size() > 0) {
+		        	int i=1;
+		        	String var="";
+		        	for(String idarea:idareas){
+		        		
+		        		if(i==1){
+		        			var=" and (";
+		        		}else{
+		        			var=" or ";
+		        		}
+		        	
+		        	stringconcatenado += var+ " are.idarea ='"+ Long.valueOf(idarea) +"' ";
+		 		       i+=1; 
+		        	}
+		        	 q.append(stringconcatenado+")");
+		          }
+			
+			q.append(" order by asi.fechainicioprogramado asc");
+		
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			//ps.setLong(1, idarea);
+			//ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				reporteasistencia = new ReporteAsistencia();
+				 identificaciontipo=new IdentificacionTipo();
+				 empleadoIdentificacion=new EmpleadoIdentificacion();
+				 empresa=new Empresa();
+				 empleado=new EmpleadoBean();
+				 cargo=new Cargo();
+				 area=new Area();
+				 areaasignada=new Area();
+				 asistencia=new Asistencia();
+				 
+				 identificaciontipo.setIdidentificaciontipo(rs.getLong(c++));
+				 identificaciontipo.setAbreviatura(rs.getString(c++));
+				 identificaciontipo.setTipo(rs.getString(c++));
+				 empleadoIdentificacion.setNumeroidentificacion(rs.getString(c++));
+				 empleadoIdentificacion.setActual(rs.getInt(c++));
+				 empleadoIdentificacion.setCodigoidentificacion(rs.getString(c++));
+				 empleado.setIdempleado(rs.getLong(c++));
+				 empleado.setNombres(rs.getString(c++));
+				 empleado.setApellidos(rs.getString(c++));
+				area.setIdarea(rs.getLong(c++));
+				area.setNombrearea(rs.getString(c++));
+				
+				cargo.setIdcargo(rs.getLong(c++));
+				cargo.setNombrecargo(rs.getString(c++));
+				asistencia.setIdasistencia(rs.getLong(c++));
+				asistencia.setFechainicioprogramado(rs.getTimestamp(c++));
+				asistencia.setFechafinprogramado(rs.getTimestamp(c++));
+				asistencia.setFechainiciomarcado(rs.getTimestamp(c++));
+				asistencia.setFechafinmarcado(rs.getTimestamp(c++));
+				asistencia.setCalculoentrada(rs.getInt(c++));
+				asistencia.setCalculosalida(rs.getInt(c++));
+				asistencia.setCalculomintrabajados(rs.getInt(c++));
+				asistencia.setMinutosflexibilidad(rs.getInt(c++));
+				asistencia.setIp(rs.getString(c++));
+				asistencia.setPublicip(rs.getString(c++));
+				asistencia.setIdclasificacion(rs.getInt(c++));
+				AsistenciaClasificacion clasificacion=new AsistenciaClasificacion();
+				clasificacion.setIdclasificacion(Long.valueOf(asistencia.getIdclasificacion()));
+				clasificacion.setAbreviatura(rs.getString(c++));
+				clasificacion.setNombre(rs.getString(c++));
+				clasificacion.setColor(rs.getString(c++));
+							
+				asistencia.setEstadoasistencia(rs.getString(c++));
+			
+				asistencia.setClasificacion(clasificacion);
+				reporteasistencia.setAsistencia(asistencia);
+				reporteasistencia.setCargo(cargo);
+				reporteasistencia.setArea(area);
+				
+				//reporteasistencia.setContrato(contrato);
+				reporteasistencia.setEmpleado(empleado);
+				reporteasistencia.setIdentificaciontipo(identificaciontipo);
+				reporteasistencia.setEmpleadoidentificacion(empleadoIdentificacion);
+				reporteasistencia.setFechadesde(fechadesde);
+				reporteasistencia.setFechahasta(fechahasta);
+				Date fecha = new Date(asistencia.getFechainicioprogramado().getTime());
+				
+				reporteasistencia.setFecha(Util.dateToString(fecha, "dd/MM/yyyy"));
+				reporteasistencias.add(reporteasistencia);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return reporteasistencias;
+
+	}
+	
+	
+	public List<ReporteAsignacion> Reporteasignacion(String fechadesde,String fechahasta,List<String> idareas) throws DatoException, ParseException {
+		ReporteAsignacion reporteasignacion=new ReporteAsignacion();
+		IdentificacionTipo identificaciontipo=new IdentificacionTipo();
+		EmpleadoIdentificacion empleadoIdentificacion=new EmpleadoIdentificacion();
+		HorarioAsignado horarioasignado=new HorarioAsignado();
+		Empresa empresa=new Empresa();
+		Cargo cargo=new Cargo();
+		Area area=new Area();
+		EmpleadoBean empleado=new EmpleadoBean();
+		 Asistencia asistencia=new Asistencia();
+		FrecuenciaAsignacion frecuenciaasignacion=new FrecuenciaAsignacion();
+		 Horario horario=new Horario();
+		
+		List<ReporteAsignacion> reporteasignaciones=new ArrayList<ReporteAsignacion>();
+		GregorianCalendar desde=new GregorianCalendar();
+		GregorianCalendar hasta=new GregorianCalendar();
+		desde.setTime(Util.stringToDate(fechadesde, "dd/MM/yyyy"));
+		
+		hasta.setTime(Util.stringToDate(fechahasta, "dd/MM/yyyy"));
+		hasta.add(Calendar.DAY_OF_YEAR,1);
+		
+		Date desdet = desde.getTime();
+		Date hastat = hasta.getTime();
+	
+		int intervalo = 0;
+		String intervalofechas="";
+		if(desdet.equals(hastat)){
+			intervalofechas=intervalofechas+ "["+Util.dateToString(desdet, "dd/MM/yyyy")+"] ";	
+		}
+		//for(int i=desde.get(Calendar.DATE); ){
+			
+		while (desdet.before(hastat)) {
+			String coma;
+			if(intervalo==0){
+				coma="";
+			}else{
+				coma=",";
+			}
+			intervalofechas=intervalofechas+coma+" ["+Util.dateToString(desdet, "dd/MM/yyyy")+"] ";
+			intervalo++;
+			desdet=Util.addDays(new Timestamp(desdet.getTime()), 1);
+			
+			
+		}
+		
+		
+		try {
+			StringBuffer q = new StringBuffer();
+			q.append(" SELECT * " 
+ 
++" FROM ( " 
++" select identificacion,idemple,nombresP,apellidosP,nombreareaP,cargoP,conc,fechapp from( "
+ 
++" select identificacion as identificacion, " 
++" (fechahorarioini+'-'+fechahorariofin)as conc , fecha as fechapp "
++" ,frecuencia as frecuenci,diasemana as diaseman "
++",idemple "
++" ,nombres as nombresP "
++" ,apellidos as apellidosP "
++" ,nombrearea as nombreareaP,cargo as cargoP, " );
+			
+			
+		q.append(" CASE "
+		+" WHEN (frecuencia=7 and diasemana=0) THEN 'ok' " //domingo
+        +" WHEN (frecuencia=1 and diasemana=1) THEN 'ok' "//lunes
+        +" WHEN (frecuencia=2 and diasemana=2) THEN 'ok' "//martes
+        +" WHEN (frecuencia=3 and diasemana=3) THEN 'ok' "//miercoles
+        +" WHEN (frecuencia=4 and diasemana=4) THEN 'ok' "//jueves
+        +" WHEN (frecuencia=5 and diasemana=5) THEN 'ok'  "//viernes
+        +" WHEN (frecuencia=6 and diasemana=6) THEN 'ok' " //sabado
+       
+        // lun-viernes diurno
+        +" WHEN (frecuencia=8 and diasemana=1) THEN 'ok' "//lun-vie
+        +" WHEN (frecuencia=8 and diasemana=2) THEN 'ok' "
+        +" WHEN (frecuencia=8 and diasemana=3) THEN 'ok' "
+        +" WHEN (frecuencia=8 and diasemana=4) THEN 'ok' "
+        +"  WHEN (frecuencia=8 and diasemana=5) THEN 'ok' "
+          // lun-sabado diurno
+        +" WHEN (frecuencia=9 and diasemana=1) THEN 'ok' "//lun-vie
+        +"  WHEN (frecuencia=9 and diasemana=2) THEN 'ok' "
+        +" WHEN (frecuencia=9 and diasemana=3) THEN 'ok' "
+        +" WHEN (frecuencia=9 and diasemana=4) THEN 'ok' "
+        +" WHEN (frecuencia=9 and diasemana=5) THEN 'ok' "
+        +" WHEN (frecuencia=9 and diasemana=6) THEN 'ok' "
+           // finsemana
+        +" WHEN (frecuencia=10 and diasemana=6) THEN 'ok' "//sabado
+        +" WHEN (frecuencia=10 and diasemana=0) THEN 'ok' "//domingo
+        //nocturno
+        +" WHEN (frecuencia=17 and diasemana=0) THEN 'ok' "//domingo
+        +" WHEN (frecuencia=11 and diasemana=1) THEN 'ok' "//lunes
+        +" WHEN (frecuencia=12 and diasemana=2) THEN 'ok' "//martes
+        +" WHEN (frecuencia=13 and diasemana=3) THEN 'ok' "//miercoles
+        +" WHEN (frecuencia=14 and diasemana=4) THEN 'ok' "//jueves
+        +" WHEN (frecuencia=15 and diasemana=5) THEN 'ok' "//viernes
+        +" WHEN (frecuencia=16 and diasemana=6) THEN 'ok' "//sabado
+        
+          // lun-viernes nocturno
+       +" WHEN (frecuencia=18 and diasemana=1) THEN 'ok' "//lun-vie
+        +" WHEN (frecuencia=18 and diasemana=2) THEN 'ok'"
+       +"  WHEN (frecuencia=18 and diasemana=3) THEN 'ok'"
+       +"  WHEN (frecuencia=18 and diasemana=4) THEN 'ok'"
+       +"  WHEN (frecuencia=18 and diasemana=5) THEN 'ok' "
+        
+           // lun-sabado nocturno
+       +"  WHEN (frecuencia=19 and diasemana=1) THEN 'ok'  "//lun-vie
+       +"  WHEN (frecuencia=19 and diasemana=2) THEN 'ok' "
+       +"  WHEN (frecuencia=19 and diasemana=3) THEN 'ok' "
+       +"  WHEN (frecuencia=19 and diasemana=4) THEN 'ok' "
+       +"  WHEN (frecuencia=19 and diasemana=5) THEN 'ok' "
+      +"   WHEN (frecuencia=19 and diasemana=6) THEN 'ok'"
+         
+         
+            // finsemananocturno
+       +"  WHEN (frecuencia=20 and diasemana=6) THEN 'ok' " //sabado
+       +"  WHEN (frecuencia=20 and diasemana=0) THEN 'ok' "//domingo
+         
+     
+         
+       +"  ELSE 'bad' "
+      +" END as test ");	
+			
+			
+			
+		q.append("	from(		"
+				 
+				 
+		+"		   select convert(nvarchar(MAX),f.splitdata,103) as fecha,  ei.numeroidentificacion as identificacion, "
+		+"		   convert(nvarchar(MAX),f.splitdata,100) as fechahorarioinicio,"
+		+"		     convert(nvarchar(MAX),f.splitdata,100)  as fechahorarioini," 
+				+"     convert(nvarchar(MAX),f.splitdata2,100)  as fechahorariofin,"
+				+"     emp.idempleado as idemple, emp.nombres as nombres ,emp.apellidos as apellidos,are.nombrearea as nombrearea,car.cargo as cargo" 
+				+"   ,fa.idfrecuenciaasignacion as frecuencia "
+				+"   ,datepart(DW,f.splitdata)-1 as diasemana "
+				+"     from rrhh.horarioasignado h " 
+				 +"    left join  rrhh.horario ho on h.idhorario=ho.idhorario "
+				 +"     left join  rrhh.frecuenciaasignacion fa on ho.idfrecuenciaasignacion=fa.idfrecuenciaasignacion"
+				  +"      inner join rrhh.empleado_identificacion ei on h.idempleado=ei.idempleado" 
+				   +"      inner join rrhh.empleado emp on ei.idempleado=emp.idempleado" 
+				  +"       inner join rrhh.identificaciontipo it on  it.ididentificaciontipo=ei.ididentificaciontipo"  
+				   +"      inner join rrhh.contrato con on emp.idempleado=con.idempleado and con.idcontrato= " 
+				    +"     (select top 1 c.idcontrato" 
+				    +"     from rrhh.contrato c where c.idempleado=emp.idempleado order by idcontrato desc )"
+				    +"      and con.estado=2 " 
+				    +" inner join rrhh.area are on con.idareaasignada=are.idarea"
+				    +" inner join rrhh.cargo car on car.idcargo=con.idcargo"
+				    +"  CROSS APPLY [dbo].F_SplitHorariosAsiganados (h.validezinicio,DATEADD(day,1,h.validezfin),ho.idfrecuenciaasignacion ) f "  
+				      
+				      
+				      
+
+	+	"  ");
+			q.append(" where ");
+			q.append(" h.estado='2'");
+			q.append(" and ei.actual='1'");
+			
+			q.append(" and f.splitdata >= convert(datetime,'"+fechadesde+"',103) "); 
+			
+			 String txtTo = Util.stringToString(fechahasta.trim(), "dd/MM/yyyy", "yyyyMMdd");
+			q.append(" and f.splitdata2 < convert(datetime,'" + Util.addDays("yyyyMMdd", txtTo, 1) + "',112) ");
+			
+			
+			
+			
+			
+			
+			
+			String stringconcatenado = "";
+			 if (idareas!= null  && idareas.size() > 0) {
+		        	int i=1;
+		        	String var="";
+		        	for(String idarea:idareas){
+		        		
+		        		if(i==1){
+		        			var=" and (";
+		        		}else{
+		        			var=" or ";
+		        		}
+		        	
+		        	stringconcatenado += var+ " are.idarea ='"+ Long.valueOf(idarea) +"' ";
+		 		       i+=1; 
+		        	}
+		        	 q.append(stringconcatenado+")");
+		          }
+			
+			 q.append("   )as t"
+					
+		              
+		               
+			      +"   )as p "
+			       +"   where   test='ok' "
+			       +"   "
+			          
+			        +"   ) AS "
+			        +"   SourceTable " 
+			           
+						+" PIVOT"
+						+" ("
+						+" min(conc)"
+						
+						
+						+" FOR fechapp" 
+						+" IN ( "
+						
+						+ intervalofechas
+						
+						
+						+ " ) "
+						
+						+" ) AS PivotTable"
+						 );
+									
+			//q.append(" order by are.idarea ,ei.ididentificaciontipo,ei.numeroidentificacion asc");
+		
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				reporteasignacion = new ReporteAsignacion();
+				 identificaciontipo=new IdentificacionTipo();
+				 empleadoIdentificacion=new EmpleadoIdentificacion();
+				 empresa=new Empresa();
+				 empleado=new EmpleadoBean();
+				 cargo=new Cargo();
+				 area=new Area();
+				 horario=new Horario();
+				 horarioasignado=new HorarioAsignado();
+				 
+				/* identificaciontipo.setIdidentificaciontipo(rs.getLong(c++));
+				 identificaciontipo.setAbreviatura(rs.getString(c++));
+				 identificaciontipo.setTipo(rs.getString(c++));
+				*/ 
+				 empleadoIdentificacion.setNumeroidentificacion(rs.getString(c++));
+				// empleadoIdentificacion.setActual(rs.getInt(c++));
+				// empleadoIdentificacion.setCodigoidentificacion(rs.getString(c++));
+				 
+				 empleado.setIdempleado(rs.getLong(c++));
+				 empleado.setNombres(rs.getString(c++));
+				 empleado.setApellidos(rs.getString(c++));
+				 
+				//area.setIdarea(rs.getLong(c++));
+				area.setNombrearea(rs.getString(c++));
+				
+				//cargo.setIdcargo(rs.getLong(c++));
+				cargo.setNombrecargo(rs.getString(c++));
+				
+			
+				
+				List<HorarioparaReporte> valores = new ArrayList<HorarioparaReporte>();
+				for (int i = 0; i < intervalo; i++) {
+					HorarioparaReporte horarioreporte= new HorarioparaReporte();
+					horarioreporte.setFechas(rs.getString(c++));
+					
+					valores.add(horarioreporte);
+				}
+				
+				reporteasignacion.setValores(valores);
+				
+				
+				reporteasignacion.setEmpleadoidentificacion(empleadoIdentificacion);
+				reporteasignacion.setEmpleado(empleado);
+		
+				reporteasignacion.setCargo(cargo);
+				reporteasignacion.setArea(area);
+				//reporteasistencia.setContrato(contrato);
+				
+				
+				
+				reporteasignaciones.add(reporteasignacion);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return reporteasignaciones;
+
+	}
+	
+	public List<ReporteGraficaAsistencia> ReporteGraficaAsistencia(String basedatosasistencia,String fechadesde,String fechahasta,List<AsistenciaClasificacion> clasificacion,List<String> idareas) throws DatoException, ParseException {
+		ReporteAsignacion reporteasignacion=new ReporteAsignacion();
+		IdentificacionTipo identificaciontipo=new IdentificacionTipo();
+		EmpleadoIdentificacion empleadoIdentificacion=new EmpleadoIdentificacion();
+		HorarioAsignado horarioasignado=new HorarioAsignado();
+		Empresa empresa=new Empresa();
+		Cargo cargo=new Cargo();
+		Area area=new Area();
+		EmpleadoBean empleado=new EmpleadoBean();
+		 Asistencia asistencia=new Asistencia();
+		FrecuenciaAsignacion frecuenciaasignacion=new FrecuenciaAsignacion();
+		ReporteGraficaAsistencia reportegrafica =new ReporteGraficaAsistencia();
+		 
+		
+		List<ReporteGraficaAsistencia> reportegraficas=new ArrayList<ReporteGraficaAsistencia>();
+		GregorianCalendar desde=new GregorianCalendar();
+		GregorianCalendar hasta=new GregorianCalendar();
+		desde.setTime(Util.stringToDate(fechadesde, "dd/MM/yyyy"));
+		
+		hasta.setTime(Util.stringToDate(fechahasta, "dd/MM/yyyy"));
+		hasta.add(Calendar.DAY_OF_YEAR,1);
+		
+		Date desdet = desde.getTime();
+		Date hastat = hasta.getTime();
+	
+		int intervalo = 0;
+		String intervalocategorias="";
+		
+		//for(int i=desde.get(Calendar.DATE); ){
+			
+		for(AsistenciaClasificacion clasifica:clasificacion){
+			String coma;
+			if(intervalo==0){
+				coma="";
+			}else{
+				coma=",";
+			}
+			intervalocategorias=intervalocategorias+coma+" ["+clasifica.getIdclasificacion()+"] ";
+			intervalo++;
+			
+			
+			
+		}
+		
+		
+		try {
+			StringBuffer q = new StringBuffer();
+			q.append(" "
+
++" select *"
+
+
+ +"from"
++"("
+
+
++"select t.fecha,t.numeroidentificacion,t.idclasificacion from( ");	
+			
+			
+			
+		q.append("	select "
+  +"convert(nvarchar(MAX),asi.fechainicioprogramado,103) as fecha,"
+
++"it.abreviatura,"
+
++"ei.numeroidentificacion,ei.actual,ei.codigoidentificacion," 
+
++"are.idarea, are.nombrearea,"
+
++"asi.fechainicioprogramado,asi.fechafinprogramado"
+
+  +" ,asi.idclasificacion" 
+
+  
++"   from "+ basedatosasistencia+".asistencia.asistencia  asi" 
+  +"  inner join rrhh.contrato con on asi.idcontrato=con.idcontrato"  
+  +"  inner join rrhh.empleado emp on con.idempleado=emp.idempleado" 
+  +"   inner join rrhh.empleado_identificacion  ei on ei.idempleado=emp.idempleado   and ei.actual = 1" 
+  +"   inner join rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo " 
+  +"   left join rrhh.cargo car on car.idcargo=con.idcargo " 
+  +"  left join rrhh.area are on are.idarea=con.idareaasignada   "  
+				      
+				      
+				      
+
+	+	"  ");
+			q.append(" where ");
+		
+			
+			q.append(" asi.fechainicioprogramado >= convert(datetime,'"+fechadesde+"',103) "); 
+			
+			 String txtTo = Util.stringToString(fechahasta.trim(), "dd/MM/yyyy", "yyyyMMdd");
+			q.append(" and asi.fechainicioprogramado < convert(datetime,'" + Util.addDays("yyyyMMdd", txtTo, 1) + "',112) ");
+			
+			
+			
+			
+			
+			q.append("  and asi.estado=2   ");
+			
+			String stringconcatenado = "";
+			 if (idareas!= null  && idareas.size() > 0) {
+		        	int i=1;
+		        	String var="";
+		        	for(String idarea:idareas){
+		        		
+		        		if(i==1){
+		        			var=" and (";
+		        		}else{
+		        			var=" or ";
+		        		}
+		        	
+		        	stringconcatenado += var+ " are.idarea ='"+ Long.valueOf(idarea) +"' ";
+		 		       i+=1; 
+		        	}
+		        	 q.append(stringconcatenado+")");
+		          }
+			
+			 q.append("   )as t"
+				        
+			        +"   ) AS "
+			        +"   SourceTable " 
+			           
+					
+						+"  PIVOT ( count(numeroidentificacion) "
+						
+						
+						+"  FOR idclasificacion " 
+						+" IN ( "
+						
+						+ intervalocategorias
+						
+						
+						+ " ) "
+						
+						+" ) AS PivotTable"
+						 );
+									
+			//q.append(" order by are.idarea ,ei.ididentificaciontipo,ei.numeroidentificacion asc");
+		
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+		
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				reporteasignacion = new ReporteAsignacion();
+				 reportegrafica=new ReporteGraficaAsistencia();
+				 empleadoIdentificacion=new EmpleadoIdentificacion();
+				 empresa=new Empresa();
+				 empleado=new EmpleadoBean();
+				 cargo=new Cargo();
+				 area=new Area();
+				
+				 
+			
+				 reportegrafica.setFecha(rs.getString(c++));
+				
+					
+					reportegrafica.setTarde(rs.getInt(c++));
+					reportegrafica.setAtiempo(rs.getInt(c++));
+					reportegrafica.setFalta(rs.getInt(c++));
+					reportegrafica.setAtiempoconflex(rs.getInt(c++));
+					
+				
+				
+				
+				
+				
+				
+				
+					reportegraficas.add(reportegrafica);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return reportegraficas;
+
+	}
+	
+}

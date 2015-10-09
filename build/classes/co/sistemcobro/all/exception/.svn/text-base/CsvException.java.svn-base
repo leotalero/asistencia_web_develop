@@ -1,0 +1,29 @@
+package co.sistemcobro.all.exception;
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class CsvException extends Exception {
+
+	private static final long serialVersionUID = -7393514908352290012L;
+
+	private String mensaje;
+
+	public CsvException() {
+	}
+
+	public CsvException(String mensaje) {
+		this.mensaje = mensaje;
+	}
+
+	@Override
+	public String toString() {
+		return mensaje;
+	}
+
+	@Override
+	public String getMessage() {
+		return mensaje;
+	}
+}

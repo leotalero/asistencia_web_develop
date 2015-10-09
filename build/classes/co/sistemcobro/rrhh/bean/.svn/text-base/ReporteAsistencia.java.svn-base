@@ -1,0 +1,101 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+import co.sistemcobro.asistencia.bean.Asistencia;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class ReporteAsistencia implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Asistencia asistencia;
+	private EmpleadoBean empleado;
+	private Contrato contrato;
+	private IdentificacionTipo identificaciontipo;
+	private EmpleadoIdentificacion empleadoidentificacion;
+	private Cargo cargo;
+	private Area area;
+	private HorarioAsignado horarioasignado;
+	private String fechadesde;
+	private String fechahasta;
+	private String fecha;
+	public Asistencia getAsistencia() {
+		return asistencia;
+	}
+	public void setAsistencia(Asistencia asistencia) {
+		this.asistencia = asistencia;
+	}
+	public EmpleadoBean getEmpleado() {
+		return empleado;
+	}
+	public void setEmpleado(EmpleadoBean empleado) {
+		this.empleado = empleado;
+	}
+	public Contrato getContrato() {
+		return contrato;
+	}
+	public void setContrato(Contrato contrato) {
+		this.contrato = contrato;
+	}
+	public IdentificacionTipo getIdentificaciontipo() {
+		return identificaciontipo;
+	}
+	public void setIdentificaciontipo(IdentificacionTipo identificaciontipo) {
+		this.identificaciontipo = identificaciontipo;
+	}
+	public EmpleadoIdentificacion getEmpleadoidentificacion() {
+		return empleadoidentificacion;
+	}
+	public void setEmpleadoidentificacion(
+			EmpleadoIdentificacion empleadoidentificacion) {
+		this.empleadoidentificacion = empleadoidentificacion;
+	}
+	public Cargo getCargo() {
+		return cargo;
+	}
+	public void setCargo(Cargo cargo) {
+		this.cargo = cargo;
+	}
+	public Area getArea() {
+		return area;
+	}
+	public void setArea(Area area) {
+		this.area = area;
+	}
+	public HorarioAsignado getHorarioasignado() {
+		return horarioasignado;
+	}
+	public void setHorarioasignado(HorarioAsignado horarioasignado) {
+		this.horarioasignado = horarioasignado;
+	}
+	public String getFechadesde() {
+		return fechadesde;
+	}
+	public void setFechadesde(String fechadesde) {
+		this.fechadesde = fechadesde;
+	}
+	public String getFechahasta() {
+		return fechahasta;
+	}
+	public void setFechahasta(String fechahasta) {
+		this.fechahasta = fechahasta;
+	}
+	public String getFecha() {
+		return fecha;
+	}
+	public void setFecha(String fecha) {
+		this.fecha = fecha;
+	}
+
+	
+	
+	
+
+
+}

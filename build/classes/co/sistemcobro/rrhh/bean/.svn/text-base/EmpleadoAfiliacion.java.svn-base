@@ -1,0 +1,117 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+public class EmpleadoAfiliacion implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idempleadoafiliacion;
+	private Long idempleado;
+	private Long idafiliaciontipo;
+	private Long idafiliacionentidad;
+	private Timestamp fechainicio;
+	private Timestamp fechafin;
+	private String observacion;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	private AfiliacionTipo afiliacionTipo;
+	private AfiliacionEntidad afiliacionEntidad;
+	
+	
+	public Long getIdempleadoafiliacion() {
+		return idempleadoafiliacion;
+	}
+	public void setIdempleadoafiliacion(Long idempleadoafiliacion) {
+		this.idempleadoafiliacion = idempleadoafiliacion;
+	}
+	public Long getIdempleado() {
+		return idempleado;
+	}
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+	public Long getIdafiliaciontipo() {
+		return idafiliaciontipo;
+	}
+	public void setIdafiliaciontipo(Long idafiliaciontipo) {
+		this.idafiliaciontipo = idafiliaciontipo;
+	}
+	public Long getIdafiliacionentidad() {
+		return idafiliacionentidad;
+	}
+	public void setIdafiliacionentidad(Long idafiliacionentidad) {
+		this.idafiliacionentidad = idafiliacionentidad;
+	}
+	public Timestamp getFechainicio() {
+		return fechainicio;
+	}
+	public void setFechainicio(Timestamp fechainicio) {
+		this.fechainicio = fechainicio;
+	}
+	public Timestamp getFechafin() {
+		return fechafin;
+	}
+	public void setFechafin(Timestamp fechafin) {
+		this.fechafin = fechafin;
+	}
+	public String getObservacion() {
+		return observacion;
+	}
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	
+	public AfiliacionTipo getAfiliacionTipo() {
+		return afiliacionTipo;
+	}
+	public void setAfiliacionTipo(AfiliacionTipo afiliacionTipo) {
+		this.afiliacionTipo = afiliacionTipo;
+	}
+	public AfiliacionEntidad getAfiliacionEntidad() {
+		return afiliacionEntidad;
+	}
+	public void setAfiliacionEntidad(AfiliacionEntidad afiliacionEntidad) {
+		this.afiliacionEntidad = afiliacionEntidad;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+}

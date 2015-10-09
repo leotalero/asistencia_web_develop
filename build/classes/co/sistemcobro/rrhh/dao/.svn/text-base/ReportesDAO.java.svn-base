@@ -1,0 +1,801 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.hermes.bean.Estado;
+import co.sistemcobro.hermes.bean.UsuarioBean;
+import co.sistemcobro.hermes.constante.UsuarioTipoBusquedaEnum;
+import co.sistemcobro.rrhh.bean.AfiliacionEntidad;
+import co.sistemcobro.rrhh.bean.AfiliacionEntidadTipo;
+import co.sistemcobro.rrhh.bean.Area;
+import co.sistemcobro.rrhh.bean.Banco;
+import co.sistemcobro.rrhh.bean.Cargo;
+import co.sistemcobro.rrhh.bean.Contrato;
+import co.sistemcobro.rrhh.bean.ContratoProceso;
+import co.sistemcobro.rrhh.bean.EmpleadoBanco;
+import co.sistemcobro.rrhh.bean.EmpleadoBean;
+import co.sistemcobro.rrhh.bean.EmpleadoDesvinculacion;
+import co.sistemcobro.rrhh.bean.EmpleadoIdentificacion;
+import co.sistemcobro.rrhh.bean.EmpleadoPropiedad;
+import co.sistemcobro.rrhh.bean.Empresa;
+import co.sistemcobro.rrhh.bean.EstadoDesvinculacion;
+import co.sistemcobro.rrhh.bean.Genero;
+import co.sistemcobro.rrhh.bean.IdentificacionTipo;
+import co.sistemcobro.rrhh.bean.Proceso;
+import co.sistemcobro.rrhh.bean.ReporteIngresosPersonal;
+import co.sistemcobro.rrhh.bean.RetiroMotivo;
+import co.sistemcobro.rrhh.bean.Sucursal;
+import co.sistemcobro.rrhh.constante.EmpleadoTipoBusquedaEnum;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class ReportesDAO extends BaseDAO {
+
+	Logger log  = Logger.getLogger(ReportesDAO.class);
+	
+	public ReportesDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public List<Contrato> getContratosporIdEmpleado(Long idempleado) throws DatoException {
+		Contrato contrato = null;
+		List<Contrato> contratos=new ArrayList<Contrato>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select c.idcontrato,c.idempleado,c.idempresa,c.idsucursal,c.idcargo,c.idarea,c.idretiromotivo,c.numerocontrato,");
+			q.append(" c.fechafirma,c.fechainicio,c.fechafin,c.idusuariocrea,c.fechacrea, c.idusuariomod, c.fechamod, c.estado, ");
+			q.append("em.idempresa,em.nombreempresa,");
+			q.append("su.idsucursal,su.nombresucursal,");
+			q.append("ar.idarea,ar.nombrearea,");
+			q.append("cg.idcargo,cg.cargo,");
+			q.append("rm.idretiromotivo,rm.nombremotivo ");
+			q.append("from rrhh.contrato c ");
+			q.append("left join  rrhh.empresa em on em.idempresa=c.idempresa  ");
+			q.append("left join  rrhh.sucursal su on su.idsucursal=c.idsucursal  ");
+			q.append("left join  rrhh.area ar on ar.idarea=c.idarea  ");
+			q.append("left join  rrhh.cargo cg on cg.idcargo=c.idcargo  ");
+			q.append("left join  rrhh.retiromotivo rm on rm.idretiromotivo=c.idretiromotivo  ");
+			q.append("where  c.idempleado=? order by c.fechacrea desc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			//ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(1, idempleado);
+			//ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contrato = new Contrato();
+				contrato.setIdcontrato(rs.getLong(c++));
+				contrato.setIdempleado(rs.getLong(c++));
+				contrato.setIdempresa(rs.getLong(c++));
+				contrato.setIdsucursal(rs.getLong(c++));
+				contrato.setIdcargo(rs.getLong(c++));
+				contrato.setIdarea(rs.getLong(c++));
+				contrato.setIdretiromotivo(rs.getLong(c++));
+				contrato.setNumerocontrato(rs.getString(c++));
+				contrato.setFechafirma(rs.getTimestamp(c++));
+				contrato.setFechainicio(rs.getTimestamp(c++));
+				contrato.setFechafin(rs.getTimestamp(c++));
+				contrato.setIdusuariocrea(rs.getInt(c++));
+				contrato.setFechacrea(rs.getTimestamp(c++));
+				contrato.setIdusuariomod(rs.getInt(c++));
+				contrato.setFechamod(rs.getTimestamp(c++));
+				contrato.setEstado(rs.getInt(c++));
+				Empresa empresa=new Empresa();
+				empresa.setIdempresa(rs.getLong(c++));
+				empresa.setNombreempresa(rs.getString(c++));
+				contrato.setEmpresa(empresa);
+				Sucursal sucursal=new Sucursal();
+				sucursal.setIdsucursal(rs.getLong(c++));
+				sucursal.setNombresucursal(rs.getString(c++));
+				contrato.setSucursal(sucursal);
+				Area area=new Area();
+				area.setIdarea(rs.getLong(c++));
+				area.setNombrearea(rs.getString(c++));
+				contrato.setArea(area);
+				Cargo cargo=new Cargo();
+				cargo.setIdcargo(rs.getLong(c++));
+				cargo.setNombrecargo(rs.getString(c++));
+				contrato.setCargo(cargo);
+				RetiroMotivo retiro=new RetiroMotivo();
+				retiro.setIdretiromotivo(rs.getLong(c++));
+				retiro.setNombremotivo(rs.getString(c++));
+				//contrato.setTipo(rs.getString(c++));
+				//tipoidentificacion.setAbreviatura(rs.getString(c++));
+				contrato.setRetiromotivo(retiro);
+				contratos.add(contrato);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contratos;
+
+	}	
+	
+	
+	public List<Area> obtenerAreasAcargoPorIdCargo(Contrato contrato)throws DatoException {
+		Area area = null;
+		List<Area> listaAreas = new ArrayList<Area>();
+			
+		try{
+			
+			String consulta = "SELECT a.idarea,a.nombrearea,a.idusuariocrea,a.fechacrea,a.idusuariomod,a.fechamod,a.estado "
+							 +"FROM rrhh.area a " 
+							 +"INNER JOIN rrhh.cargo_area_asignada caa ON caa.idareamostrar = a.idarea "
+							 +"WHERE caa.idcargo=?"+" "
+							 +"AND a.estado=?"+" "
+							 +"AND caa.idareaasignada=?"; 
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+			ps.setLong(1,contrato.getIdcargo());
+			ps.setLong(2,EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(3, contrato.getIdareaasignada());
+			
+			rs = ps.executeQuery();
+			
+			
+			while (rs.next()) {
+				area = new Area();
+				
+				area.setIdarea(rs.getLong("idarea"));
+				area.setNombrearea(rs.getString("nombrearea"));
+				area.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				area.setFechacrea(rs.getTimestamp("fechacrea"));
+				area.setIdusuariomod(rs.getInt("idusuariomod"));
+				area.setEstado(rs.getInt("estado"));
+				
+				listaAreas.add(area);
+			}
+				
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return listaAreas;
+	}
+	
+	
+	
+	public Contrato getUltimoContratosporIdEmpleado(Long idempleado) throws DatoException {
+		Contrato contrato = null;
+		List<Contrato> contratos=new ArrayList<Contrato>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select TOP 1 c.idcontrato,c.idempleado,c.idempresa,c.idsucursal,c.idcargo,c.idarea,c.idretiromotivo,c.numerocontrato,");
+			q.append(" c.fechafirma,c.fechainicio,c.fechafin,c.idusuariocrea,c.fechacrea, c.idusuariomod, c.fechamod, c.estado, ");
+			q.append("em.idempresa,em.nombreempresa,");
+			q.append("su.idsucursal,su.nombresucursal,");
+			q.append("ar.idarea,ar.nombrearea,");
+			q.append("cg.idcargo,cg.cargo,");
+			q.append("rm.idretiromotivo,rm.nombremotivo ");
+			q.append("from rrhh.contrato c ");
+			q.append("left join  rrhh.empresa em on em.idempresa=c.idempresa  ");
+			q.append("left join  rrhh.sucursal su on su.idsucursal=c.idsucursal  ");
+			q.append("left join  rrhh.area ar on ar.idarea=c.idarea  ");
+			q.append("left join  rrhh.cargo cg on cg.idcargo=c.idcargo  ");
+			q.append("left join  rrhh.retiromotivo rm on rm.idretiromotivo=c.idretiromotivo  ");
+			q.append("where c.estado=? and c.idempleado=? order by c.fechacrea desc ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idempleado);
+			//ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contrato = new Contrato();
+				contrato.setIdcontrato(rs.getLong(c++));
+				contrato.setIdempleado(rs.getLong(c++));
+				contrato.setIdempresa(rs.getLong(c++));
+				contrato.setIdsucursal(rs.getLong(c++));
+				contrato.setIdcargo(rs.getLong(c++));
+				contrato.setIdarea(rs.getLong(c++));
+				contrato.setIdretiromotivo(rs.getLong(c++));
+				contrato.setNumerocontrato(rs.getString(c++));
+				contrato.setFechafirma(rs.getTimestamp(c++));
+				contrato.setFechainicio(rs.getTimestamp(c++));
+				contrato.setFechafin(rs.getTimestamp(c++));
+				contrato.setIdusuariocrea(rs.getInt(c++));
+				contrato.setFechacrea(rs.getTimestamp(c++));
+				contrato.setIdusuariomod(rs.getInt(c++));
+				contrato.setFechamod(rs.getTimestamp(c++));
+				contrato.setEstado(rs.getInt(c++));
+				Empresa empresa=new Empresa();
+				empresa.setIdempresa(rs.getLong(c++));
+				empresa.setNombreempresa(rs.getString(c++));
+				contrato.setEmpresa(empresa);
+				Sucursal sucursal=new Sucursal();
+				sucursal.setIdsucursal(rs.getLong(c++));
+				sucursal.setNombresucursal(rs.getString(c++));
+				contrato.setSucursal(sucursal);
+				Area area=new Area();
+				area.setIdarea(rs.getLong(c++));
+				area.setNombrearea(rs.getString(c++));
+				contrato.setArea(area);
+				Cargo cargo=new Cargo();
+				cargo.setIdcargo(rs.getLong(c++));
+				cargo.setNombrecargo(rs.getString(c++));
+				contrato.setCargo(cargo);
+				RetiroMotivo retiro=new RetiroMotivo();
+				retiro.setIdretiromotivo(rs.getLong(c++));
+				retiro.setNombremotivo(rs.getString(c++));
+				//contrato.setTipo(rs.getString(c++));
+				//tipoidentificacion.setAbreviatura(rs.getString(c++));
+				contrato.setRetiromotivo(retiro);
+			//	contratos.add(contrato);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contrato;
+
+	}	
+	
+	
+	public Contrato getContratobyId(Long idcontrato) throws DatoException {
+		Contrato contrato = null;
+		//List<Contrato> con=new ArrayList<Contrato>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select c.idcontrato,c.idempleado,c.idempresa,c.idsucursal,c.idcargo,c.idarea,c.idretiromotivo,c.numerocontrato,");
+			q.append(" c.fechafirma,c.fechainicio,c.fechafin,c.idusuariocrea,c.fechacrea, c.idusuariomod, c.fechamod, c.estado, ");
+			q.append("em.idempresa,em.nombreempresa,");
+			q.append("su.idsucursal,su.nombresucursal,");
+			q.append("ar.idarea,ar.nombrearea,");
+			q.append("cg.idcargo,cg.cargo,");
+			q.append("rm.idretiromotivo,rm.nombremotivo ");
+			q.append("from rrhh.contrato c ");
+			q.append("left join  rrhh.empresa em on em.idempresa=c.idempresa  ");
+			q.append("left join  rrhh.sucursal su on su.idsucursal=c.idsucursal  ");
+			q.append("left join  rrhh.area ar on ar.idarea=c.idarea  ");
+			q.append("left join  rrhh.cargo cg on cg.idcargo=c.idcargo  ");
+			q.append("left join  rrhh.retiromotivo rm on rm.idretiromotivo=c.idretiromotivo  ");
+			q.append("where  c.idcontrato=? order by c.fechacrea ");
+			con = ds.getConnection();
+
+
+			ps = con.prepareStatement(q.toString());
+			//ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(1, idcontrato);
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				contrato = new Contrato();
+				contrato.setIdcontrato(rs.getLong(c++));
+				contrato.setIdempleado(rs.getLong(c++));
+				contrato.setIdempresa(rs.getLong(c++));
+				contrato.setIdsucursal(rs.getLong(c++));
+				contrato.setIdcargo(rs.getLong(c++));
+				contrato.setIdarea(rs.getLong(c++));
+				contrato.setIdretiromotivo(rs.getLong(c++));
+				contrato.setNumerocontrato(rs.getString(c++));
+				contrato.setFechafirma(rs.getTimestamp(c++));
+				contrato.setFechainicio(rs.getTimestamp(c++));
+				contrato.setFechafin(rs.getTimestamp(c++));
+				contrato.setIdusuariocrea(rs.getInt(c++));
+				contrato.setFechacrea(rs.getTimestamp(c++));
+				contrato.setIdusuariomod(rs.getInt(c++));
+				contrato.setFechamod(rs.getTimestamp(c++));
+				contrato.setEstado(rs.getInt(c++));
+				Empresa empresa=new Empresa();
+				empresa.setIdempresa(rs.getLong(c++));
+				empresa.setNombreempresa(rs.getString(c++));
+				contrato.setEmpresa(empresa);
+				Sucursal sucursal=new Sucursal();
+				sucursal.setIdsucursal(rs.getLong(c++));
+				sucursal.setNombresucursal(rs.getString(c++));
+				contrato.setSucursal(sucursal);
+				Area area=new Area();
+				area.setIdarea(rs.getLong(c++));
+				area.setNombrearea(rs.getString(c++));
+				contrato.setArea(area);
+				Cargo cargo=new Cargo();
+				cargo.setIdcargo(rs.getLong(c++));
+				cargo.setNombrecargo(rs.getString(c++));
+				contrato.setCargo(cargo);
+				RetiroMotivo retiro=new RetiroMotivo();
+				retiro.setIdretiromotivo(rs.getLong(c++));
+				retiro.setNombremotivo(rs.getString(c++));
+				//contrato.setTipo(rs.getString(c++));
+				//tipoidentificacion.setAbreviatura(rs.getString(c++));
+				contrato.setRetiromotivo(retiro);
+				//contratos.add(contrato);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contrato;
+
+	}
+
+	
+	public Contrato insertarContrato(Contrato contrato) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.contrato (idempleado, idempresa,idsucursal,idcargo,idarea,idretiromotivo,numerocontrato,fechainicio,fechafirma,fechafin, ");
+			q.append(" idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,?,?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(), Statement.RETURN_GENERATED_KEYS);
+			c = 1;
+
+			
+			
+			ps.setLong(c++, contrato.getIdempleado());
+			ps.setLong(c++, contrato.getIdempresa());
+			ps.setLong(c++, contrato.getIdsucursal());
+			ps.setLong(c++, contrato.getIdcargo());
+			ps.setLong(c++, contrato.getIdarea());
+			if (null == contrato.getIdretiromotivo() || contrato.getIdretiromotivo() <= 0) {
+				ps.setNull(c++, java.sql.Types.LONGNVARCHAR);
+			} else {
+				ps.setLong(c++, contrato.getIdretiromotivo());
+			}
+		
+			ps.setString(c++,contrato.getNumerocontrato() );
+			
+			ps.setTimestamp(c++, contrato.getFechainicio());
+			ps.setTimestamp(c++, contrato.getFechafirma());
+			if (null == contrato.getIdretiromotivo() || contrato.getIdretiromotivo() <= 0) {
+				ps.setNull(c++, java.sql.Types.TIMESTAMP);
+			} else {
+				ps.setTimestamp(c++, contrato.getFechafin());
+			}
+		
+			
+			
+			
+			
+			
+			
+			ps.setInt(c++, contrato.getIdusuariocrea());
+			ps.setInt(c++, contrato.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				contrato.setIdcontrato(rs.getLong(1));
+			} else {
+				throw new SQLException("Empleado, no se pudo generar su IDEmpleado.");
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return contrato;
+
+	}
+	public Integer actualizaContrato(Contrato contrato) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.contrato set idempresa=?, idsucursal=?, idarea=?, idcargo=?, idretiromotivo=?,numerocontrato=?, fechafirma=?, fechainicio=?,fechafin=?,");
+			
+			q.append(" idusuariomod=?, fechamod=getdate() where idcontrato=? ");
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+			ps.setLong(c++, contrato.getIdempresa());
+			ps.setLong(c++, contrato.getIdsucursal());
+			ps.setLong(c++, contrato.getIdarea());
+			ps.setLong(c++, contrato.getIdcargo());
+			
+			if (null == contrato.getIdretiromotivo() || contrato.getIdretiromotivo()==0 ) {
+				ps.setNull(c++, java.sql.Types.INTEGER);
+			} else {
+				ps.setLong(c++, contrato.getIdretiromotivo());
+			}
+			
+			
+			ps.setString(c++, contrato.getNumerocontrato());
+			
+			ps.setTimestamp(c++, contrato.getFechafirma());
+			ps.setTimestamp(c++, contrato.getFechainicio());
+			if (null == contrato.getFechafin() || contrato.getFechafin().equals("")) {
+				ps.setNull(c++, java.sql.Types.TIMESTAMP);
+			} else {
+				ps.setTimestamp(c++, contrato.getFechafin());
+			}
+			
+			
+		
+			ps.setInt(c++, contrato.getIdusuariomod());
+			ps.setLong(c++, contrato.getIdcontrato());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	
+	public Integer actualizarEstadoContrato(Contrato contrato) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.contrato set estado=?, idusuariomod=?, fechamod=getdate() where idcontrato=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+
+			ps.setInt(c++, contrato.getEstado());
+			ps.setInt(c++, contrato.getIdusuariomod());
+			ps.setLong(c++, contrato.getIdcontrato());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	
+	public List<EmpleadoDesvinculacion> buscarEmpleadosdesvinculacion(String desde, String hasta, String valor, UsuarioTipoBusquedaEnum tipobusqueda,List<Proceso> procesos) throws DatoException {
+		List<EmpleadoDesvinculacion> empleados = new ArrayList<EmpleadoDesvinculacion>();
+		EmpleadoDesvinculacion empleadodesvinculacion=new EmpleadoDesvinculacion();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario=null;
+		Estado usuarioestado = null;
+		int intervalo = 0;
+		String intervaloprocesos="";
+		
+		for(Proceso p:procesos){
+			String coma;
+			if(intervalo==0){
+				coma="";
+			}else{
+				coma=",";
+			}
+			intervaloprocesos=intervaloprocesos+coma+" ["+p.getNombreproceso()+"] ";
+			intervalo++;
+		}
+		
+		
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append(" select * from ");
+			q.append(" (select * from ");
+			q.append(" (select  c.estado as contratoestado,it.abreviatura,it.tipo,ei.numeroidentificacion, e.nombres,e.apellidos,e.estado, ");
+			q.append(" (e.apellidos +' '+ e.nombres +' '+ e.apellidos) as nombreconcat, ");
+			q.append(" c.idestadodesvinculacion,ed.nombreestado,c.idcontrato,c.fechafin,car.cargo");
+			q.append(" ,p.nombreproceso as nombreproceso,cp.porcentaje,convert(nvarchar(MAX),cp.fechacrea,103) as fecha");
+			q.append(" ,a.nombrearea as area,ab.nombrearea as areaAsignada ");
+			q.append(" ");
+			q.append("  from  rrhh.contrato c ");
+			q.append(" inner join rrhh.area a on c.idarea = a.idarea "); 
+			q.append(" inner join rrhh.area ab on c.idareaasignada = ab.idarea ");
+			q.append(" inner join rrhh.empleado e on e.idempleado=c.idempleado inner join rrhh.empleado_identificacion ei on ei.idempleado=e.idempleado and ei.actual=1 ");
+			q.append("  inner join rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  inner join rrhh.estadodesvinculacion ed on ed.idestadodesvinculacion=c.idestadodesvinculacion ");
+			q.append("  left join rrhh.contrato_proceso cp on cp.idcontrato=c.idcontrato  inner join rrhh.cargo car on car.idcargo=c.idcargo  ");
+			q.append(" left join rrhh.proceso p on p.idproceso=cp.idproceso ");
+			q.append(" ) as t ");
+			q.append(" where 1=1  ");
+			
+			if (EmpleadoTipoBusquedaEnum.FECHA_CREACION.getIndex() == tipobusqueda.getIndex()) {
+				q.append("and convert(datetime,t.fecha,103) >= convert(datetime,'" + desde + "',103) ");
+				q.append("and convert(datetime,t.fecha,103)< convert(datetime,'" + Util.addDays("yyyyMMdd", hasta, 1) + "',103) ");
+			} else if (EmpleadoTipoBusquedaEnum.NUMIDENTIFICACION.getIndex() == tipobusqueda.getIndex()) {
+				q.append("and t.numeroidentificacion like '" + valor + "' ");
+			}  else if (EmpleadoTipoBusquedaEnum.CODUSUARIO.getIndex() == tipobusqueda.getIndex()) {
+				q.append("and t.codempleado =  " + valor + " ");
+			} else if (EmpleadoTipoBusquedaEnum.USUARIO.getIndex() == tipobusqueda.getIndex()) {
+				q.append("and t.usuario like  '" + valor + "' ");
+			} else  if(EmpleadoTipoBusquedaEnum.NOMBRE.getIndex() == tipobusqueda.getIndex()) {
+				q.append(" and t.nombreconcat like '" + valor + "' ");
+			}
+			q.append("  ) AS SourceTable PIVOT( max(porcentaje)FOR nombreproceso IN ("+intervaloprocesos+") ");
+			q.append(") AS PivotTable ");
+			
+		/*	q.append(" ) as t ");
+			 if (EmpleadoTipoBusquedaEnum.NOMBRE.getIndex() == tipobusqueda.getIndex()) {
+				q.append("where  nombreconcat like '" + valor + "' ");
+			} */
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			
+			log.info("consulta : "+q.toString());
+			
+			//ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+		
+			rs = ps.executeQuery();
+			
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				
+				Contrato contrato = new Contrato();
+				Area area =  new Area();
+				Area areaAsignada = new Area();
+
+				contrato.setEstado(rs.getInt(c++));
+				
+				empleado = new EmpleadoBean();
+				
+				empleadodesvinculacion=new EmpleadoDesvinculacion();
+				IdentificacionTipo identificaciontipo=new IdentificacionTipo();
+				identificaciontipo.setAbreviatura(rs.getString(c++));
+				identificaciontipo.setTipo(rs.getString(c++));
+				
+				EmpleadoIdentificacion empleadoidentificacion=new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs.getString(c++));
+				
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaciontipo);
+				empleado.setEstado(rs.getInt(c++));
+				String nombreconcat=(rs.getString(c++));
+			
+				contrato.setIdestadodesvinculacion(rs.getLong(c++));
+			
+				EstadoDesvinculacion estadosevinculacion=new EstadoDesvinculacion();
+				estadosevinculacion.setNombreestado(rs.getString(c++));
+				
+				contrato.setIdcontrato(rs.getLong(c++));
+				contrato.setFechafin(rs.getTimestamp(c++));
+				
+				Cargo cargo=new Cargo();
+				contrato.setCargo(cargo);
+				contrato.getCargo().setNombrecargo(rs.getString(c++));
+				
+				String fecha = rs.getString(c++);
+				empleadodesvinculacion.setFechacrea(Util.stringToTimestamp(fecha, "dd/MM/yyyy"));
+				List<ContratoProceso> valores = new ArrayList<ContratoProceso>();
+				
+				area.setNombrearea(rs.getString(c++));
+				areaAsignada.setNombrearea(rs.getString(c++));
+				contrato.setArea(area);
+				contrato.setAreaasignada(areaAsignada);
+				
+				for (Proceso p:procesos) {
+					ContratoProceso contratoproceso=new ContratoProceso();
+					contratoproceso.setProceso(p);
+					contratoproceso.setPorcentaje(rs.getInt(c++));
+					
+					valores.add(contratoproceso);
+				}
+				
+				empleadodesvinculacion.setValores(valores);
+				empleadodesvinculacion.setEmpleado(empleado);
+				empleadodesvinculacion.setEstadodesvinculacion(estadosevinculacion);
+				empleadodesvinculacion.setContrato(contrato);
+				empleadodesvinculacion.setEstado(empleado.getEstado());
+				
+				empleados.add(empleadodesvinculacion);
+			}
+			
+		} catch (SQLException e) {
+			log.info("SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+	
+	/**
+	 * Este método consult la base de datos para obtener los empleados que han ingresado en un rango de fechas.
+	 * @param String. desde.
+	 * @param String. hasta.
+	 * @throws DatoException 
+	 * */
+	public List<ReporteIngresosPersonal> obtenerIngresosDePersonalPorFecha(String desde, String hasta) throws DatoException{
+		
+		ReporteIngresosPersonal reporte = null;
+		List<ReporteIngresosPersonal> listaReporte =  new ArrayList<ReporteIngresosPersonal>();
+		
+		//campos del reporte:
+		IdentificacionTipo identificacionTipo = null;
+		EmpleadoIdentificacion empleadoIdentificacion = null;
+		EmpleadoBean empleado = null;
+		Sucursal sucursal = null;
+		Contrato contrato = null;
+		Cargo cargo = null;
+		Area area = null;
+		Area areaAsignada = null;
+		EmpleadoPropiedad empleadoPropiedad = null;
+		AfiliacionEntidad afiliacionEntidadEPS = null;
+		AfiliacionEntidad afiliacionEntidadPension = null;
+		AfiliacionEntidad afiliacionEntidadCesantias = null;
+		AfiliacionEntidad afiliacionEntidadCajaCompensacion = null;
+		EmpleadoBanco empleadoBanco =  null;
+		Banco banco = null;
+		
+		
+		try{
+			
+			String consulta = "SELECT "
+							+"it.abreviatura,"
+							+"ei.numeroidentificacion AS CC,"
+							+"e.apellidos AS Apellidos,e.nombres as Nombre,"
+							+"s.nombresucursal AS Sucursal,"
+							+"c.fechainicio AS FechaIngreso,"
+							+"c.fechafin AS FechaRetiro,"
+							+"ca.cargo AS Cargo,"
+							+"cs.salario AS SalarioMensual"
+							+",a.nombrearea as Area"
+							+",aa.nombrearea as Area_Asignada"
+							+",ep.dato AS Correo"
+							+",ae.nombreentidad AS EPS "
+							+",ae1.nombreentidad AS PENSION "
+							+",ae2.nombreentidad AS CESANTIAS "
+							+",ae3.nombreentidad AS CAJA_COMPENSACION "
+							+",eb.numerocuenta NumeroCuenta,b.nombrebanco NombreBanco "
+							+"FROM rrhh.empleado e " 
+							+"LEFT JOIN rrhh.empleado_propiedad ep ON ep.idempleado = e.idempleado AND ep.idpropiedad=1"+" "
+							+"INNER JOIN rrhh.contrato c ON e.idempleado = c.idempleado  AND c.estado=2"+" "
+							+"INNER JOIN rrhh.empleado_identificacion ei ON e.idempleado = ei.idempleado "
+							+"INNER JOIN rrhh.cargo ca ON c.idcargo = ca.idcargo "
+							+"LEFT JOIN rrhh.sucursal s ON s.idsucursal = c.idsucursal "
+							+"LEFT JOIN rrhh.contrato_salario cs ON cs.idcontrato = c.idcontrato "
+							+"LEFT JOIN rrhh.empleado_afiliacion ea ON ea.idempleado = e.idempleado AND ea.idafiliaciontipo=1"+" "
+							+"LEFT JOIN rrhh.empleado_afiliacion ea1 ON ea1.idempleado = e.idempleado AND ea1.idafiliaciontipo=2"+" "
+							+"LEFT JOIN rrhh.empleado_afiliacion ea2 ON ea2.idempleado = e.idempleado AND ea2.idafiliaciontipo=3"+" "
+							+"LEFT JOIN rrhh.empleado_afiliacion ea3 ON ea3.idempleado = e.idempleado AND ea3.idafiliaciontipo=4"+" "
+							+"LEFT JOIN rrhh.afiliacion_entidad ae ON ae.idafiliacionentidad = ea.idafiliacionentidad "
+							+"LEFT JOIN rrhh.afiliacion_entidad ae1 ON ae1.idafiliacionentidad = ea1.idafiliacionentidad " 
+							+"LEFT JOIN rrhh.afiliacion_entidad ae2 ON ae2.idafiliacionentidad = ea2.idafiliacionentidad "
+							+"LEFT JOIN rrhh.afiliacion_entidad ae3 ON ae3.idafiliacionentidad = ea3.idafiliacionentidad "
+							+"INNER JOIN rrhh.identificaciontipo it ON it.ididentificaciontipo = ei.ididentificaciontipo "
+							+"LEFT JOIN rrhh.empleado_banco eb ON eb.idempleado=e.idempleado AND eb.estado=2 "
+							+"LEFT JOIN rrhh.banco b on b.idbanco = eb.idbanco AND b.estado=2 "
+							+"LEFT JOIN rrhh.area a ON a.idarea = c.idarea "
+							+"LEFT JOIN rrhh.area aa ON aa.idarea = c.idareaasignada "
+							+"WHERE " 
+							+"c.fechainicio>=CONVERT(datetime,'"+desde+"',112) AND c.fechainicio <=CONVERT(datetime,'"+hasta+"',112)"; 
+	
+			con = ds.getConnection();
+			
+			ps = con.prepareStatement(consulta);
+			
+			rs = ps.executeQuery();
+			
+			log.info("Consulta : "+consulta);
+			
+			while (rs.next()) {
+				reporte = new ReporteIngresosPersonal();
+				
+				identificacionTipo = new IdentificacionTipo();
+				empleadoIdentificacion = new EmpleadoIdentificacion();
+				empleado = new EmpleadoBean();
+				sucursal = new Sucursal();
+				contrato = new Contrato();
+				cargo = new Cargo();
+				area = new Area();
+				areaAsignada = new Area();
+				empleadoPropiedad = new EmpleadoPropiedad();
+				afiliacionEntidadEPS = new AfiliacionEntidad();
+				afiliacionEntidadPension = new AfiliacionEntidad();
+				afiliacionEntidadCesantias = new AfiliacionEntidad();
+				afiliacionEntidadCajaCompensacion = new AfiliacionEntidad();
+				empleadoBanco = new EmpleadoBanco();
+				banco = new Banco();
+				
+				identificacionTipo.setAbreviatura(rs.getString("abreviatura"));
+				empleadoIdentificacion.setNumeroidentificacion(rs.getString("CC"));
+				empleado.setApellidos(rs.getString("Apellidos"));
+				empleado.setNombres(rs.getString("Nombre"));
+				sucursal.setNombresucursal(rs.getString("Sucursal"));
+				contrato.setFechainicio(rs.getTimestamp("FechaIngreso"));
+				contrato.setFechafin(rs.getTimestamp("FechaRetiro"));
+				contrato.setInfosalarial(rs.getString("SalarioMensual"));
+				cargo.setNombrecargo(rs.getString("Cargo"));
+				area.setNombrearea(rs.getString("Area"));
+				areaAsignada.setNombrearea(rs.getString("Area_Asignada"));
+				empleadoPropiedad.setDato(rs.getString("Correo"));
+				afiliacionEntidadEPS.setNombreentidad(rs.getString("EPS"));
+				afiliacionEntidadPension.setNombreentidad(rs.getString("PENSION"));
+				afiliacionEntidadCesantias.setNombreentidad(rs.getString("CESANTIAS"));
+				afiliacionEntidadCajaCompensacion.setNombreentidad(rs.getString("CAJA_COMPENSACION"));
+				empleadoBanco.setNumerocuenta(rs.getString("NumeroCuenta"));
+				banco.setNombrebanco(rs.getString("NombreBanco"));
+				
+				reporte.setIdentificacionTipo(identificacionTipo);
+				reporte.setEmpleadoIdentificacion(empleadoIdentificacion);
+				reporte.setEmpleado(empleado);
+				reporte.setSucursal(sucursal);
+				reporte.setContrato(contrato);
+				reporte.setCargo(cargo);
+				reporte.setArea(area);
+				reporte.setAreaAsignada(areaAsignada);
+				reporte.setEmpleadoPropiedad(empleadoPropiedad);
+				reporte.setAfiliacionEntidadSalud(afiliacionEntidadEPS);
+				reporte.setAfiliacionEntidadPension(afiliacionEntidadPension);
+				reporte.setAfiliacionEntidadCesantias(afiliacionEntidadCesantias);
+				reporte.setAfiliacionEntidadCajaCompensacion(afiliacionEntidadCajaCompensacion);
+				reporte.setEmpleadoBanco(empleadoBanco);
+				reporte.setBanco(banco);
+				
+				listaReporte.add(reporte);
+			}
+				
+		} catch (SQLException e) {
+			log.info("SQLException e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception e = "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		
+		log.info("Tamaño de lista : "+listaReporte.size());
+		
+		return listaReporte;
+	}
+	
+	
+}

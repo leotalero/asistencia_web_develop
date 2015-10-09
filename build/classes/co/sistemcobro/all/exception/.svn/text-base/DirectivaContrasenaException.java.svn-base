@@ -1,0 +1,38 @@
+package co.sistemcobro.all.exception;
+
+import javax.ejb.ApplicationException;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+@ApplicationException(rollback=true)
+public class DirectivaContrasenaException extends Exception {
+	private static final long serialVersionUID = -7393514908352290012L;
+
+	public DirectivaContrasenaException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public DirectivaContrasenaException(Throwable cause) {
+		super(cause);
+	}
+
+	public DirectivaContrasenaException() {
+	}
+
+	public DirectivaContrasenaException(String mensaje) {
+		super(mensaje);
+	}
+
+	@Override
+	public String toString() {
+		return getMessage();
+	}
+
+	@Override
+	public String getMessage() {
+		return super.getMessage();
+	}
+}

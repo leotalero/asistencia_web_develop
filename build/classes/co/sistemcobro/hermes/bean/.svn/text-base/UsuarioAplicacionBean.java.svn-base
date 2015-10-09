@@ -1,0 +1,145 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class UsuarioAplicacionBean implements Serializable{
+
+    private static final long serialVersionUID = 1L;
+    private Integer idusuario;
+	private Integer idaplicacion;
+	private Integer idgrupo;
+
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	private GrupoBean grupo;
+	private UsuarioBean usuario;
+	private AplicacionBean aplicacion;
+	private Estado estadob;
+	private Integer iddirectivared;
+
+	public UsuarioAplicacionBean() {
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public Integer getIdusuario() {
+		return idusuario;
+	}
+
+	public void setIdusuario(Integer idusuario) {
+		this.idusuario = idusuario;
+	}
+
+	public Integer getIdaplicacion() {
+		return idaplicacion;
+	}
+
+	public void setIdaplicacion(Integer idaplicacion) {
+		this.idaplicacion = idaplicacion;
+	}
+
+	public Integer getIdgrupo() {
+		return idgrupo;
+	}
+
+	public void setIdgrupo(Integer idgrupo) {
+		this.idgrupo = idgrupo;
+	}
+
+	public GrupoBean getGrupo() {
+		return grupo;
+	}
+
+	public void setGrupo(GrupoBean grupo) {
+		this.grupo = grupo;
+	}
+
+	public UsuarioBean getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(UsuarioBean usuario) {
+		this.usuario = usuario;
+	}
+
+	public AplicacionBean getAplicacion() {
+		return aplicacion;
+	}
+
+	public void setAplicacion(AplicacionBean aplicacion) {
+		this.aplicacion = aplicacion;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Estado getEstadob() {
+		return estadob;
+	}
+
+	public void setEstadob(Estado estadob) {
+		this.estadob = estadob;
+	}
+
+	public Integer getIddirectivared() {
+		return iddirectivared;
+	}
+
+	public void setIddirectivared(Integer iddirectivared) {
+		this.iddirectivared = iddirectivared;
+	}
+
+	@Override
+	public String toString() {
+		return "UsuarioAplicacionBean [idusuario=" + idusuario
+				+ ", idaplicacion=" + idaplicacion + ", idgrupo=" + idgrupo
+				+ ", grupo=" + grupo + ", usuario=" + usuario + "]";
+	}
+
+}

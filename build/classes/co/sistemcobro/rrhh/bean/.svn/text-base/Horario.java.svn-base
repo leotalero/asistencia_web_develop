@@ -1,0 +1,146 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Time;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class Horario implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long idhorario;
+	private String nombrehorario;
+	private Time horaentrada;
+	private Time horasalidat;
+	private Time horaentradat;
+	private Time horasalida;
+	private Long idfrecuenciaasignacion;
+	private Integer minutosflex;
+	private Integer minutospermitidos;
+	
+	
+	 	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	
+	
+	private FrecuenciaAsignacion frecuenciaasignacion;
+	
+	public Long getIdhorario() {
+		return idhorario;
+	}
+	public void setIdhorario(Long idhorario) {
+		this.idhorario = idhorario;
+	}
+	public String getNombrehorario() {
+		return nombrehorario;
+	}
+	public void setNombrehorario(String nombrehorario) {
+		this.nombrehorario = nombrehorario;
+	}
+	public Time getHoraentrada() {
+		return horaentrada;
+	}
+	public void setHoraentrada(Time horaentrada) {
+		this.horaentrada = horaentrada;
+	}
+	public Time getHorasalidat() {
+		return horasalidat;
+	}
+	public void setHorasalidat(Time horasalidat) {
+		this.horasalidat = horasalidat;
+	}
+	public Time getHoraentradat() {
+		return horaentradat;
+	}
+	public void setHoraentradat(Time horaentradat) {
+		this.horaentradat = horaentradat;
+	}
+	public Time getHorasalida() {
+		return horasalida;
+	}
+	public void setHorasalida(Time horasalida) {
+		this.horasalida = horasalida;
+	}
+	
+	
+	public Long getIdfrecuenciaasignacion() {
+		return idfrecuenciaasignacion;
+	}
+	public void setIdfrecuenciaasignacion(Long idfrecuenciaasignacion) {
+		this.idfrecuenciaasignacion = idfrecuenciaasignacion;
+	}
+	
+	
+	
+	
+	
+	public Integer getMinutosflex() {
+		return minutosflex;
+	}
+	public void setMinutosflex(Integer minutosflex) {
+		this.minutosflex = minutosflex;
+	}
+	public Integer getMinutospermitidos() {
+		return minutospermitidos;
+	}
+	public void setMinutospermitidos(Integer minutospermitidos) {
+		this.minutospermitidos = minutospermitidos;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public FrecuenciaAsignacion getFrecuenciaasignacion() {
+		return frecuenciaasignacion;
+	}
+	public void setFrecuenciaasignacion(FrecuenciaAsignacion frecuenciaasignacion) {
+		this.frecuenciaasignacion = frecuenciaasignacion;
+	}
+
+	
+	
+	
+	
+	
+	
+
+	
+
+
+}

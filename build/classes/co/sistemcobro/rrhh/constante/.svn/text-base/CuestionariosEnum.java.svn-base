@@ -1,0 +1,43 @@
+package co.sistemcobro.rrhh.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum CuestionariosEnum {
+	DESVINCULACION(1);
+
+	public static final Map<Integer, CuestionariosEnum> mapByID = new HashMap<Integer, CuestionariosEnum>();
+	public static final Map<String, CuestionariosEnum> mapByNAME = new HashMap<String, CuestionariosEnum>();
+
+	static {
+		for (CuestionariosEnum s : EnumSet
+				.allOf(CuestionariosEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	CuestionariosEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static CuestionariosEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static CuestionariosEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

@@ -1,0 +1,124 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo talero
+ * 
+ */
+public class ContratoProceso implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idcontratoproceso;
+	private Long idcontrato;
+	private Long idproceso;
+	private Integer idprocesoestado;
+	
+	
+	private Integer porcentaje;
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	private Proceso proceso;
+	private ProcesoEstado procesoestado;
+	
+	
+	
+	public Long getIdcontratoproceso() {
+		return idcontratoproceso;
+	}
+	public void setIdcontratoproceso(Long idcontratoproceso) {
+		this.idcontratoproceso = idcontratoproceso;
+	}
+	public Long getIdcontrato() {
+		return idcontrato;
+	}
+	public void setIdcontrato(Long idcontrato) {
+		this.idcontrato = idcontrato;
+	}
+	public Long getIdproceso() {
+		return idproceso;
+	}
+	public void setIdproceso(Long idproceso) {
+		this.idproceso = idproceso;
+	}
+	
+	
+	
+	public Integer getIdprocesoestado() {
+		return idprocesoestado;
+	}
+	public void setIdprocesoestado(Integer idprocesoestado) {
+		this.idprocesoestado = idprocesoestado;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	public Proceso getProceso() {
+		return proceso;
+	}
+	public void setProceso(Proceso proceso) {
+		this.proceso = proceso;
+	}
+	public ProcesoEstado getProcesoestado() {
+		return procesoestado;
+	}
+	public void setProcesoestado(ProcesoEstado procesoestado) {
+		this.procesoestado = procesoestado;
+	}
+	public Integer getPorcentaje() {
+		return porcentaje;
+	}
+	public void setPorcentaje(Integer porcentaje) {
+		this.porcentaje = porcentaje;
+	}
+
+	
+	
+	
+	
+	
+	
+
+	
+	
+
+	
+
+
+}

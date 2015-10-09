@@ -1,0 +1,102 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+
+import javax.servlet.http.HttpSession;
+
+public class Sessionserial implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	private HttpSession session;
+
+	private UsuarioBean usuario;
+	private UsuarioBean existe;
+	private String useragent;
+	private String ip;
+	private String idsession;
+	private String deviceinfo;
+	//private  usuario;
+	
+	public HttpSession getSession() {
+		return session;
+	}
+
+
+	public void setSession(HttpSession session) {
+		this.session = session;
+	}
+
+
+	public UsuarioBean getUsuario() {
+		return usuario;
+	}
+
+
+	public void setUsuario(UsuarioBean usuario) {
+		this.usuario = usuario;
+	}
+
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+
+	public UsuarioBean getExiste() {
+		return existe;
+	}
+
+
+	public void setExiste(UsuarioBean existe) {
+		this.existe = existe;
+	}
+
+
+	public String getUseragent() {
+		return useragent;
+	}
+
+
+	public void setUseragent(String useragent) {
+		this.useragent = useragent;
+	}
+
+
+	public String getIp() {
+		return ip;
+	}
+
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+
+	public String getIdsession() {
+		return idsession;
+	}
+
+
+	public void setIdsession(String idsession) {
+		this.idsession = idsession;
+	}
+
+
+	public String getDeviceinfo() {
+		return deviceinfo;
+	}
+
+
+	public void setDeviceinfo(String deviceinfo) {
+		this.deviceinfo = deviceinfo;
+	}
+	
+	
+	
+
+}

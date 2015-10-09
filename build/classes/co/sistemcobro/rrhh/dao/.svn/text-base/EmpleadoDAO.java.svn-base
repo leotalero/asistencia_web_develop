@@ -1,0 +1,2890 @@
+package co.sistemcobro.rrhh.dao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.util.Util;
+import co.sistemcobro.hermes.bean.Estado;
+import co.sistemcobro.hermes.bean.UsuarioBean;
+import co.sistemcobro.hermes.constante.UsuarioTipoBusquedaEnum;
+import co.sistemcobro.rrhh.bean.Area;
+import co.sistemcobro.rrhh.bean.DocumentoConfiguracion;
+import co.sistemcobro.rrhh.bean.EmpleadoBean;
+import co.sistemcobro.rrhh.bean.EmpleadoDocumentoGenerado;
+import co.sistemcobro.rrhh.bean.EmpleadoIdentificacion;
+import co.sistemcobro.rrhh.bean.EmpleadoPropiedad;
+import co.sistemcobro.rrhh.bean.Empresa;
+import co.sistemcobro.rrhh.bean.EmpresaSucursal;
+import co.sistemcobro.rrhh.bean.Genero;
+import co.sistemcobro.rrhh.bean.IdentificacionTipo;
+import co.sistemcobro.rrhh.bean.Prioridad;
+import co.sistemcobro.rrhh.bean.Propiedad;
+import co.sistemcobro.rrhh.bean.Sucursal;
+import co.sistemcobro.rrhh.constante.ActualEnum;
+import co.sistemcobro.rrhh.constante.EmpleadoTipoBusquedaEnum;
+
+//import co.sistemcobro.hermes.bean.IdentificacionTipo;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class EmpleadoDAO extends BaseDAO {
+
+	Logger log = Logger.getLogger(EmpleadoDAO.class);
+
+	//Desarrollo - pruebas.
+//	private final Integer limiteInferior = 13;
+//	private final Integer limiteSuperior = 16;
+	
+	//Producción
+	private final Integer limiteInferior = 17;
+	private final Integer limiteSuperior = 20;
+	
+	
+	public EmpleadoDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public List<EmpleadoBean> buscarEmpleados(String desde, String hasta,
+			String valor, UsuarioTipoBusquedaEnum tipobusqueda)
+			throws DatoException {
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		Estado usuarioestado = null;
+		
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select * from( ");
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado,   ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion,");
+			q.append("it.abreviatura,it.tipo,(e.apellidos +' '+ e.nombres +' '+ e.apellidos) as nombreconcat ");
+			q.append(" from rrhh.empleado e  ");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+
+			// q.append(" left join  apps.hermes.sco.usuario hu on hu.codusuario=e.codempleado ");
+			q.append(" where e.estado is not null ");
+			if (EmpleadoTipoBusquedaEnum.FECHA_CREACION.getIndex() == tipobusqueda.getIndex()) {
+				q.append("and e.fechacrea >= convert(datetime,'" + desde + "',112) ");
+				q.append("and e.fechacrea < convert(datetime,'"+ Util.addDays("yyyyMMdd", hasta, 1) + "',112) ");
+//				q.append(" and ei.actual=1 ");
+			} else if (EmpleadoTipoBusquedaEnum.NUMIDENTIFICACION.getIndex() == tipobusqueda.getIndex()) {
+				q.append("and ei.numeroidentificacion like '" + valor + "' ");
+//				q.append(" and ei.actual=1 ");
+			} else if (EmpleadoTipoBusquedaEnum.CODUSUARIO.getIndex() == tipobusqueda.getIndex()) {
+				q.append("and e.codempleado =  " + valor + " ");
+//				q.append(" and ei.actual=1 ");
+			} else if (EmpleadoTipoBusquedaEnum.USUARIO.getIndex() == tipobusqueda.getIndex()) {
+				q.append("and hu.usuario like  '" + valor + "' ");
+//				q.append(" and ei.actual=1 ");
+			}
+
+			// q.append("order by e.idempleado desc  ");
+//			q.append(" and ei.actual=1 ");
+			q.append(" ) as t ");
+			if (EmpleadoTipoBusquedaEnum.NOMBRE.getIndex() == tipobusqueda.getIndex()) {
+				q.append("where  nombreconcat like '" + valor + "' ");
+//				q.append(" and ei.actual=1 ");
+			}
+
+			log.info("Consulta para empleados. \n"+q.toString());
+			
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			// ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+
+			rs = ps.executeQuery();
+			
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+				empleados.add(empleado);
+			}
+
+		} catch (SQLException e) {
+			log.info("Error 1 al consultar los empleados. Error : "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Error 2 al consultar los empleados. Error : "+e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+
+	public EmpleadoBean buscarEmpleadosporId(Long idempleado)
+			throws DatoException {
+
+		// List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		// Estado usuarioestado = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado,e.fotonombre,   ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo");
+			q.append(" from rrhh.empleado e  ");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+
+			// q.append(" where e.estado=? and e.idempleado=? ");
+			q.append(" where  e.idempleado=? ");
+
+			q.append(" and ei.actual=? ");
+			q.append("order by e.idempleado desc  ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			// ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(1, idempleado);
+			ps.setLong(2, ActualEnum.ACTUAL.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+				// empleados.add(empleado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleado;
+
+	}
+
+	public List<EmpleadoBean> buscarEmpleadospornumeroidentificacion(
+			String numeroidentificacion) throws DatoException {
+
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		// Estado usuarioestado = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado, e.fotonombre,  ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo");
+			q.append(" from rrhh.empleado e  ");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+
+			// q.append(" where e.estado=? and e.idempleado=? ");
+			q.append(" where  ei.numeroidentificacion=? ");
+
+			q.append(" and ei.actual=? ");
+			q.append("order by e.idempleado desc  ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			// ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setString(1, numeroidentificacion);
+			ps.setLong(2, ActualEnum.ACTUAL.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+				
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+				empleados.add(empleado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+
+	
+	public List<EmpleadoBean> buscarEmpleadosporUsuarioWindows(
+			String usuariowin) throws DatoException {
+
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		// Estado usuarioestado = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado, e.fotonombre,  ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo");
+			q.append(" from rrhh.empleado e  ");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append("  left join  rrhh.empleado_identificacion  ei on     ei.idempleado=e.idempleado   and ei.actual=1 ");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+			q.append(" left join rrhh.empleado_propiedad ep on ep.idempleado=e.idempleado  ");
+			// q.append(" where e.estado=? and e.idempleado=? ");
+			q.append(" where   ep.idpropiedad=9 and ep.estado=2 and e.estado=2   and ep.dato=? ");
+
+			q.append(" and ei.actual=? ");
+			q.append("order by e.idempleado desc  ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			// ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setString(1, usuariowin);
+			ps.setLong(2, ActualEnum.ACTUAL.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+				
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+				empleados.add(empleado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+	public List<EmpleadoBean> buscarEmpleadospornumeroidentificacionActivo(
+			String numeroidentificacion) throws DatoException {
+
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		// Estado usuarioestado = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado, e.fotonombre,  ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo");
+			q.append(" from rrhh.empleado e  ");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+
+			// q.append(" where e.estado=? and e.idempleado=? ");
+			q.append(" where  ei.numeroidentificacion=? ");
+
+			q.append(" and ei.actual=?  and e.estado=? ");
+			q.append("order by e.idempleado desc  ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			// ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setString(1, numeroidentificacion);
+			ps.setLong(2, ActualEnum.ACTUAL.getIndex());
+			ps.setLong(3, EstadoEnum.ACTIVO.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+				
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+				empleados.add(empleado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+
+	public List<EmpleadoBean> buscarEmpleadosporCodigoIdentificacion(
+			String codigoidentificacion) throws DatoException {
+		log.info("Entro a EmpleadoDAO a buscarEmpleadosporCodigoIdentificacion()");
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		// Estado usuarioestado = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado, e.fotonombre,  ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo");
+			q.append(" from rrhh.empleado e  ");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+
+			// q.append(" where e.estado=? and e.idempleado=? ");
+			q.append(" where  ei.codigoidentificacion=? ");
+
+			q.append(" and ei.actual=? ");
+			q.append("order by e.idempleado desc  ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			// ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setString(1, codigoidentificacion);
+			ps.setLong(2, ActualEnum.ACTUAL.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+				
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+				empleados.add(empleado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+
+	public List<IdentificacionTipo> getIdentificacionTipo()
+			throws DatoException {
+		IdentificacionTipo tipoidentificacion = null;
+		List<IdentificacionTipo> tiposidentificacion = new ArrayList<IdentificacionTipo>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select it.ididentificaciontipo,it.tipo,");
+			q.append(" it.abreviatura,it.idusuariocrea,it.fechacrea, it.idusuariomod, it.fechamod, it.estado ");
+			q.append("from rrhh.identificaciontipo it where it.estado =? ");
+			// q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				tipoidentificacion = new IdentificacionTipo();
+				tipoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+
+				tipoidentificacion.setTipo(rs.getString(c++));
+				tipoidentificacion.setAbreviatura(rs.getString(c++));
+				tipoidentificacion.setIdusuariocrea(rs.getInt(c++));
+				tipoidentificacion.setFechacrea(rs.getTimestamp(c++));
+				tipoidentificacion.setIdusuariomod(rs.getInt(c++));
+				tipoidentificacion.setFechamod(rs.getTimestamp(c++));
+				tipoidentificacion.setEstado(rs.getInt(c++));
+				tiposidentificacion.add(tipoidentificacion);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return tiposidentificacion;
+
+	}
+
+	public IdentificacionTipo getIdentificacionTipoporid(Long identificaciontipo)
+			throws DatoException {
+		IdentificacionTipo tipoidentificacion = null;
+		List<IdentificacionTipo> tiposidentificacion = new ArrayList<IdentificacionTipo>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select it.ididentificaciontipo,it.tipo,");
+			q.append(" it.abreviatura,it.idusuariocrea,it.fechacrea, it.idusuariomod, it.fechamod, it.estado ");
+			q.append("from rrhh.identificaciontipo it where it.estado =? and it.ididentificaciontipo=?");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, identificaciontipo);
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				tipoidentificacion = new IdentificacionTipo();
+				tipoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+
+				tipoidentificacion.setTipo(rs.getString(c++));
+				tipoidentificacion.setAbreviatura(rs.getString(c++));
+				tipoidentificacion.setIdusuariocrea(rs.getInt(c++));
+				tipoidentificacion.setFechacrea(rs.getTimestamp(c++));
+				tipoidentificacion.setIdusuariomod(rs.getInt(c++));
+				tipoidentificacion.setFechamod(rs.getTimestamp(c++));
+				tipoidentificacion.setEstado(rs.getInt(c++));
+				// tiposidentificacion.add(tipoidentificacion);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return tipoidentificacion;
+
+	}
+
+	public List<Empresa> getEmpresas() throws DatoException {
+		Empresa empresa = null;
+		List<Empresa> empresas = new ArrayList<Empresa>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select em.idempresa,em.nombreempresa,");
+			q.append(" em.idusuariocrea,em.fechacrea, em.idusuariomod, em.fechamod, em.estado ");
+			q.append("from rrhh.empresa em where em.estado =? ");
+			// q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empresa = new Empresa();
+				empresa.setIdempresa(rs.getLong(c++));
+				empresa.setNombreempresa(rs.getString(c++));
+				empresa.setIdusuariocrea(rs.getInt(c++));
+				empresa.setFechacrea(rs.getTimestamp(c++));
+				empresa.setIdusuariomod(rs.getInt(c++));
+				empresa.setFechamod(rs.getTimestamp(c++));
+				empresa.setEstado(rs.getInt(c++));
+				empresas.add(empresa);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empresas;
+
+	}
+
+	public List<EmpleadoBean> getEmpleados(List<String> estados)
+			throws DatoException {
+
+		log.info("VA A CONSULTAR TODOS LOS EMPLEADOS........");
+
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado,e.fotonombre,   ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo ");	
+			q.append(" from rrhh.empleado e  ");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append(" left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+			q.append(" where ei.actual=1 and ");
+			// q.append(" where  ei.codigoidentificacion=? ");
+			
+			String stringconcatenado = "";
+			if (estados != null && estados.size() > 0) {
+				int i = 1;
+				String var = "";
+				for (String idestado : estados) {
+
+					if (i == 1) {
+						var = " ";
+					} else {
+						var = " or ";
+					}
+
+					stringconcatenado += var + " e.estado ='"+ Integer.valueOf(idestado) + "' ";
+					i += 1;
+				}
+				q.append(stringconcatenado + " ");
+			}
+//			q.append(" and ei.actual=1 ");
+			q.append("order by fechanacimiento asc  ");
+			// q.append("and  it.idpreguntasegura=? ");
+			
+			
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			// ps.setLong(1, estado);
+//			ps.setLong(1, ActualEnum.ACTUAL.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				genero = new Genero();
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+//				EmpleadoBanco empleadoBanco = new EmpleadoBanco();
+//				Banco banco = new Banco();
+
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+				
+				genero.setNombregenero(rs.getString(c++));
+
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+
+//				//Set EmpleadoBanco.
+//				empleadoBanco.setIdempleadobanco(rs.getLong("idempleadobanco"));
+//				empleadoBanco.setNumerocuenta(rs.getString("numerocuenta"));
+//				empleadoBanco.setVigentedesde(rs.getTimestamp("vigentedesde"));
+//				empleado.setEmpleadobanco(empleadoBanco);
+//				
+//				
+//				//Set Banco
+//				banco.setIdbanco(rs.getLong("idbanco"));
+//				banco.setNombrebanco(rs.getString("nombrebanco"));
+//				empleado.setBanco(banco);
+				
+				empleados.add(empleado);
+
+			}
+		} catch (SQLException e) {
+			log.info("Error SQL : " + e);
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			log.info("Exception e  = " + e);
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+
+	public List<EmpleadoBean> getEmpleadosporfechacumple(String fechahasta)
+			throws DatoException {
+
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		try {
+			String desde = Util.dateToString(new Date(), "yyyyMMdd");
+			String hasta = Util.stringToString(fechahasta.trim(), "dd/MM/yyyy",
+					"yyyyMMdd");
+			StringBuffer q = new StringBuffer();
+			q.append(" select * from( ");
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado,e.fotonombre,   ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo,");
+			q.append(" CONVERT(VARCHAR(7), e.fechanacimiento, 106) + CAST(datepart(year,(getdate()))as  varchar(4))as fechaconcorta,"
+					+ "   STUFF(CONVERT(VARCHAR(10), e.fechanacimiento, 126), 1, 4, CAST(datepart(year,(getdate())) as varchar(4)))as fechacon");
+
+			q.append(" from rrhh.empleado e  ");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+
+			q.append(" where e.estado=? ");
+			// q.append(" where  ei.codigoidentificacion=? ");
+
+			q.append(" and ei.actual=? ");
+			q.append(" )as t"
+
+			+ " where t.fechacon >= convert(datetime,'"
+					+ Util.addDays("yyyyMMdd", desde, 0) + "',112)"
+
+					+ "	and t.fechacon <= convert(datetime,'"
+					+ Util.addDays("yyyyMMdd", hasta, 1) + "',112) ");
+
+			q.append(" order by t.fechacon asc   ");
+			// q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, ActualEnum.ACTUAL.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+				empleados.add(empleado);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+
+	public List<Empresa> getEmpresasporId(Long idempresa) throws DatoException {
+		Empresa empresa = null;
+		List<Empresa> empresas = new ArrayList<Empresa>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select em.idempresa,em.nombreempresa,");
+			q.append(" em.idusuariocrea,em.fechacrea, em.idusuariomod, em.fechamod, em.estado ");
+			q.append("from rrhh.empresa em where em.estado =? and em.idempresa=?");
+			// q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idempresa);
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empresa = new Empresa();
+				empresa.setIdempresa(rs.getLong(c++));
+				empresa.setNombreempresa(rs.getString(c++));
+				empresa.setIdusuariocrea(rs.getInt(c++));
+				empresa.setFechacrea(rs.getTimestamp(c++));
+				empresa.setIdusuariomod(rs.getInt(c++));
+				empresa.setFechamod(rs.getTimestamp(c++));
+				empresa.setEstado(rs.getInt(c++));
+				empresas.add(empresa);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empresas;
+
+	}
+
+	public List<Genero> getGeneros() throws DatoException {
+		Genero genero = null;
+		List<Genero> generos = new ArrayList<Genero>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select g.idgenero,g.nombregenero,");
+			q.append(" g.idusuariocrea,g.fechacrea, g.idusuariomod, g.fechamod, g.estado ");
+			q.append("from rrhh.genero g where g.estado =? ");
+			// q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				genero = new Genero();
+				genero.setIdgenero(rs.getLong(c++));
+				genero.setNombregenero(rs.getString(c++));
+				genero.setIdusuariocrea(rs.getInt(c++));
+				genero.setFechacrea(rs.getTimestamp(c++));
+				genero.setIdusuariomod(rs.getInt(c++));
+				genero.setFechamod(rs.getTimestamp(c++));
+				genero.setEstado(rs.getInt(c++));
+				generos.add(genero);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return generos;
+
+	}
+
+	public List<EmpresaSucursal> getSucursalesporEmpresa(Long idempresa)
+			throws DatoException {
+		EmpresaSucursal sucursal = null;
+		List<EmpresaSucursal> sucursales = new ArrayList<EmpresaSucursal>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select es.idempresa,es.idsucursal,");
+			q.append(" es.idusuariocrea,es.fechacrea, es.idusuariomod, es.fechamod, es.estado ");
+			q.append("from rrhh.empresa_sucursal es where es.estado =?  and es.idempresa=?");
+			// q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idempresa);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				sucursal = new EmpresaSucursal();
+				sucursal.setIdempresa(rs.getLong(c++));
+				sucursal.setIdsucursal(rs.getLong(c++));
+				sucursal.setIdusuariocrea(rs.getInt(c++));
+				sucursal.setFechacrea(rs.getTimestamp(c++));
+				sucursal.setIdusuariomod(rs.getInt(c++));
+				sucursal.setFechamod(rs.getTimestamp(c++));
+				sucursal.setEstado(rs.getInt(c++));
+				sucursales.add(sucursal);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return sucursales;
+
+	}
+
+	public List<Sucursal> getSucursalesporEmpresasucursal(
+			List<EmpresaSucursal> empresassucursales) throws DatoException {
+		Sucursal sucursal = null;
+		List<Sucursal> sucursales = new ArrayList<Sucursal>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select s.idsucursal,s.nombresucursal,");
+			q.append(" s.idusuariocrea,s.fechacrea, s.idusuariomod, s.fechamod, s.estado ");
+			q.append("from rrhh.sucursal s where s.estado =?  and s.idsucursal=?");
+			// q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			for (EmpresaSucursal x : empresassucursales) {
+				ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+				ps.setLong(2, x.getIdsucursal());
+
+				rs = ps.executeQuery();
+				int c = 1;
+				while (rs.next()) {
+					c = 1;
+					sucursal = new Sucursal();
+					// sucursal.setIdempresa(rs.getLong(c++));
+					sucursal.setIdsucursal(rs.getLong(c++));
+					sucursal.setNombresucursal(rs.getString(c++));
+					sucursal.setIdusuariocrea(rs.getInt(c++));
+					sucursal.setFechacrea(rs.getTimestamp(c++));
+					sucursal.setIdusuariomod(rs.getInt(c++));
+					sucursal.setFechamod(rs.getTimestamp(c++));
+					sucursal.setEstado(rs.getInt(c++));
+					sucursales.add(sucursal);
+				}
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return sucursales;
+
+	}
+
+	public Sucursal getSucursalesporId(Long idsucursal) throws DatoException {
+		Sucursal sucursal = null;
+		// List<Sucursal> sucursales=new ArrayList<Sucursal>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select s.idsucursal,s.nombresucursal,");
+			q.append(" s.idusuariocrea,s.fechacrea, s.idusuariomod, s.fechamod, s.estado ");
+			q.append("from rrhh.sucursal s where s.estado =?  and s.idsucursal=?");
+			// q.append("and  it.idpreguntasegura=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idsucursal);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				sucursal = new Sucursal();
+				// sucursal.setIdempresa(rs.getLong(c++));
+				sucursal.setIdsucursal(rs.getLong(c++));
+				sucursal.setNombresucursal(rs.getString(c++));
+				sucursal.setIdusuariocrea(rs.getInt(c++));
+				sucursal.setFechacrea(rs.getTimestamp(c++));
+				sucursal.setIdusuariomod(rs.getInt(c++));
+				sucursal.setFechamod(rs.getTimestamp(c++));
+				sucursal.setEstado(rs.getInt(c++));
+				// sucursales.add(sucursal);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return sucursal;
+
+	}
+
+	public EmpleadoBean insertarEmpleado(EmpleadoBean empleado)
+			throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.empleado (idgenero, nombres,apellidos, ");
+			q.append("fechanacimiento, idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(),
+					Statement.RETURN_GENERATED_KEYS);
+			c = 1;
+
+			ps.setLong(c++, empleado.getGenero().getIdgenero());
+			ps.setString(c++, empleado.getNombres());
+			ps.setString(c++, empleado.getApellidos());
+			ps.setTimestamp(c++, empleado.getFechanacimiento());
+
+			ps.setInt(c++, empleado.getIdusuariocrea());
+			ps.setInt(c++, empleado.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				empleado.setIdempleado(rs.getLong(1));
+			} else {
+				throw new SQLException(
+						"Empleado, no se pudo generar su IDEmpleado.");
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleado;
+
+	}
+
+	public Integer insertarEmpleadoIdentificacion(
+			EmpleadoIdentificacion empleadoidentificacion) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.empleado_identificacion (idempleado, ididentificaciontipo, numeroidentificacion,actual, ");
+			q.append("ciudadexpedicion, idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(),
+					Statement.RETURN_GENERATED_KEYS);
+			c = 1;
+
+			ps.setLong(c++, empleadoidentificacion.getIdempleado());
+			ps.setLong(c++, empleadoidentificacion.getIdidentificaciontipo());
+			ps.setString(c++, empleadoidentificacion.getNumeroidentificacion());
+			ps.setLong(c++, empleadoidentificacion.getActual());
+			ps.setString(c++, empleadoidentificacion.getCiudadexpedicion());
+			ps.setInt(c++, empleadoidentificacion.getIdusuariocrea());
+			ps.setInt(c++, empleadoidentificacion.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				// empleadoidentificacion.setIdempleado(rs.getLong(1));
+			} else {
+				throw new SQLException(
+						"Empleado, no se pudo generar su Id Empleado identificacion.");
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	public EmpleadoIdentificacion getEmpleadoIdentificacionActual(
+			Long idempleado) throws DatoException {
+		// Sucursal sucursal = null;
+		EmpleadoIdentificacion empleadoiden = new EmpleadoIdentificacion();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select ei.idempleado,ei.ididentificaciontipo,ei.numeroidentificacion,ei.actual,ei.ciudadexpedicion,");
+			q.append(" ei.idusuariocrea,ei.fechacrea, ei.idusuariomod, ei.fechamod, ei.estado ");
+			q.append("from rrhh.empleado_identificacion ei where ei.estado =?  and ei.idempleado=? ");
+			q.append(" and  ei.actual=? ");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idempleado);
+			ps.setLong(3, ActualEnum.ACTUAL.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleadoiden = new EmpleadoIdentificacion();
+				// sucursal.setIdempresa(rs.getLong(c++));
+				empleadoiden.setIdempleado(rs.getLong(c++));
+				empleadoiden.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoiden.setNumeroidentificacion(rs.getString(c++));
+				empleadoiden.setActual(rs.getInt(c++));
+				empleadoiden.setCiudadexpedicion(rs.getString(c++));
+
+				empleadoiden.setIdusuariocrea(rs.getInt(c++));
+				empleadoiden.setFechacrea(rs.getTimestamp(c++));
+				empleadoiden.setIdusuariomod(rs.getInt(c++));
+				empleadoiden.setFechamod(rs.getTimestamp(c++));
+				empleadoiden.setEstado(rs.getInt(c++));
+				// sucursales.add(sucursal);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoiden;
+
+	}
+
+	
+	public EmpleadoIdentificacion getEmpleadoIdentificacionPorNumIdentificacion(String numeroIdentificacion) throws DatoException {
+		// Sucursal sucursal = null;
+		EmpleadoIdentificacion empleadoiden = new EmpleadoIdentificacion();
+		try {
+
+			String consulta ="SELECT ei.idempleado,ei.ididentificaciontipo,ei.numeroidentificacion,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion,ei.idusuariocrea,ei.fechacrea,ei.idusuariomod, ei.fechamod,ei.estado " 
+						    +"FROM rrhh.empleado_identificacion ei "
+						    +"WHERE ei.numeroidentificacion=?"+" "
+						    +"AND ei.estado=?";
+			
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+			ps.setString(1, numeroIdentificacion);
+			ps.setLong(2, EstadoEnum.ACTIVO.getIndex());
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				empleadoiden = new EmpleadoIdentificacion();
+				
+				empleadoiden.setIdempleado(rs.getLong("idempleado"));
+				empleadoiden.setIdidentificaciontipo(rs.getLong("ididentificaciontipo"));
+				empleadoiden.setNumeroidentificacion(rs.getString("numeroidentificacion"));
+				empleadoiden.setCodigoidentificacion(rs.getString("codigoidentificacion"));
+				empleadoiden.setActual(rs.getInt("actual"));
+				empleadoiden.setCiudadexpedicion(rs.getString("ciudadexpedicion"));
+				empleadoiden.setIdusuariocrea(rs.getInt("idusuariocrea"));
+				empleadoiden.setFechacrea(rs.getTimestamp("fechacrea"));
+				empleadoiden.setIdusuariomod(rs.getInt("idusuariomod"));
+				empleadoiden.setFechamod(rs.getTimestamp("fechamod"));
+				empleadoiden.setEstado(rs.getInt("estado"));
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadoiden;
+
+	}
+	
+	
+	public Integer actualizaEmpleado(EmpleadoBean empleado)
+			throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.empleado set idgenero=?, nombres=?, apellidos=?, fechanacimiento=?, ");
+
+			q.append(" idusuariomod=?, fechamod=getdate() where idempleado=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+			ps.setLong(c++, empleado.getIdgenero());
+			ps.setString(c++, empleado.getNombres());
+			ps.setString(c++, empleado.getApellidos());
+			ps.setTimestamp(c++, empleado.getFechanacimiento());
+
+			ps.setInt(c++, empleado.getIdusuariomod());
+			ps.setLong(c++, empleado.getIdempleado());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+	public Integer actualizaEmpleadoestadofoto(EmpleadoBean empleado)
+			throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.empleado set estadofoto=? ");
+
+			q.append(" where idempleado=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+			ps.setString(c++, empleado.getEstadofoto());
+			
+			ps.setLong(c++, empleado.getIdempleado());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	public Integer actualizaEmpleadoIdentificacion(
+			EmpleadoIdentificacion empleadoidenti) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.empleado_identificacion set idempleado=?, ididentificaciontipo=?, numeroidentificacion=?, actual=?,ciudadexpedicion=?, ");
+
+			q.append(" idusuariomod=?, fechamod=getdate() where codigoidentificacion=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+			ps.setLong(c++, empleadoidenti.getIdempleado());
+			ps.setLong(c++, empleadoidenti.getIdidentificaciontipo());
+			ps.setString(c++, empleadoidenti.getNumeroidentificacion());
+			ps.setInt(c++, empleadoidenti.getActual());
+			ps.setString(c++, empleadoidenti.getCiudadexpedicion());
+			ps.setInt(c++, empleadoidenti.getIdusuariomod());
+			// //paramateros where
+			ps.setString(c++, empleadoidenti.getCodigoidentificacion());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	public Integer actualizaEmpleadofoto(
+			EmpleadoBean empleado) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.empleado set fotonombre=?, ");
+
+			q.append(" idusuariomod=?, fechamod=getdate() where idempleado=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+			
+			ps.setString(c++, empleado.getFotonombre());
+			ps.setInt(c++, empleado.getIdusuariomod());
+			// //paramateros where
+			ps.setLong(c++, empleado.getIdempleado());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	public Integer actualizarEstadoEmpleado(EmpleadoBean empleado)
+			throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.empleado set estado=?, idusuariomod=?, fechamod=getdate() where idempleado=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+
+			ps.setInt(c++, empleado.getEstado());
+			ps.setInt(c++, empleado.getIdusuariomod());
+			ps.setLong(c++, empleado.getIdempleado());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	public List<EmpleadoPropiedad> getEmpeladoPropiedadesporidEmpleado(
+			Long idempleado) throws DatoException {
+		EmpleadoPropiedad empleadopropiedad = null;
+		List<EmpleadoPropiedad> emplepropiedades = new ArrayList<EmpleadoPropiedad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select ep.idempleadopropiedad,ep.idempleado,");
+			q.append(" ep.idpropiedad,ep.dato,ep.observacion,ep.idprioridad,ep.idusuariocrea,ep.fechacrea, ep.idusuariomod, ep.fechamod, ep.estado, ");
+			q.append(" p.idprioridad,p.nombreprioridad,");
+			q.append(" pr.idpropiedad,pr.nombrepropiedad ");
+			q.append(" from rrhh.empleado_propiedad ep");
+			q.append(" inner join rrhh.prioridad p on  p.idprioridad=ep.idprioridad");
+			q.append(" left join rrhh.propiedad pr on  pr.idpropiedad=ep.idpropiedad");
+			q.append(" where  ep.idempleado=?");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, idempleado);
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleadopropiedad = new EmpleadoPropiedad();
+				empleadopropiedad.setIdempleadopropiedad(rs.getLong(c++));
+				empleadopropiedad.setIdempleado(rs.getLong(c++));
+				empleadopropiedad.setIdpropiedad(rs.getLong(c++));
+				empleadopropiedad.setDato(rs.getString(c++));
+				empleadopropiedad.setObservacion(rs.getString(c++));
+				empleadopropiedad.setIdprioridad(rs.getLong(c++));
+
+				empleadopropiedad.setIdusuariocrea(rs.getInt(c++));
+				empleadopropiedad.setFechacrea(rs.getTimestamp(c++));
+				empleadopropiedad.setIdusuariomod(rs.getInt(c++));
+				empleadopropiedad.setFechamod(rs.getTimestamp(c++));
+				empleadopropiedad.setEstado(rs.getInt(c++));
+				Prioridad prioridad = new Prioridad();
+				prioridad.setIdprioridad(rs.getLong(c++));
+				prioridad.setNombreprioridad(rs.getString(c++));
+				empleadopropiedad.setPrioridad(prioridad);
+
+				Propiedad propiedad = new Propiedad();
+				propiedad.setIdpropiedad(rs.getLong(c++));
+				propiedad.setNombrepropiedad(rs.getString(c++));
+				empleadopropiedad.setPropiedad(propiedad);
+
+				emplepropiedades.add(empleadopropiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return emplepropiedades;
+
+	}
+
+	
+	/**
+	 * Permite obtener las propiedades de correspondencia de un empleado por su id.
+	 * @param Long. idEmpleado.
+	 * @return List. EmpleadoPropiedad.
+	 * */
+	public List<EmpleadoPropiedad> obtenerPropiedadesDeCorrespondenciaPorIdEmpleado(Long idempleado) throws DatoException {
+		EmpleadoPropiedad empleadopropiedad = null;
+		List<EmpleadoPropiedad> emplepropiedades = new ArrayList<EmpleadoPropiedad>();
+		
+		try {
+
+			String consulta = "SELECT ep.idempleadopropiedad,ep.idempleado,"
+					        + "ep.idpropiedad,ep.dato,ep.observacion,ep.idprioridad,ep.idusuariocrea,ep.fechacrea, ep.idusuariomod, ep.fechamod, ep.estado,"
+							+ "p.idprioridad,p.nombreprioridad,"
+							+ "pr.idpropiedad,pr.nombrepropiedad "
+							+ "FROM rrhh.empleado_propiedad ep "
+							+ "INNER JOIN rrhh.prioridad p ON  p.idprioridad=ep.idprioridad "
+							+ "LEFT JOIN rrhh.propiedad pr ON  pr.idpropiedad=ep.idpropiedad "
+							+ "WHERE ep.idempleado=?"+" "
+							+ "AND ep.idpropiedad>"+this.limiteInferior+" and ep.idpropiedad<"+this.limiteSuperior;
+					
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+			ps.setLong(1, idempleado);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			
+			while (rs.next()) {
+				c = 1;
+				empleadopropiedad = new EmpleadoPropiedad();
+				empleadopropiedad.setIdempleadopropiedad(rs.getLong(c++));
+				empleadopropiedad.setIdempleado(rs.getLong(c++));
+				empleadopropiedad.setIdpropiedad(rs.getLong(c++));
+				empleadopropiedad.setDato(rs.getString(c++));
+				empleadopropiedad.setObservacion(rs.getString(c++));
+				empleadopropiedad.setIdprioridad(rs.getLong(c++));
+
+				empleadopropiedad.setIdusuariocrea(rs.getInt(c++));
+				empleadopropiedad.setFechacrea(rs.getTimestamp(c++));
+				empleadopropiedad.setIdusuariomod(rs.getInt(c++));
+				empleadopropiedad.setFechamod(rs.getTimestamp(c++));
+				empleadopropiedad.setEstado(rs.getInt(c++));
+				Prioridad prioridad = new Prioridad();
+				prioridad.setIdprioridad(rs.getLong(c++));
+				prioridad.setNombreprioridad(rs.getString(c++));
+				empleadopropiedad.setPrioridad(prioridad);
+
+				Propiedad propiedad = new Propiedad();
+				propiedad.setIdpropiedad(rs.getLong(c++));
+				propiedad.setNombrepropiedad(rs.getString(c++));
+				empleadopropiedad.setPropiedad(propiedad);
+
+				emplepropiedades.add(empleadopropiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return emplepropiedades;
+
+	}
+	
+	
+	public EmpleadoPropiedad getEmpeladoPropiedadesporid(
+			Long idempleadopropiedad) throws DatoException {
+		EmpleadoPropiedad empleadopropiedad = null;
+		// List<EmpleadoPropiedad> emplepropiedades=new
+		// ArrayList<EmpleadoPropiedad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select ep.idempleadopropiedad,ep.idempleado,");
+			q.append(" ep.idpropiedad,ep.dato,ep.observacion,ep.idprioridad,ep.idusuariocrea,ep.fechacrea, ep.idusuariomod, ep.fechamod, ep.estado, ");
+			q.append(" p.idprioridad,p.nombreprioridad,");
+			q.append(" pr.idpropiedad,pr.nombrepropiedad ");
+			q.append(" from rrhh.empleado_propiedad ep");
+			q.append(" inner join rrhh.prioridad p on  p.idprioridad=ep.idprioridad");
+			q.append(" left join rrhh.propiedad pr on  pr.idpropiedad=ep.idpropiedad");
+			q.append(" where  ep.idempleadopropiedad=?");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, idempleadopropiedad);
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleadopropiedad = new EmpleadoPropiedad();
+				empleadopropiedad.setIdempleadopropiedad(rs.getLong(c++));
+				empleadopropiedad.setIdempleado(rs.getLong(c++));
+				empleadopropiedad.setIdpropiedad(rs.getLong(c++));
+				empleadopropiedad.setDato(rs.getString(c++));
+				empleadopropiedad.setObservacion(rs.getString(c++));
+				empleadopropiedad.setIdprioridad(rs.getLong(c++));
+
+				empleadopropiedad.setIdusuariocrea(rs.getInt(c++));
+				empleadopropiedad.setFechacrea(rs.getTimestamp(c++));
+				empleadopropiedad.setIdusuariomod(rs.getInt(c++));
+				empleadopropiedad.setFechamod(rs.getTimestamp(c++));
+				empleadopropiedad.setEstado(rs.getInt(c++));
+				Prioridad prioridad = new Prioridad();
+				prioridad.setIdprioridad(rs.getLong(c++));
+				prioridad.setNombreprioridad(rs.getString(c++));
+				empleadopropiedad.setPrioridad(prioridad);
+
+				Propiedad propiedad = new Propiedad();
+				propiedad.setIdpropiedad(rs.getLong(c++));
+				propiedad.setNombrepropiedad(rs.getString(c++));
+				empleadopropiedad.setPropiedad(propiedad);
+
+				// emplepropiedades.add(empleadopropiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadopropiedad;
+
+	}
+
+	public List<Propiedad> getPropiedades() throws DatoException {
+		Propiedad propiedad = null;
+		List<Propiedad> propiedades = new ArrayList<Propiedad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select p.idpropiedad,p.nombrepropiedad,");
+			q.append(" p.idusuariocrea,p.fechacrea, p.idusuariomod, p.fechamod, p.estado ");
+			// q.append(" p.idprioridad,p.nombreprioridad,");
+			// q.append(" pr.idpropiedad,p.nombrepropiedad,");
+			q.append(" from rrhh.propiedad p where  p.estado=?");
+			// q.append(" left join rrhh.prioridad p on  p.idpiroridad=ep.idprioridad");
+			q.append(" order by p.nombrepropiedad asc");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				propiedad = new Propiedad();
+				propiedad.setIdpropiedad(rs.getLong(c++));
+				propiedad.setNombrepropiedad(rs.getString(c++));
+
+				propiedad.setIdusuariocrea(rs.getInt(c++));
+				propiedad.setFechacrea(rs.getTimestamp(c++));
+				propiedad.setIdusuariomod(rs.getInt(c++));
+				propiedad.setFechamod(rs.getTimestamp(c++));
+				propiedad.setEstado(rs.getInt(c++));
+				propiedades.add(propiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return propiedades;
+
+	}
+
+	
+	/**
+	 * Consultar las propiedades de Correspondencia. (Correo y Dirección)
+	 * */
+	public List<Propiedad> getPropiedadesDeCorrespondencia() throws DatoException {
+		Propiedad propiedad = null;
+		List<Propiedad> propiedades = new ArrayList<Propiedad>();
+		
+		try {
+
+			String consulta = "SELECT p.idpropiedad,p.nombrepropiedad,p.idusuariocrea,p.fechacrea, p.idusuariomod, p.fechamod, p.estado "
+							+ "FROM rrhh.propiedad p "
+							+ "WHERE  p.estado="+EstadoEnum.ACTIVO.getIndex()+" "
+							+ "AND p.idpropiedad>"+this.limiteInferior+" and p.idpropiedad<"+this.limiteSuperior+" "
+							+ "ORDER BY p.nombrepropiedad ASC";
+					
+			con = ds.getConnection();
+			ps = con.prepareStatement(consulta);
+			rs = ps.executeQuery();
+			int c = 1;
+			
+			while (rs.next()) {
+				c = 1;
+				propiedad = new Propiedad();
+				propiedad.setIdpropiedad(rs.getLong(c++));
+				propiedad.setNombrepropiedad(rs.getString(c++));
+
+				propiedad.setIdusuariocrea(rs.getInt(c++));
+				propiedad.setFechacrea(rs.getTimestamp(c++));
+				propiedad.setIdusuariomod(rs.getInt(c++));
+				propiedad.setFechamod(rs.getTimestamp(c++));
+				propiedad.setEstado(rs.getInt(c++));
+				propiedades.add(propiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return propiedades;
+
+	}
+	
+	
+	public Propiedad getPropiedadesporId(Long idpropiedad) throws DatoException {
+		Propiedad propiedad = null;
+		List<Propiedad> propiedades = new ArrayList<Propiedad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select p.idpropiedad,p.nombrepropiedad,");
+			q.append(" p.idusuariocrea,p.fechacrea, p.idusuariomod, p.fechamod, p.estado ");
+			// q.append(" p.idprioridad,p.nombreprioridad,");
+			// q.append(" pr.idpropiedad,p.nombrepropiedad,");
+			q.append(" from rrhh.propiedad p where  p.estado=? and p.idpropiedad=?");
+			// q.append(" left join rrhh.prioridad p on  p.idpiroridad=ep.idprioridad");
+			// q.append(" left join rrhh.propiedad pr on  pr.idpropiedad=pr.idpropiedad");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, idpropiedad);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				propiedad = new Propiedad();
+				propiedad.setIdpropiedad(rs.getLong(c++));
+				propiedad.setNombrepropiedad(rs.getString(c++));
+
+				propiedad.setIdusuariocrea(rs.getInt(c++));
+				propiedad.setFechacrea(rs.getTimestamp(c++));
+				propiedad.setIdusuariomod(rs.getInt(c++));
+				propiedad.setFechamod(rs.getTimestamp(c++));
+				propiedad.setEstado(rs.getInt(c++));
+				// propiedades.add(propiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return propiedad;
+
+	}
+
+	public Integer actualizarEstadoEmpleadoPropiedad(
+			EmpleadoPropiedad empleadopropiedad) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.empleado_propiedad set estado=?, idusuariomod=?, fechamod=getdate() where idempleadopropiedad=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+
+			ps.setInt(c++, empleadopropiedad.getEstado());
+			ps.setInt(c++, empleadopropiedad.getIdusuariomod());
+			ps.setLong(c++, empleadopropiedad.getIdempleadopropiedad());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	public List<Prioridad> getPrioridades() throws DatoException {
+		Prioridad prioridad = null;
+		List<Prioridad> prioridades = new ArrayList<Prioridad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select p.idprioridad,p.nombreprioridad,");
+			q.append(" p.idusuariocrea,p.fechacrea, p.idusuariomod, p.fechamod, p.estado ");
+			// q.append(" p.idprioridad,p.nombreprioridad,");
+			// q.append(" pr.idpropiedad,p.nombrepropiedad,");
+			q.append(" from rrhh.prioridad p where  p.estado=?");
+			// q.append(" left join rrhh.prioridad p on  p.idpiroridad=ep.idprioridad");
+			// q.append(" left join rrhh.propiedad pr on  pr.idpropiedad=pr.idpropiedad");
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				prioridad = new Prioridad();
+				prioridad.setIdprioridad(rs.getLong(c++));
+				prioridad.setNombreprioridad(rs.getString(c++));
+
+				prioridad.setIdusuariocrea(rs.getInt(c++));
+				prioridad.setFechacrea(rs.getTimestamp(c++));
+				prioridad.setIdusuariomod(rs.getInt(c++));
+				prioridad.setFechamod(rs.getTimestamp(c++));
+				prioridad.setEstado(rs.getInt(c++));
+				prioridades.add(prioridad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return prioridades;
+
+	}
+
+	public EmpleadoPropiedad insertarEmpleadoPropiedad(
+			EmpleadoPropiedad empleadopropiedad) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.empleado_propiedad (idpropiedad, idempleado,dato,observacion, ");
+			q.append("idprioridad, idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(),
+					Statement.RETURN_GENERATED_KEYS);
+			c = 1;
+
+			ps.setLong(c++, empleadopropiedad.getIdpropiedad());
+			ps.setLong(c++, empleadopropiedad.getIdempleado());
+			ps.setString(c++, empleadopropiedad.getDato());
+			if (empleadopropiedad.getObservacion() == null) {
+				ps.setNull(c++, java.sql.Types.NVARCHAR);
+			} else {
+				ps.setString(c++, empleadopropiedad.getObservacion());
+			}
+
+			ps.setLong(c++, empleadopropiedad.getIdprioridad());
+
+			ps.setInt(c++, empleadopropiedad.getIdusuariocrea());
+			ps.setInt(c++, empleadopropiedad.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				empleadopropiedad.setIdempleadopropiedad(rs.getLong(1));
+			} else {
+				throw new SQLException(
+						"Empleado, no se pudo generar su IDEmpleado.");
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadopropiedad;
+
+	}
+
+	public Integer editarEmpleadoPropiedad(EmpleadoPropiedad empleadopropiedad)
+			throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.empleado_propiedad set idpropiedad=?,dato=?,observacion=?,idprioridad=? ,estado=?, idusuariomod=?, fechamod=getdate() where idempleadopropiedad=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+
+			ps.setLong(c++, empleadopropiedad.getIdpropiedad());
+			ps.setString(c++, empleadopropiedad.getDato());
+
+			ps.setString(c++, empleadopropiedad.getObservacion());
+			ps.setLong(c++, empleadopropiedad.getIdprioridad());
+
+			ps.setInt(c++, empleadopropiedad.getEstado());
+			ps.setInt(c++, empleadopropiedad.getIdusuariomod());
+			ps.setLong(c++, empleadopropiedad.getIdempleadopropiedad());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return estatus;
+
+	}
+
+	public List<EmpleadoBean> buscarEmpleadosSinHorario(String fechahasta,String fechadesde,
+			List<String> idarea) throws DatoException {
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		Area area = new Area();
+		// Estado usuarioestado = null;
+//fechadesde=fechahasta;
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado, e.fotonombre,  ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo,");
+			q.append("a.idarea,a.nombrearea");
+			// q.append("it.abreviatura,it.tipo");
+			q.append(" from rrhh.empleado e  ");
+			q.append("   left join rrhh.contrato con on  e.idempleado= con.idempleado and con.idcontrato="
+					+ " (select top 1 c.idcontrato from rrhh.contrato c where c.idempleado=e.idempleado order by idcontrato desc )"
+					+ " and con.estado=2");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado   and ei.actual = 1");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+			q.append(" left join  rrhh.horarioasignado ha on ha.idempleado=e.idempleado ");
+			q.append(" left join  rrhh.area a on a.idarea=con.idareaasignada ");
+			// q.append(" where e.estado=? and e.idempleado=? ");
+			q.append(" where  e.estado=? and ei.actual=?  ");
+			q.append("   ");
+			String stringconcatenado = "", stringconcatenado1 = "";
+			if (idarea != null && idarea.size() > 0) {
+				int i = 1;
+				String var = "";
+				for (String idar : idarea) {
+
+					if (i == 1) {
+						var = " and (";
+					} else {
+						var = " or ";
+					}
+					stringconcatenado += var + " a.idarea ='"
+							+ Long.valueOf(idar) + "'";
+					stringconcatenado1 += var + " are.idarea ='"
+							+ Long.valueOf(idar) + "'";
+					i += 1;
+				}
+				q.append(stringconcatenado + " )");
+			}
+
+			q.append(" and e.idempleado not in ("
+					+ ""
+					+ " select idempleado  from ( "
+					+ " "
+		+"		   select convert(nvarchar(MAX),f.splitdata,103) as fecha,  ei.numeroidentificacion as identificacion, "
+		+"		   convert(nvarchar(MAX),f.splitdata,100) as fechahorarioinicio,"
+		+"		     convert(nvarchar(MAX),f.splitdata,100)  as fechahorarioini," 
+				+"     convert(nvarchar(MAX),f.splitdata2,100)  as fechahorariofin"
+				+"     , emp.nombres as nombres ,emp.apellidos as apellidos,are.nombrearea as nombrearea,car.cargo as cargo" 
+				+"   ,fa.idfrecuenciaasignacion as frecuencia "
+				+"   ,datepart(DW,f.splitdata)-1 as diasemana, "
+				+"   emp.idempleado "
+				+"     from rrhh.horarioasignado h " 
+				 +"    left join  rrhh.horario ho on h.idhorario=ho.idhorario "
+				 +"     left join  rrhh.frecuenciaasignacion fa on ho.idfrecuenciaasignacion=fa.idfrecuenciaasignacion"
+				  +"      inner join rrhh.empleado_identificacion ei on h.idempleado=ei.idempleado" 
+				   +"      inner join rrhh.empleado emp on ei.idempleado=emp.idempleado" 
+				  +"       inner join rrhh.identificaciontipo it on  it.ididentificaciontipo=ei.ididentificaciontipo"  
+				   +"      inner join rrhh.contrato con on emp.idempleado=con.idempleado and con.idcontrato= " 
+				    +"     (select top 1 c.idcontrato" 
+				    +"     from rrhh.contrato c where c.idempleado=emp.idempleado order by idcontrato desc )"
+				    +"      and con.estado=2 " 
+				    +" inner join rrhh.area are on con.idareaasignada=are.idarea"
+				    +" inner join rrhh.cargo car on car.idcargo=con.idcargo"
+				    +"  CROSS APPLY [dbo].F_SplitHorariosAsiganados (h.validezinicio,DATEADD(day,1,h.validezfin),ho.idfrecuenciaasignacion ) f "  
+				      
+				      
+				      
+
+	+	"  ");
+			q.append(" where ");
+			q.append(" h.estado='2'");
+			q.append(" and ei.actual='1'");
+			
+			q.append(" and f.splitdata >= convert(datetime,'"+fechadesde+"',103) "); 
+			
+			 String txtTo = Util.stringToString(fechahasta.trim(), "dd/MM/yyyy", "yyyyMMdd");
+			q.append(" and f.splitdata2 < convert(datetime,'" + Util.addDays("yyyyMMdd", txtTo, 1) + "',112) ");
+			
+			
+			
+			
+			
+			
+			
+			String stringconcatenado2 = "";
+			 if (idarea!= null  && idarea.size() > 0) {
+		        	int i=1;
+		        	String var="";
+		        	for(String idar:idarea){
+		        		
+		        		if(i==1){
+		        			var=" and (";
+		        		}else{
+		        			var=" or ";
+		        		}
+		        	
+		        		stringconcatenado2 += var+ " are.idarea ='"+ Long.valueOf(idar) +"' ";
+		 		       i+=1; 
+		        	}
+		        	 q.append(stringconcatenado2+")");
+		          }
+			
+			 q.append("   )as t   group by idempleado ");
+					
+
+			q.append(""
+
+			+ " ");
+			//q.append(stringconcatenado1 + " )");
+
+			q.append(" ) order by a.idarea desc  ");
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, ActualEnum.ACTUAL.getIndex());
+			// ps.setLong(2, idarea);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+				
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				area = new Area();
+				area.setIdarea(rs.getLong(c++));
+				area.setNombrearea(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+
+				empleados.add(empleado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+
+
+	public List<EmpleadoBean> buscarEmpleadosSinHorarioV2(String fechahasta,String fechadesde,
+			List<String> idarea, List<Long> empleadosconhorario) throws DatoException {
+		List<EmpleadoBean> empleados = new ArrayList<EmpleadoBean>();
+		EmpleadoBean empleado = null;
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		Area area = new Area();
+		// Estado usuarioestado = null;
+//fechadesde=fechahasta;
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select distinct e.idempleado, e.codempleado, e.idgenero, e.nombres,e.apellidos, ");
+			q.append("e.fechanacimiento,e.idusuariocrea,e.fechacrea,e.idusuariomod, e.fechamod, e.estado, e.fotonombre,  ");
+			q.append("g.nombregenero,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion, ");
+			q.append("it.abreviatura,it.tipo,");
+			q.append("a.idarea,a.nombrearea");
+			// q.append("it.abreviatura,it.tipo");
+			q.append(" from rrhh.empleado e  ");
+			q.append("   left join rrhh.contrato con on  e.idempleado= con.idempleado and con.idcontrato="
+					+ " (select top 1 c.idcontrato from rrhh.contrato c where c.idempleado=e.idempleado order by idcontrato desc )"
+					+ " and con.estado=2");
+			q.append(" left join rrhh.genero g on g.idgenero=e.idgenero ");
+			q.append(" left join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado   and ei.actual = 1");
+			q.append("  left join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo  ");
+			q.append(" left join  rrhh.horarioasignado ha on ha.idempleado=e.idempleado ");
+			q.append(" left join  rrhh.area a on a.idarea=con.idareaasignada ");
+			// q.append(" where e.estado=? and e.idempleado=? ");
+			q.append(" where  e.estado=? and ei.actual=?  ");
+			q.append("   ");
+			String stringconcatenado = "", stringconcatenado1 = "";
+			if (idarea != null && idarea.size() > 0) {
+				int i = 1;
+				String var = "";
+				for (String idar : idarea) {
+
+					if (i == 1) {
+						var = " and (";
+					} else {
+						var = " or ";
+					}
+					stringconcatenado += var + " a.idarea ='"
+							+ Long.valueOf(idar) + "'";
+					stringconcatenado1 += var + " are.idarea ='"
+							+ Long.valueOf(idar) + "'";
+					i += 1;
+				}
+				q.append(stringconcatenado + " )");
+			}
+
+			//q.append(" and e.idempleado ");
+					
+			
+			String stringidempleado="";
+			if (empleadosconhorario != null && empleadosconhorario.size() > 0) {
+				int i = 1;
+				String var = "";
+				for (Long idempleado : empleadosconhorario) {
+
+					
+						var = " and ";
+				
+						
+					stringidempleado += var + " e.idempleado !='"
+							+ Long.valueOf(idempleado) + "'";
+					i += 1;
+				}
+				q.append(stringidempleado + " ");
+			}
+		
+					
+
+			q.append(""
+
+			+ " ");
+			//q.append(stringconcatenado1 + " )");
+
+			q.append("  order by a.idarea desc  ");
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, EstadoEnum.ACTIVO.getIndex());
+			ps.setLong(2, ActualEnum.ACTUAL.getIndex());
+			// ps.setLong(2, idarea);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				empleado.setIdusuariocrea(rs.getInt(c++));
+				empleado.setFechacrea(rs.getTimestamp(c++));
+				empleado.setIdusuariomod(rs.getInt(c++));
+				empleado.setFechamod(rs.getTimestamp(c++));
+				empleado.setEstado(rs.getInt(c++));
+				empleado.setFotonombre(rs.getString(c++));
+				
+				genero.setNombregenero(rs.getString(c++));
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				area = new Area();
+				area.setIdarea(rs.getLong(c++));
+				area.setNombrearea(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				empleado.setUsuariohermes(usuario);
+
+				empleados.add(empleado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleados;
+
+	}
+
+	public List<DocumentoConfiguracion> getDocumentoConfiguracion(
+			Long iddocumentotipo) throws DatoException {
+		DocumentoConfiguracion docconfigurarion = null;
+		List<DocumentoConfiguracion> docconfigurariones = new ArrayList<DocumentoConfiguracion>();
+		// List<EmpleadoPropiedad> emplepropiedades=new
+		// ArrayList<EmpleadoPropiedad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select dc.iddocumentoconfiguracion,dc.iddocumentotipo,");
+			q.append(" dc.nombrecampo,dc.texto,dc.idusuariocrea,dc.fechacrea, dc.idusuariomod, dc.fechamod, dc.estado ");
+
+			q.append(" from rrhh.documento_configuracion dc");
+			// q.append(" inner join rrhh.prioridad p on  p.idprioridad=ep.idprioridad");
+			// q.append(" left join rrhh.propiedad pr on  pr.idpropiedad=ep.idpropiedad");
+			q.append(" where  dc.iddocumentotipo=?");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, iddocumentotipo);
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				docconfigurarion = new DocumentoConfiguracion();
+				docconfigurarion.setIddocumentoconfiguracion(rs.getLong(c++));
+				docconfigurarion.setIddocumentotipo(rs.getLong(c++));
+				docconfigurarion.setNombrecampo(rs.getString(c++));
+				docconfigurarion.setTexto(rs.getString(c++));
+
+				docconfigurarion.setIdusuariocrea(rs.getInt(c++));
+				docconfigurarion.setFechacrea(rs.getTimestamp(c++));
+				docconfigurarion.setIdusuariomod(rs.getInt(c++));
+				docconfigurarion.setFechamod(rs.getTimestamp(c++));
+				docconfigurarion.setEstado(rs.getInt(c++));
+
+				docconfigurariones.add(docconfigurarion);
+
+				// emplepropiedades.add(empleadopropiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return docconfigurariones;
+
+	}
+
+	public EmpleadoDocumentoGenerado insertarEmpleadoDocumentogenerado(
+			EmpleadoDocumentoGenerado empleadodocumentogenerado)
+			throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+
+		Util.registerConverters();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("insert rrhh.empleado_documento_generado (idempleado,iddocumentotipo,nombredocumento,nombreamostrar, ");
+			q.append("codigodeverificacion, idusuariocrea, fechacrea, estado)  ");
+			q.append("values (?,?,?,?,?,?,getdate(),?)");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString(),
+					Statement.RETURN_GENERATED_KEYS);
+			c = 1;
+
+			ps.setLong(c++, empleadodocumentogenerado.getIdempleado());
+			ps.setLong(c++, empleadodocumentogenerado.getIddocumentotipo());
+			ps.setString(c++, empleadodocumentogenerado.getNombredocumento());
+			ps.setString(c++, empleadodocumentogenerado.getNombreamostrar());
+			ps.setString(c++, empleadodocumentogenerado.getCodigoverificacion());
+
+			ps.setInt(c++, empleadodocumentogenerado.getIdusuariocrea());
+			ps.setInt(c++, empleadodocumentogenerado.getEstado());
+
+			estatus = estatus + ps.executeUpdate();
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				empleadodocumentogenerado.setIdempleadodocumentogenerado(rs
+						.getLong(1));
+			} else {
+				throw new SQLException(
+						"Empleado, no se pudo generar su IDEmpleado.");
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadodocumentogenerado;
+
+	}
+
+	public EmpleadoDocumentoGenerado actualizarEmpleadoDocumentoGenerado(
+			EmpleadoDocumentoGenerado empleadodocu) throws DatoException {
+		Integer estatus = 0;
+		int c = 1;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("update rrhh.empleado_documento_generado set nombredocumento=?, estado=?, ");
+
+			q.append(" idusuariomod=?, fechamod=getdate() where idempleadodocumento=? ");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			c = 1;
+			ps.setString(c++, empleadodocu.getNombredocumento());
+			ps.setInt(c++, empleadodocu.getEstado());
+
+			ps.setInt(c++, empleadodocu.getIdusuariomod());
+			// //paramateros where
+			ps.setLong(c++, empleadodocu.getIdempleadodocumentogenerado());
+
+			estatus = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadodocu;
+
+	}
+
+	public List<EmpleadoDocumentoGenerado> buscarCertificadosGenerados(
+			String desde, String hasta, String valor,
+			UsuarioTipoBusquedaEnum tipobusqueda) throws DatoException {
+		List<EmpleadoDocumentoGenerado> certificados = new ArrayList<EmpleadoDocumentoGenerado>();
+		EmpleadoDocumentoGenerado certificado = null;
+		EmpleadoBean empleado = new EmpleadoBean();
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		Estado usuarioestado = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select * from( ");
+			q.append("select  ed.idempleadodocumento, ed.idempleado, ed.iddocumentotipo, ed.nombredocumento,ed.nombreamostrar, ");
+			q.append("ed.codigodeverificacion,ed.codigocertificado,ed.idusuariocrea,ed.fechacrea,ed.idusuariomod, ed.fechamod, ed.estado,   ");
+			q.append("e.idempleado as empleadoid, e.codempleado, e.idgenero, e.nombres,e.apellidos,e.fechanacimiento,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion,");
+			q.append("it.abreviatura,it.tipo,(e.apellidos +' '+ e.nombres +' '+ e.apellidos) as nombreconcat");
+
+			q.append(" from rrhh.empleado_documento_generado ed  ");
+			q.append(" inner join rrhh.empleado e on e.idempleado=ed.idempleado ");
+			q.append(" inner join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  inner join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo and ei.actual=1 ");
+
+			// q.append(" left join  apps.hermes.sco.usuario hu on hu.codusuario=e.codempleado ");
+			q.append(" where ed.estado=2 ");
+			if (EmpleadoTipoBusquedaEnum.FECHA_CREACION.getIndex() == tipobusqueda
+					.getIndex()) {
+				q.append("and ed.fechacrea >= convert(datetime,'" + desde
+						+ "',112) ");
+				q.append("and ed.fechacrea < convert(datetime,'"
+						+ Util.addDays("yyyyMMdd", hasta, 1) + "',112) ");
+			} else if (EmpleadoTipoBusquedaEnum.NUMIDENTIFICACION.getIndex() == tipobusqueda
+					.getIndex()) {
+				q.append("and ei.numeroidentificacion like '" + valor + "' ");
+			} else if (EmpleadoTipoBusquedaEnum.CODUSUARIO.getIndex() == tipobusqueda
+					.getIndex()) {
+				q.append("and e.codempleado =  " + valor + " ");
+			} else if (EmpleadoTipoBusquedaEnum.USUARIO.getIndex() == tipobusqueda
+					.getIndex()) {
+				q.append("and hu.usuario like  '" + valor + "' ");
+			} else if (EmpleadoTipoBusquedaEnum.NUMEROCERTIFICADO.getIndex() == tipobusqueda
+					.getIndex()) {
+				q.append("and ed.codigocertificado like  '" + valor + "' ");
+			} else if (EmpleadoTipoBusquedaEnum.CODIGOVERIFICACION.getIndex() == tipobusqueda
+					.getIndex()) {
+				q.append("and ed.codigodeverificacion like  '" + valor + "' ");
+			}
+
+			// q.append("order by e.idempleado desc  ");
+			q.append(" ) as t ");
+			if (EmpleadoTipoBusquedaEnum.NOMBRE.getIndex() == tipobusqueda
+					.getIndex()) {
+				q.append("where  nombreconcat like '" + valor + "' ");
+			}
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			// ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				certificado = new EmpleadoDocumentoGenerado();
+				certificado.setIdempleadodocumentogenerado(rs.getLong(c++));
+				certificado.setIdempleado(rs.getLong(c++));
+				certificado.setIddocumentotipo(rs.getLong(c++));
+				certificado.setNombredocumento(rs.getString(c++));
+				certificado.setNombreamostrar(rs.getString(c++));
+				certificado.setCodigoverificacion(rs.getString(c++));
+				certificado.setCodigocertificado(rs.getString(c++));
+
+				certificado.setIdusuariocrea(rs.getInt(c++));
+				certificado.setFechacrea(rs.getTimestamp(c++));
+				certificado.setIdusuariomod(rs.getInt(c++));
+				certificado.setFechamod(rs.getTimestamp(c++));
+				certificado.setEstado(rs.getInt(c++));
+
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				certificado.setEmpleado(empleado);
+				certificados.add(certificado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return certificados;
+
+	}
+
+	public EmpleadoDocumentoGenerado buscarEmpleadoDocumentoGenerado(
+			Long idempleadodocumento) throws DatoException {
+		EmpleadoDocumentoGenerado empleadodocumento = null;
+		List<DocumentoConfiguracion> docconfigurariones = new ArrayList<DocumentoConfiguracion>();
+		// List<EmpleadoPropiedad> emplepropiedades=new
+		// ArrayList<EmpleadoPropiedad>();
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select ed.idempleadodocumento,ed.idempleado,");
+			q.append(" ed.iddocumentotipo,ed.nombredocumento,ed.nombreamostrar,ed.codigodeverificacion,ed.codigocertificado,ed.idusuariocrea,ed.fechacrea, ed.idusuariomod, ed.fechamod, ed.estado ");
+
+			q.append(" from rrhh.empleado_documento_generado ed");
+			// q.append(" inner join rrhh.prioridad p on  p.idprioridad=ep.idprioridad");
+			// q.append(" left join rrhh.propiedad pr on  pr.idpropiedad=ep.idpropiedad");
+			q.append(" where  ed.idempleadodocumento=?");
+
+			con = ds.getConnection();
+			ps = con.prepareStatement(q.toString());
+			ps.setLong(1, idempleadodocumento);
+			// ps.setLong(2, idpreguntasegura);
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				empleadodocumento = new EmpleadoDocumentoGenerado();
+				empleadodocumento.setIdempleadodocumentogenerado(rs
+						.getLong(c++));
+				empleadodocumento.setIdempleado(rs.getLong(c++));
+				empleadodocumento.setIddocumentotipo(rs.getLong(c++));
+				empleadodocumento.setNombredocumento(rs.getString(c++));
+				empleadodocumento.setNombreamostrar(rs.getString(c++));
+				empleadodocumento.setCodigoverificacion(rs.getString(c++));
+				empleadodocumento.setCodigocertificado(rs.getString(c++));
+
+				empleadodocumento.setIdusuariocrea(rs.getInt(c++));
+				empleadodocumento.setFechacrea(rs.getTimestamp(c++));
+				empleadodocumento.setIdusuariomod(rs.getInt(c++));
+				empleadodocumento.setFechamod(rs.getTimestamp(c++));
+				empleadodocumento.setEstado(rs.getInt(c++));
+
+				// docconfigurariones.add(docconfigurarion);
+
+				// emplepropiedades.add(empleadopropiedad);
+			}
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return empleadodocumento;
+
+	}
+
+	public List<EmpleadoDocumentoGenerado> buscarCertificadosGeneradosporEmpleado(
+			Long idempleado) throws DatoException {
+		List<EmpleadoDocumentoGenerado> certificados = new ArrayList<EmpleadoDocumentoGenerado>();
+		EmpleadoDocumentoGenerado certificado = null;
+		EmpleadoBean empleado = new EmpleadoBean();
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		Estado usuarioestado = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select * from( ");
+			q.append("select  ed.idempleadodocumento, ed.idempleado, ed.iddocumentotipo, ed.nombredocumento,ed.nombreamostrar, ");
+			q.append("ed.codigodeverificacion,ed.codigocertificado,ed.idusuariocrea,ed.fechacrea,ed.idusuariomod, ed.fechamod, ed.estado,   ");
+			q.append("e.idempleado as empleadoid, e.codempleado, e.idgenero, e.nombres,e.apellidos,e.fechanacimiento,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion,");
+			q.append("it.abreviatura,it.tipo,(e.apellidos +' '+ e.nombres +' '+ e.apellidos) as nombreconcat");
+
+			q.append(" from rrhh.empleado_documento_generado ed  ");
+			q.append(" inner join rrhh.empleado e on e.idempleado=ed.idempleado ");
+			q.append(" inner join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  inner join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo and ei.actual=1 ");
+
+			// q.append(" left join  apps.hermes.sco.usuario hu on hu.codusuario=e.codempleado ");
+			q.append(" where ed.estado=2 ");
+
+			// q.append("order by e.idempleado desc  ");
+			q.append(" ) as t ");
+
+			q.append("where  idempleado = " + idempleado
+					+ " order by idempleadodocumento desc ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			// ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				certificado = new EmpleadoDocumentoGenerado();
+				certificado.setIdempleadodocumentogenerado(rs.getLong(c++));
+				certificado.setIdempleado(rs.getLong(c++));
+				certificado.setIddocumentotipo(rs.getLong(c++));
+				certificado.setNombredocumento(rs.getString(c++));
+				certificado.setNombreamostrar(rs.getString(c++));
+				certificado.setCodigoverificacion(rs.getString(c++));
+				certificado.setCodigocertificado(rs.getString(c++));
+
+				certificado.setIdusuariocrea(rs.getInt(c++));
+				certificado.setFechacrea(rs.getTimestamp(c++));
+				certificado.setIdusuariomod(rs.getInt(c++));
+				certificado.setFechamod(rs.getTimestamp(c++));
+				certificado.setEstado(rs.getInt(c++));
+
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				certificado.setEmpleado(empleado);
+				certificados.add(certificado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return certificados;
+
+	}
+
+	
+	
+	public List<EmpleadoDocumentoGenerado> buscarCertificadosGeneradosporEmpleadoyfecha(
+			Long idempleado,Date fecha) throws DatoException {
+		List<EmpleadoDocumentoGenerado> certificados = new ArrayList<EmpleadoDocumentoGenerado>();
+		EmpleadoDocumentoGenerado certificado = null;
+		EmpleadoBean empleado = new EmpleadoBean();
+		Genero genero = null;
+		UsuarioBean usuario = null;
+		Estado usuarioestado = null;
+
+		try {
+
+			StringBuffer q = new StringBuffer();
+			q.append("select * from( ");
+			q.append("select  ed.idempleadodocumento, ed.idempleado, ed.iddocumentotipo, ed.nombredocumento,ed.nombreamostrar, ");
+			q.append("ed.codigodeverificacion,ed.codigocertificado,ed.idusuariocrea,ed.fechacrea,ed.idusuariomod, ed.fechamod, ed.estado,   ");
+			q.append("e.idempleado as empleadoid, e.codempleado, e.idgenero, e.nombres,e.apellidos,e.fechanacimiento,");
+			q.append("ei.numeroidentificacion,ei.ididentificaciontipo,ei.codigoidentificacion,ei.actual,ei.ciudadexpedicion,");
+			q.append("it.abreviatura,it.tipo,(e.apellidos +' '+ e.nombres +' '+ e.apellidos) as nombreconcat");
+
+			q.append(" from rrhh.empleado_documento_generado ed  ");
+			q.append(" inner join rrhh.empleado e on e.idempleado=ed.idempleado ");
+			q.append(" inner join  rrhh.empleado_identificacion  ei on ei.idempleado=e.idempleado ");
+			q.append("  inner join  rrhh.identificaciontipo it on it.ididentificaciontipo=ei.ididentificaciontipo and ei.actual=1 ");
+
+			// q.append(" left join  apps.hermes.sco.usuario hu on hu.codusuario=e.codempleado ");
+			q.append(" where ed.estado=2 ");
+
+			// q.append("order by e.idempleado desc  ");
+			q.append(" ) as t ");
+
+			q.append("where  idempleado = " + idempleado
+					+ " and month(convert(date,fechacrea,112))=month(convert(date,'"+Util.dateToString(fecha,"yyyyMMdd") +"',112))"  
+					+ " order by idempleadodocumento desc ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			// ps.setInt(1, EstadoEnum.ACTIVO.getIndex());
+
+			rs = ps.executeQuery();
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+				certificado = new EmpleadoDocumentoGenerado();
+				certificado.setIdempleadodocumentogenerado(rs.getLong(c++));
+				certificado.setIdempleado(rs.getLong(c++));
+				certificado.setIddocumentotipo(rs.getLong(c++));
+				certificado.setNombredocumento(rs.getString(c++));
+				certificado.setNombreamostrar(rs.getString(c++));
+				certificado.setCodigoverificacion(rs.getString(c++));
+				certificado.setCodigocertificado(rs.getString(c++));
+
+				certificado.setIdusuariocrea(rs.getInt(c++));
+				certificado.setFechacrea(rs.getTimestamp(c++));
+				certificado.setIdusuariomod(rs.getInt(c++));
+				certificado.setFechamod(rs.getTimestamp(c++));
+				certificado.setEstado(rs.getInt(c++));
+
+				empleado = new EmpleadoBean();
+				empleado.setIdempleado(rs.getLong(c++));
+				empleado.setCodempleado(rs.getString(c++));
+				empleado.setIdgenero(rs.getLong(c++));
+				genero = new Genero();
+				genero.setIdgenero(empleado.getIdgenero());
+				empleado.setNombres(rs.getString(c++));
+				empleado.setApellidos(rs.getString(c++));
+				empleado.setFechanacimiento(rs.getTimestamp(c++));
+
+				EmpleadoIdentificacion empleadoidentificacion = new EmpleadoIdentificacion();
+				empleadoidentificacion.setNumeroidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setIdidentificaciontipo(rs.getLong(c++));
+				empleadoidentificacion.setCodigoidentificacion(rs
+						.getString(c++));
+				empleadoidentificacion.setActual(rs.getInt(c++));
+				empleadoidentificacion.setCiudadexpedicion(rs.getString(c++));
+
+				IdentificacionTipo identificaiontipo = new IdentificacionTipo();
+				identificaiontipo.setAbreviatura(rs.getString(c++));
+				identificaiontipo.setTipo(rs.getString(c++));
+				// usuario=new UsuarioBean();
+				// usuario.setIdusuario(rs.getInt(c++));
+				// usuario.setNombre(rs.getString(c++));
+				// usuario.setUsuario(rs.getString(c++));
+				empleado.setEmpleadoidentificacion(empleadoidentificacion);
+				empleado.setIdentificaciontipo(identificaiontipo);
+				empleado.setGenero(genero);
+				certificado.setEmpleado(empleado);
+				certificados.add(certificado);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return certificados;
+
+	}
+}

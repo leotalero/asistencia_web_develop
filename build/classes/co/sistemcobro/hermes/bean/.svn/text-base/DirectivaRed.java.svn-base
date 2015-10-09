@@ -1,0 +1,143 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class DirectivaRed implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private Integer iddirectivared;
+	
+	private String nombre;
+	private String descripcion;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	
+
+	private List<Red> redes;
+
+
+
+	public Integer getIddirectivared() {
+		return iddirectivared;
+	}
+
+
+
+	public void setIddirectivared(Integer iddirectivared) {
+		this.iddirectivared = iddirectivared;
+	}
+
+
+
+	public String getNombre() {
+		return nombre;
+	}
+
+
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+
+
+
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+
+
+	public List<Red> getRedes() {
+		return redes;
+	}
+
+
+
+	public void setRedes(List<Red> redes) {
+		this.redes = redes;
+	}
+
+	
+
+}

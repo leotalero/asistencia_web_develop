@@ -1,0 +1,306 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class UsuarioBean implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private Integer idusuario;
+	private Integer idsucursal;
+	private Integer iddirectivacontrasena;
+	private Integer codusuario;
+	private String codigoidentificacion;
+	private Long ididentificaciontipo;
+	private String numidentificacion;
+	private String nombre;
+
+	private Integer claveCambio;
+
+	@Deprecated
+	private Integer usuarioaltitude;
+
+	private String clave;
+	private String usuario;
+
+	private Integer extensionaltitude;
+	private Integer extensionxlite;
+
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	// private GrupoBean grupo;
+
+	private DirectivaContrasena directivacontrasena;
+	private UsuarioAplicacionBean usuarioaplicacion;
+	private UsuarioCuenta usuariocuenta;
+	private Sucursal sucursal;
+	private Estado estadob;
+	private UsuarioIni usuarioini;
+	private IdentificacionTipo identificaciontipo;
+
+	private List<UsuarioAplicacionBean> usuarioaplicaciones;
+	private List<UsuarioCuenta> usuariocuentas;
+	private List<ContrasenaHistorial> contrasenahistoriales;
+
+	public UsuarioBean() {
+	}
+
+	public Integer getClaveCambio() {
+		return claveCambio;
+	}
+
+	public void setClaveCambio(Integer claveCambio) {
+		this.claveCambio = claveCambio;
+	}
+
+	public UsuarioCuenta getUsuariocuenta() {
+		return usuariocuenta;
+	}
+
+	public void setUsuariocuenta(UsuarioCuenta usuariocuenta) {
+		this.usuariocuenta = usuariocuenta;
+	}
+
+	public List<UsuarioCuenta> getUsuariocuentas() {
+		return usuariocuentas;
+	}
+
+	public void setUsuariocuentas(List<UsuarioCuenta> usuariocuentas) {
+		this.usuariocuentas = usuariocuentas;
+	}
+
+	public Integer getIdsucursal() {
+		return idsucursal;
+	}
+
+	public void setIdsucursal(Integer idsucursal) {
+		this.idsucursal = idsucursal;
+	}
+
+	public Sucursal getSucursal() {
+		return sucursal;
+	}
+
+	public void setSucursal(Sucursal sucursal) {
+		this.sucursal = sucursal;
+	}
+
+	public Integer getExtensionaltitude() {
+		return extensionaltitude;
+	}
+
+	public void setExtensionaltitude(Integer extensionaltitude) {
+		this.extensionaltitude = extensionaltitude;
+	}
+
+	public Integer getExtensionxlite() {
+		return extensionxlite;
+	}
+
+	public void setExtensionxlite(Integer extensionxlite) {
+		this.extensionxlite = extensionxlite;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public List<UsuarioAplicacionBean> getUsuarioaplicaciones() {
+		return usuarioaplicaciones;
+	}
+
+	public void setUsuarioaplicaciones(List<UsuarioAplicacionBean> usuarioaplicaciones) {
+		this.usuarioaplicaciones = usuarioaplicaciones;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public String getNumidentificacion() {
+		return numidentificacion;
+	}
+
+	public void setNumidentificacion(String numidentificacion) {
+		this.numidentificacion = numidentificacion;
+	}
+
+	public UsuarioAplicacionBean getUsuarioaplicacion() {
+		return usuarioaplicacion;
+	}
+
+	public void setUsuarioaplicacion(UsuarioAplicacionBean usuarioaplicacion) {
+		this.usuarioaplicacion = usuarioaplicacion;
+	}
+
+	public UsuarioBean(Integer codusuario) {
+		this.codusuario = codusuario;
+	}
+
+	public String getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
+
+	public Integer getIdusuario() {
+		return idusuario;
+	}
+
+	public void setIdusuario(Integer idusuario) {
+		this.idusuario = idusuario;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	@Deprecated
+	public Integer getUsuarioaltitude() {
+		return usuarioaltitude;
+	}
+
+	@Deprecated
+	public void setUsuarioaltitude(Integer usuarioaltitude) {
+		this.usuarioaltitude = usuarioaltitude;
+	}
+
+	public String getClave() {
+		return clave;
+	}
+
+	public void setClave(String clave) {
+		this.clave = clave;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public Integer getCodusuario() {
+		return codusuario;
+	}
+
+	public void setCodusuario(Integer codusuario) {
+		this.codusuario = codusuario;
+	}
+
+	public Estado getEstadob() {
+		return estadob;
+	}
+
+	public void setEstadob(Estado estadob) {
+		this.estadob = estadob;
+	}
+
+	public Integer getIddirectivacontrasena() {
+		return iddirectivacontrasena;
+	}
+
+	public void setIddirectivacontrasena(Integer iddirectivacontrasena) {
+		this.iddirectivacontrasena = iddirectivacontrasena;
+	}
+
+	public DirectivaContrasena getDirectivacontrasena() {
+		return directivacontrasena;
+	}
+
+	public void setDirectivacontrasena(DirectivaContrasena directivacontrasena) {
+		this.directivacontrasena = directivacontrasena;
+	}
+
+	public List<ContrasenaHistorial> getContrasenahistoriales() {
+		return contrasenahistoriales;
+	}
+
+	public void setContrasenahistoriales(List<ContrasenaHistorial> contrasenahistoriales) {
+		this.contrasenahistoriales = contrasenahistoriales;
+	}	
+
+	public UsuarioIni getUsuarioini() {
+		return usuarioini;
+	}
+
+	public void setUsuarioini(UsuarioIni usuarioini) {
+		this.usuarioini = usuarioini;
+	}
+
+	
+	public Long getIdidentificaciontipo() {
+		return ididentificaciontipo;
+	}
+
+	public void setIdidentificaciontipo(Long ididentificaciontipo) {
+		this.ididentificaciontipo = ididentificaciontipo;
+	}
+
+	
+	public IdentificacionTipo getIdentificaciontipo() {
+		return identificaciontipo;
+	}
+
+	public void setIdentificaciontipo(IdentificacionTipo identificaciontipo) {
+		this.identificaciontipo = identificaciontipo;
+	}
+
+	
+	
+	public String getCodigoidentificacion() {
+		return codigoidentificacion;
+	}
+
+	public void setCodigoidentificacion(String codigoidentificacion) {
+		this.codigoidentificacion = codigoidentificacion;
+	}
+
+	
+
+	@Override
+	public String toString() {
+		return "UsuarioBean [idusuario=" + idusuario + ", nombre=" + nombre + ", usuariolatitude=" + usuarioaltitude + ", clave=" + clave + ", usuario=" + usuario + ", estado=" + estado + "]";
+	}
+
+}

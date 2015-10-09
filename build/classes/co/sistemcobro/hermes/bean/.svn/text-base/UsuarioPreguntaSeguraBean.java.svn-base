@@ -1,0 +1,157 @@
+package co.sistemcobro.hermes.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Leonardo Talero 
+ */
+public class UsuarioPreguntaSeguraBean implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private Long idusuariopreguntasegura;
+	private Long idusuario;
+	private Long idpreguntasegura;
+	private String respuesta;
+	
+
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	private PreguntasSeguraBean pregunta;
+
+	public UsuarioPreguntaSeguraBean() {
+	}
+
+
+	
+
+	public Long getIdusuariopreguntasegura() {
+		return idusuariopreguntasegura;
+	}
+
+
+
+
+	public void setIdusuariopreguntasegura(Long idusuariopreguntasegura) {
+		this.idusuariopreguntasegura = idusuariopreguntasegura;
+	}
+
+
+
+
+	public Long getIdusuario() {
+		return idusuario;
+	}
+
+
+
+
+	public void setIdusuario(Long idusuario) {
+		this.idusuario = idusuario;
+	}
+
+
+
+
+	public Long getIdpreguntasegura() {
+		return idpreguntasegura;
+	}
+
+
+
+
+	public void setIdpreguntasegura(Long idpreguntasegura) {
+		this.idpreguntasegura = idpreguntasegura;
+	}
+
+
+
+
+	public String getRespuesta() {
+		return respuesta;
+	}
+
+
+
+
+	public void setRespuesta(String respuesta) {
+		this.respuesta = respuesta;
+	}
+
+
+
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+
+
+
+	public PreguntasSeguraBean getPregunta() {
+		return pregunta;
+	}
+
+
+
+
+	public void setPregunta(PreguntasSeguraBean pregunta) {
+		this.pregunta = pregunta;
+	}
+
+
+	/*@Override
+	public String toString() {
+		return "UsuarioBean [idusuario=" + idusuario + ", nombre=" + nombre + ", usuariolatitude=" + usuarioaltitude + ", clave=" + clave + ", usuario=" + usuario + ", estado=" + estado + "]";
+	}*/
+
+}

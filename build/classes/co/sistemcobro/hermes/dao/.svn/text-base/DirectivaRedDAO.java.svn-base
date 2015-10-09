@@ -1,0 +1,125 @@
+package co.sistemcobro.hermes.dao;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.hermes.bean.DirectivaRed;
+import co.sistemcobro.hermes.bean.Red;
+
+/**
+ * 
+ * @author Leonardo Talero
+ * 
+ * 
+ */
+public class DirectivaRedDAO extends BaseDAO {
+
+	@SuppressWarnings("unused")
+	private Logger logger = Logger.getLogger(DirectivaRedDAO.class);
+
+	public DirectivaRedDAO(DataSource ds) {
+		this.ds = ds;
+	}
+
+	public DirectivaRed getDirectivaRedporId(Integer iddirectivadered) throws DatoException {
+
+		DirectivaRed directivared = null;
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("select d.iddirectivared, d.nombre, d.descripcion, d.idusuariocrea, d.fechacrea, d.idusuariomod, d.fechamod, d.estado ");
+			q.append("from hermes.directiva_red d   ");
+			//q.append("inner join hermes.directiva_acceso da on da.iddirectivaacceso = a.iddirectivaacceso  ");
+			q.append("where d.iddirectivared = ? ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, iddirectivadered);
+			rs = ps.executeQuery();
+
+			int c = 1;
+			if (rs.next()) {
+				c = 1;
+
+				directivared = new DirectivaRed();
+				directivared.setIddirectivared(rs.getInt(c++));
+				directivared.setNombre(rs.getString(c++));
+				directivared.setDescripcion(rs.getString(c++));
+				
+
+				directivared.setIdusuariocrea(rs.getInt(c++));
+				directivared.setFechacrea(rs.getTimestamp(c++));
+				directivared.setIdusuariomod(rs.getInt(c++));
+				directivared.setFechamod(rs.getTimestamp(c++));
+				directivared.setEstado(rs.getInt(c++));
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return directivared;
+
+	}
+
+	public List<Red> getRedpporIdDirectiva(Integer iddirectivadered) throws DatoException {
+
+		Red red = null;
+		List<Red> redes=new ArrayList<Red>();
+		try {
+
+			StringBuilder q = new StringBuilder();
+			q.append("select r.idred, r.iddirectivared, r.ip, r.descripcion, r.idusuariocrea,r.fechacrea, r.idusuariomod, r.fechamod, r.estado ");
+			q.append("from hermes.red r   ");
+			//q.append("inner join hermes.directiva_acceso da on da.iddirectivaacceso = a.iddirectivaacceso  ");
+			q.append("where r.iddirectivared = ? ");
+
+			con = ds.getConnection();
+
+			ps = con.prepareStatement(q.toString());
+			ps.setInt(1, iddirectivadered);
+			rs = ps.executeQuery();
+
+			int c = 1;
+			while (rs.next()) {
+				c = 1;
+
+				red = new Red();
+				red.setIdred(rs.getInt(c++));
+				red.setIddirectivared(rs.getInt(c++));
+				red.setIp(rs.getString(c++));
+				red.setDescripcion(rs.getString(c++));
+				
+
+				red.setIdusuariocrea(rs.getInt(c++));
+				red.setFechacrea(rs.getTimestamp(c++));
+				red.setIdusuariomod(rs.getInt(c++));
+				red.setFechamod(rs.getTimestamp(c++));
+				red.setEstado(rs.getInt(c++));
+				redes.add(red);
+			}
+
+		} catch (SQLException e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new DatoException(e.toString(), e.getCause());
+		} finally {
+			closeConexion();
+		}
+		return redes;
+
+	}
+	
+	
+
+}

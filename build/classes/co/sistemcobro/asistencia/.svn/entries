@@ -1,0 +1,43 @@
+10
+
+dir
+3401
+http://172.16.1.60/repositorio/trunk/Comun/Desarrollo/sistemcobro_ejb/ejbModule/co/sistemcobro/asistencia
+http://172.16.1.60/repositorio
+
+
+
+2015-05-19T19:51:05.157605Z
+3267
+gtalero
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+c5c58736-11ae-4ad1-b608-4b15e0b7ecd6
+
+bean
+dir
+
+constante
+dir
+
+dao
+dir
+
+ejb
+dir
+
+util
+dir
+

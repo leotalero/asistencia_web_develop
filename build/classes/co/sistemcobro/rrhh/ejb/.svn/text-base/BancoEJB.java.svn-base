@@ -1,0 +1,166 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.Banco;
+import co.sistemcobro.rrhh.bean.EmpleadoBanco;
+import co.sistemcobro.rrhh.dao.BancoDAO;
+
+/**
+ * Session Bean implementation class BancoEJB
+ * @author jpuentes
+ */
+@Stateless
+public class BancoEJB extends BaseEJB{
+
+    /**
+     * Default constructor. 
+     */
+    public BancoEJB() {
+    }
+
+    
+    /**
+     * Obtener la lista de bancos.
+     * @return List<Banco>
+     */
+    public List<Banco> obtenerListaDeBancos() throws LogicaException{
+    	
+    	List<Banco> listaDeBancos;
+		
+    	try {
+			BancoDAO bancoDAO = new BancoDAO(dc_rrhh);
+			listaDeBancos = bancoDAO.getBancos();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeBancos;    	
+    }
+    
+    /**
+     * Insertar un nuevo EmpleadoBanco.
+     * @param EmpleadoBanco. La relación de empleado con banco.
+     */
+    public EmpleadoBanco insertarEmpleadoBanco(EmpleadoBanco empleadoBanco) throws LogicaException{
+    	
+    	EmpleadoBanco resultado = null;
+    	try{
+    		BancoDAO bancoDAO = new BancoDAO(dg_rrhh);
+    		resultado=bancoDAO.insertarEmpleadoBanco(empleadoBanco);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    
+    /**
+     * Obtener informacion de bancos de un empleado.
+     * @param idempleado. El id del empleado. 
+     */
+    public List<EmpleadoBanco> buscarEmpleadoBancoPorIdEmpleado(Long idempleado)throws LogicaException{
+    	
+    	List<EmpleadoBanco> listaEmpleadoBanco =  new ArrayList<EmpleadoBanco>();
+    	
+    	try {
+			BancoDAO bancoDAO = new BancoDAO(dc_rrhh);
+			listaEmpleadoBanco = bancoDAO.obtenerBancosDeEmpleadoPorId(idempleado);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	
+    	return listaEmpleadoBanco;
+    }
+    
+    
+    /**
+     * Deshabilitar un empleado banco.
+     * @param EmpleadoBanco. la relacion EmpleadoBanco.
+     */
+    public Integer deshabilitarEmpleadoBanco(EmpleadoBanco empleadobanco) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			BancoDAO bancoDAO = new BancoDAO(dg_rrhh);
+			empleadobanco.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resultado = bancoDAO.actualizarEstadoEmpleadoBanco(empleadobanco);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    
+    /**
+     * Habilitar un empleado banco.
+     * @param EmpleadoBanco. la relacion EmpleadoBanco.
+     * @return Integer. El numero de filas afectadas.
+     */
+    public Integer habilitarEmpleadoBanco(EmpleadoBanco empleadobanco) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			BancoDAO bancoDAO = new BancoDAO(dg_rrhh);
+			empleadobanco.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resultado = bancoDAO.actualizarEstadoEmpleadoBanco(empleadobanco);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    
+    /**
+     * Obtener un EmpleadoBanco por IdEmpleadoBanco.
+     * @param idempleadobanco.
+     * @return EmpeladoBanco.
+     */
+    public EmpleadoBanco obtenerEmpleadoBancoPorId(Long idEmpleadoBanco) throws DatoException, LogicaException {
+    	EmpleadoBanco empleadoBanco = null;
+    	try{
+    		BancoDAO bancoDAO = new BancoDAO(dc_rrhh);
+    		empleadoBanco = bancoDAO.obtenerEmpleadoBancoPorId(idEmpleadoBanco);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return empleadoBanco;
+    }
+    
+    /**
+     * Editar un EmpleadoBanco.
+     * @param EmpleadoBanco. El empleadoBanco a editar.
+     * @return Integer. El numero de filas afectadas.
+     */
+	public Integer editarEmpleadoBanco(EmpleadoBanco empleadoBanco) throws DatoException, LogicaException {
+		
+			Integer resultado=null;
+			
+			try {
+				BancoDAO bancoDAO = new BancoDAO(dg_rrhh);
+				resultado = bancoDAO.editarEmpleadoBanco(empleadoBanco);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return resultado;
+		}
+    
+}

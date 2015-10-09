@@ -1,0 +1,104 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jony Hurtado
+ * 
+ */
+public class EmpleadoIdentificacion implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idempleado;
+
+	private Long ididentificaciontipo;
+	private String codigoidentificacion;
+	private String numeroidentificacion;
+	private String ciudadexpedicion;
+	private Integer actual;
+	
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	
+	public String getCodigoidentificacion() {
+		return codigoidentificacion;
+	}
+	public void setCodigoidentificacion(String codigoidentificacion) {
+		this.codigoidentificacion = codigoidentificacion;
+	}
+	public Long getIdempleado() {
+		return idempleado;
+	}
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+	public Long getIdidentificaciontipo() {
+		return ididentificaciontipo;
+	}
+	public void setIdidentificaciontipo(Long ididentificaciontipo) {
+		this.ididentificaciontipo = ididentificaciontipo;
+	}
+	public String getNumeroidentificacion() {
+		return numeroidentificacion;
+	}
+	public void setNumeroidentificacion(String numeroidentificacion) {
+		this.numeroidentificacion = numeroidentificacion;
+	}
+	public String getCiudadexpedicion() {
+		return ciudadexpedicion;
+	}
+	public void setCiudadexpedicion(String ciudadexpedicion) {
+		this.ciudadexpedicion = ciudadexpedicion;
+	}
+	public Integer getActual() {
+		return actual;
+	}
+	public void setActual(Integer actual) {
+		this.actual = actual;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	
+	
+	
+	
+	
+
+	
+
+
+}

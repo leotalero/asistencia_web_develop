@@ -1,0 +1,112 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+
+
+/**
+ * 
+ * @author Leonardo Talero
+ * 
+ */
+public class EmpleadoDesvinculacion implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private EmpleadoBean empleado;
+	private Contrato contrato;
+private List<ContratoProceso> valores;
+private EstadoDesvinculacion estadodesvinculacion;
+private List<Proceso> procesos;
+
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+
+	
+	
+	
+	
+	
+	
+	
+	public List<Proceso> getProcesos() {
+		return procesos;
+	}
+	public void setProcesos(List<Proceso> procesos) {
+		this.procesos = procesos;
+	}
+	public EstadoDesvinculacion getEstadodesvinculacion() {
+	return estadodesvinculacion;
+}
+public void setEstadodesvinculacion(EstadoDesvinculacion estadodesvinculacion) {
+	this.estadodesvinculacion = estadodesvinculacion;
+}
+	
+	
+
+
+	public List<ContratoProceso> getValores() {
+	return valores;
+}
+public void setValores(List<ContratoProceso> valores) {
+	this.valores = valores;
+}
+	public EmpleadoBean getEmpleado() {
+		return empleado;
+	}
+	public void setEmpleado(EmpleadoBean empleado) {
+		this.empleado = empleado;
+	}
+	public Contrato getContrato() {
+		return contrato;
+	}
+	public void setContrato(Contrato contrato) {
+		this.contrato = contrato;
+	}
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+	public Integer getEstado() {
+		return estado;
+	}
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+	
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+
+
+	
+	
+	//@Override
+	//public String toString() {
+	//	return "UsuarioBean [idusuario=" + idusuario + ", nombre=" + nombre + ", usuariolatitude=" + usuarioaltitude + ", clave=" + clave + ", usuario=" + usuario + ", estado=" + estado + "]";
+	//}
+
+}

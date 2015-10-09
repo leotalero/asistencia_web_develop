@@ -1,0 +1,121 @@
+package co.sistemcobro.rrhh.bean;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+/**
+ * 
+ * @author Jhon Puentes
+ * 
+ */
+public class EmpleadoBanco implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Long idempleadobanco;
+
+	private Long idempleado;
+	private Long idbanco;
+	private String numerocuenta;
+	private Timestamp vigentedesde;
+
+	private Integer idusuariocrea;
+	private Timestamp fechacrea;
+	private Integer idusuariomod;
+	private Timestamp fechamod;
+	private Integer estado;
+	
+	private Banco banco;
+	
+	
+	public Timestamp getVigentedesde() {
+		return vigentedesde;
+	}
+
+	public void setVigentedesde(Timestamp vigentedesde) {
+		this.vigentedesde = vigentedesde;
+	}
+
+	public Long getIdempleadobanco() {
+		return idempleadobanco;
+	}
+
+	public void setIdempleadobanco(Long idempleadobanco) {
+		this.idempleadobanco = idempleadobanco;
+	}
+
+	public Long getIdempleado() {
+		return idempleado;
+	}
+
+	public void setIdempleado(Long idempleado) {
+		this.idempleado = idempleado;
+	}
+
+	public Long getIdbanco() {
+		return idbanco;
+	}
+
+	public void setIdbanco(Long idbanco) {
+		this.idbanco = idbanco;
+	}
+
+	public String getNumerocuenta() {
+		return numerocuenta;
+	}
+
+	public void setNumerocuenta(String numerocuenta) {
+		this.numerocuenta = numerocuenta;
+	}
+
+	public Integer getIdusuariocrea() {
+		return idusuariocrea;
+	}
+
+	public void setIdusuariocrea(Integer idusuariocrea) {
+		this.idusuariocrea = idusuariocrea;
+	}
+
+	public Timestamp getFechacrea() {
+		return fechacrea;
+	}
+
+	public void setFechacrea(Timestamp fechacrea) {
+		this.fechacrea = fechacrea;
+	}
+
+	public Integer getIdusuariomod() {
+		return idusuariomod;
+	}
+
+	public void setIdusuariomod(Integer idusuariomod) {
+		this.idusuariomod = idusuariomod;
+	}
+
+	public Timestamp getFechamod() {
+		return fechamod;
+	}
+
+	public void setFechamod(Timestamp fechamod) {
+		this.fechamod = fechamod;
+	}
+
+	public Integer getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Integer estado) {
+		this.estado = estado;
+	}
+
+	public Banco getBanco() {
+		return banco;
+	}
+
+	public void setBanco(Banco banco) {
+		this.banco = banco;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+}

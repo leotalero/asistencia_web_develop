@@ -1,0 +1,44 @@
+package co.sistemcobro.hermes.constante;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum UsuarioTipoBusquedaEnum {
+	FECHA_CREACION(1), NOMBRE(2), NUMIDENTIFICACION(3), USUARIO(4), CODUSUARIO(
+			5), APLICACION(6), GRUPO(7), CUENTA(8) , NUMEROCERTIFICADO(9), CODIGOVERIFICACION(10);
+
+	public static final Map<Integer, UsuarioTipoBusquedaEnum> mapByID = new HashMap<Integer, UsuarioTipoBusquedaEnum>();
+	public static final Map<String, UsuarioTipoBusquedaEnum> mapByNAME = new HashMap<String, UsuarioTipoBusquedaEnum>();
+
+	static {
+		for (UsuarioTipoBusquedaEnum s : EnumSet
+				.allOf(UsuarioTipoBusquedaEnum.class)) {
+			mapByID.put(s.getIndex(), s);
+			mapByNAME.put(s.name(), s);
+		}
+	}
+
+	private int index;
+
+	UsuarioTipoBusquedaEnum(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getIndexString() {
+		return String.valueOf(index);
+	}
+
+	public static UsuarioTipoBusquedaEnum get(int id) {
+		return mapByID.get(id);
+	}
+
+	public static UsuarioTipoBusquedaEnum get(String name) {
+		return mapByNAME.get(name);
+	}
+
+}

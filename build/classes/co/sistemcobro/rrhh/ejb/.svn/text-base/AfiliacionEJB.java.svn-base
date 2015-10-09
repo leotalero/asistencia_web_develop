@@ -1,0 +1,235 @@
+package co.sistemcobro.rrhh.ejb;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+
+import co.sistemcobro.all.constante.EstadoEnum;
+import co.sistemcobro.all.exception.DatoException;
+import co.sistemcobro.all.exception.LogicaException;
+import co.sistemcobro.rrhh.bean.AfiliacionEntidad;
+import co.sistemcobro.rrhh.bean.AfiliacionTipo;
+import co.sistemcobro.rrhh.bean.EmpleadoAfiliacion;
+import co.sistemcobro.rrhh.dao.AfiliacionDAO;
+
+
+/**
+ * Gestion de datos de Afiliaciones de los empleados.
+ * @author jpuentes
+ */
+
+@Stateless
+public class AfiliacionEJB extends BaseEJB{
+
+	//private final static Logger log = Logger.getLogger(AfiliacionEJB.class.getName());
+//	private Logger log = Logger.getLogger(DesvinculacionEJB.class);
+	
+    /**
+     * Constructor. 
+     */
+    public AfiliacionEJB() {
+    }
+    
+    /**
+     * Consulta el listado de afiliaciones de un empleado.
+     * @param Long. idempleado.
+     * @return List. EmpleadoAfiliacion.
+     */
+    public List<EmpleadoAfiliacion> obtenerAfiliacionesDeEmpleadoPorIdEmpleado(Long idEmpleado) throws DatoException, LogicaException{
+  
+    	List<EmpleadoAfiliacion> listaDeEmpleadoAfiliacion = new ArrayList<EmpleadoAfiliacion>();
+    	try {
+    		AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dc_rrhh);
+    		listaDeEmpleadoAfiliacion = afiliacionDAO.obtenerAfiliacionesDeEmpleadoPorIdEmpleado(idEmpleado);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeEmpleadoAfiliacion;  
+    }
+    
+    
+    /**
+     * Consulta los tipos de afiliación.
+     * @return List. AfiliacionTipo.
+     */
+    public List<AfiliacionTipo> obtenerTiposDeAfiliacion() throws DatoException, LogicaException{
+    	
+    	List<AfiliacionTipo> listaDeTipoDeAfiliacion = new ArrayList<AfiliacionTipo>();
+    	
+    	try {
+    		AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dc_rrhh);
+    		listaDeTipoDeAfiliacion = afiliacionDAO.obtenerTiposDeAfiliacion();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeTipoDeAfiliacion;  
+    }
+    
+    
+    /**
+     * Consulta la lista de entidades de afiliación.
+     * @return List. AfiliacionEntidad.
+     */
+    public List<AfiliacionEntidad> obtenerEntidadesDeAfiliacion() throws DatoException, LogicaException{
+    	
+    	List<AfiliacionEntidad> listaDeEntidadesDeAfiliacion = new ArrayList<AfiliacionEntidad>();
+    	
+    	try {
+    		AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dc_rrhh);
+    		listaDeEntidadesDeAfiliacion = afiliacionDAO.obtenerEntidadesDeAfiliacion();
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaDeEntidadesDeAfiliacion;  
+    }
+
+    /**
+     * Método para insertar una nueva afiliación.
+     * @param EmpleadoAfiliacion. La relación a insertar.
+     * @return EmpleadoAfiliacion. La relación insertada.
+     */
+    public EmpleadoAfiliacion insertarNuevaAfiliacion(EmpleadoAfiliacion empleadoAfiliacion) throws DatoException, LogicaException{
+    	EmpleadoAfiliacion resultado = null;
+    	try{
+    		AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dg_rrhh); 
+    		resultado = afiliacionDAO.insertarEmpleadoAfiliacion(empleadoAfiliacion);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return resultado;
+    }
+    
+    /**
+     * Deshabilitar un empleado afiliacion.
+     * @param EmpleadoAfiliacion. la relacion EmpleadoAfiliacion.
+     * @return Integer. El número de filas afectadas.
+     */
+    public Integer deshabilitarEmpleadoAfiliacion(EmpleadoAfiliacion empleadoAfiliacion) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dg_rrhh);
+			empleadoAfiliacion.setEstado(EstadoEnum.DESHABILITADO.getIndex());
+			resultado = afiliacionDAO.actualizarEstadoEmpleadoAfiliacion(empleadoAfiliacion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+
+    /**
+     * Habilitar un empleado afiliacion.
+     * @param EmpleadoAfiliacion. la relacion EmpleadoAfiliacion.
+     * @return Integer. El número de filas afectadas.
+     */
+    public Integer habilitarEmpleadoAfiliacion(EmpleadoAfiliacion empleadoAfiliacion) throws DatoException, LogicaException {
+		Integer resultado;
+		try {
+			AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dg_rrhh);
+			empleadoAfiliacion.setEstado(EstadoEnum.ACTIVO.getIndex());
+			resultado = afiliacionDAO.actualizarEstadoEmpleadoAfiliacion(empleadoAfiliacion);
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return resultado;	
+	}
+    
+    
+    
+    /**
+     * Obtener un EmpleadoAfiliacion por IdEmpleadoAfiliacion.
+     * @param idempleadoafiliacion.
+     * @return EmpeladoAfiliacion.
+     */
+    public EmpleadoAfiliacion obtenerEmpleadoAfiliacionPorId(Long idEmpleadoAfiliacion) throws DatoException, LogicaException {
+    	EmpleadoAfiliacion empleadoAfiliacion = null;
+    	try{
+    		AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dc_rrhh);
+    		empleadoAfiliacion = afiliacionDAO.obtenerEmpleadoAfiliacionPorId(idEmpleadoAfiliacion);
+    	}catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+    	return empleadoAfiliacion;
+    }
+    
+    
+    /**
+     * Editar un EmpleadoAfiliacion.
+     * @param EmpleadoAfiliacion. El empleadoAfiliacion a editar.
+     * @return Integer. El numero de filas afectadas.
+     */
+	public Integer editarEmpleadoAfiliacion(EmpleadoAfiliacion empleadoAfiliacion) throws DatoException, LogicaException {
+		
+			Integer resultado=null;
+			
+			try {
+				AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dg_rrhh);
+				resultado = afiliacionDAO.editarEmpleadoAfiliacion(empleadoAfiliacion);
+			} catch (DatoException e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			} catch (Exception e) {
+				throw new LogicaException(e.toString(), e.getCause());
+			}
+			return resultado;
+	}
+	
+	/**
+	 * Este método retorna la lista de entidades de afiliación por tipo de afiliacion.
+	 * @param Long. el idafiliaciontipo.
+	 * @return List. La lista de entidades filtrada por tipo de afiliación.
+	 */
+	public List<AfiliacionEntidad> getEntidadesPorTipoAfiliacion(Long idafiliaciontipo) throws DatoException, LogicaException {
+		
+		List<AfiliacionEntidad> listaEntidades = new ArrayList<AfiliacionEntidad>();
+		
+		try {
+			AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dc_rrhh);
+			listaEntidades = afiliacionDAO.getEntidadesPorAfiliacionTipo(idafiliaciontipo);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return listaEntidades;
+		
+	}
+    
+	
+	/**
+	 * Consulta el id del tipo de afiliacion que tiene un empleado_afiliacion.
+	 * @param idempleadoafiliacion.
+	 * @return Long. El id del tipo de afiliacion.
+	 */
+	public Long getIdAfiliacionTipoPorEmpleadoAfiliacion(Long idempleadoafiliacion) throws DatoException, LogicaException {
+		Long id=null;
+		try {
+			AfiliacionDAO afiliacionDAO = new AfiliacionDAO(dc_rrhh);
+			id = afiliacionDAO.getIdAfiliacionTipoPorEmpleadoAfiliacion(idempleadoafiliacion);
+			
+		} catch (DatoException e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		} catch (Exception e) {
+			throw new LogicaException(e.toString(), e.getCause());
+		}
+		return id;
+		
+	}
+	
+}
